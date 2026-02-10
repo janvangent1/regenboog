@@ -1,0 +1,8 @@
+# Python dependencies voor Regenboog Spellen Launcher
+# tkinter is meestal al geïnstalleerd met Python, maar hier voor de volledigheid
+
+# Geen externe dependencies nodig - tkinter is standaard in Python
+# Als tkinter ontbreekt op jouw systeem, installeer het via je package manager:
+# - Windows: tkinter komt met Python
+# - Linux: sudo apt-get install python3-tk (Debian/Ubuntu)
+# - macOS: tkinter komt met Python

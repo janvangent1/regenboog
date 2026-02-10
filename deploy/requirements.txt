@@ -1,0 +1,2 @@
+# For the Regenboog Pi Deployer GUI (install in venv: pip install -r requirements.txt)
+paramiko>=3.0.0

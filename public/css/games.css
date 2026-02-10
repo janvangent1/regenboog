@@ -1,0 +1,1508 @@
+/* Game pages – zelfde Regenboog-look, responsive */
+.game-container {
+  max-width: 820px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .game-container {
+    padding: 0.75rem;
+  }
+  .game-header h1 {
+    font-size: 1rem;
+  }
+  .game-area {
+    min-height: 260px;
+    padding: 1rem;
+  }
+  .game-nav a,
+  .game-nav button {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.95rem;
+  }
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(
+    90deg,
+    var(--rainbow-1) 0%,
+    var(--rainbow-2) 20%,
+    var(--rainbow-3) 40%,
+    var(--rainbow-4) 60%,
+    var(--rainbow-5) 80%,
+    var(--rainbow-6) 100%
+  );
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 4px 12px var(--shadow);
+  position: relative;
+}
+
+.game-header::before {
+  content: 'De Regenboog';
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
+  font-size: 0.75rem;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+.game-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
+.game-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.game-nav a,
+.game-nav button {
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  text-decoration: none;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.game-nav a:hover,
+.game-nav button:hover {
+  background: rgba(255,255,255,0.95);
+  color: var(--rainbow-5);
+  border-color: white;
+}
+
+.game-area {
+  flex: 1;
+  background: var(--card);
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  padding: 1.25rem;
+  min-height: 300px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.game-score {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rainbow-5);
+}
+
+.leaderboard-box {
+  margin-top: 1.25rem;
+  padding: 1.25rem;
+  background: linear-gradient(180deg, #f8f6f2 0%, #f0ede8 100%);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.leaderboard-box h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--rainbow-5);
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 0.4rem 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.leaderboard-table th {
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.submit-score-form {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.submit-score-form input {
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  min-width: 160px;
+}
+
+.submit-score-form input:focus {
+  outline: none;
+  border-color: var(--rainbow-4);
+}
+
+.submit-score-form button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5));
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.submit-score-form button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(92, 184, 92, 0.35);
+}
+
+/* Muizen – memory cards with cheese images */
+.muizen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 100px;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.muizen-card.memory-card {
+  min-height: 100px;
+  height: 100px;
+  font-size: 2rem;
+  font-weight: 700;
+  border: 2px solid var(--rainbow-5);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f8f6f2 0%, #f0ede8 100%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.muizen-card.memory-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+.muizen-card.memory-card.flipped {
+  background: #fff;
+  border-color: var(--rainbow-4);
+}
+
+.muizen-card.memory-card.flipped svg {
+  width: 72px;
+  height: 72px;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Grote knoppen voor touch/tablet (responsive) */
+.game-btn,
+.btn-next-round {
+  margin-top: 12px;
+  padding: 0.85rem 1.5rem;
+  min-height: 48px;
+  background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-next-round:hover,
+.game-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(92, 184, 92, 0.35);
+}
+
+/* Dolfijnen – Sprong Volgorde: water strip + jumping dolphin */
+.dolfijnen-water {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 140px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(180deg, #b8d4e8 0%, #7eb8da 40%, #5a9fc9 100%);
+  border-radius: 16px;
+  border: 3px solid #4a8bb8;
+  box-shadow: inset 0 2px 8px rgba(255,255,255,0.4);
+}
+
+.dolfijnen-zone {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0.5rem;
+}
+
+.dolfijnen-zone span {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(0,0,0,0.35);
+  text-transform: capitalize;
+}
+
+.dolfijnen-dolphin {
+  position: absolute;
+  top: 50%;
+  width: 72px;
+  height: 72px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.35s ease-out;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.dolfijnen-dolphin.dolfijn-sprong {
+  animation: dolfijn-sprong 0.45s ease-out;
+}
+
+@keyframes dolfijn-sprong {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  45% { transform: translate(-50%, -50%) scale(1.15) translateY(-18px); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.dolfijnen-dolphin .dolfijn-sprite {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+.dolfijnen-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.dolfijnen-buttons .dolphin-btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #457b9d;
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.dolfijnen-buttons .dolphin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(69, 123, 157, 0.35);
+}
+
+/* Lieveheersbeestjes – Stippen Tellen: duidelijke tekening met echte stippen */
+.lieveheersbeestje-vraag {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.lieveheersbeestje-visual {
+  width: 100%;
+  max-width: 220px;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  background: linear-gradient(180deg, #f5f5dc 0%, #eee8c8 100%);
+  border-radius: 16px;
+  border: 2px solid #d4c88a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.lieveheersbeestje-picture {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+.lieveheersbeestje-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.lieveheersbeestje-btn {
+  padding: 14px 28px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 2px solid #c41e3a;
+  background: linear-gradient(180deg, #fff0f0 0%, #ffd6d6 100%);
+  color: #8b1530;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.lieveheersbeestje-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+}
+
+/* Vossen – Hol Zoeken: responsive grid + toetsenbord */
+.vossen-grid-wrap {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  width: 100%;
+  max-width: min(420px, 95vw);
+  aspect-ratio: 8 / 6;
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f5deb3;
+  outline: none;
+}
+
+.vossen-grid-wrap:focus {
+  box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.4);
+}
+
+.vossen-cell {
+  border: 1px solid #ddb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+}
+
+.vossen-cell.vossen-wall {
+  background: #8b4513;
+  border-color: #6b3410;
+}
+
+.vossen-fox,
+.vossen-fox-emoji {
+  width: 85%;
+  height: 85%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.vossen-fox-emoji {
+  font-size: min(8vw, 2rem);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vossen-hole {
+  font-size: min(8vw, 2rem);
+  line-height: 1;
+}
+
+.vossen-hint {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+/* Draken – Vuur Bollen: draak schiet op doelen */
+.draken-score {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.draken-arena {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  max-width: 480px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 50%, #e0f4e8 100%);
+  border-radius: 16px;
+  border: 2px solid #5a9fb8;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(255,255,255,0.3);
+}
+
+.draken-dragon {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 64px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.draken-dragon-sprite {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));
+}
+
+.draken-vuur {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  margin-top: -14px;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff9800 40%, #e65100 100%);
+  box-shadow: 0 0 12px #ff9800, 0 0 4px #ff5722;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  transition: opacity 0.05s;
+}
+
+.draken-vuur-vlieg {
+  opacity: 1;
+  transition: left 0.35s ease-out, top 0.35s ease-out, transform 0.2s;
+}
+
+.draken-targets {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.draken-targets > * {
+  pointer-events: auto;
+}
+
+.draken-target {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: linear-gradient(145deg, #ffccbc 0%, #ff8a65 50%, #ff5722 100%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.draken-target:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.draken-target-getroffen {
+  pointer-events: none;
+  animation: draken-pop 0.25s ease-out forwards;
+  opacity: 0;
+  transform: scale(1.5);
+}
+
+@keyframes draken-pop {
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+.draken-hint {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-soft);
+}
+
+/* Beren – Honing Verzamelen: doolhofgrid met beer en honing */
+.beren-instruction {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.beren-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  width: 100%;
+  max-width: min(280px, 85vw);
+  aspect-ratio: 1;
+  gap: 4px;
+  margin: 1rem 0;
+  padding: 8px;
+  background: linear-gradient(180deg, #e8dcc4 0%, #d4c4a0 100%);
+  border-radius: 12px;
+  border: 2px solid #8b7355;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.beren-cell {
+  min-height: 0;
+  min-width: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5eed8;
+  border: 2px solid #c4b896;
+}
+
+.beren-cell.beren-start {
+  background: linear-gradient(180deg, #d4e4c4 0%, #b8d4a8 100%);
+  border-color: #7a9e6a;
+}
+
+.beren-cell.beren-honey {
+  background: linear-gradient(180deg, #fff8dc 0%, #ffe4b5 100%);
+  border-color: #c9a227;
+}
+
+.beren-cell.beren-wall {
+  background: #6b5344;
+  border-color: #4a3728;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.beren-bear {
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
+}
+
+.beren-bear-emoji {
+  font-size: min(12vw, 2.5rem);
+  line-height: 1;
+}
+
+.beren-honey-icon {
+  font-size: min(12vw, 2.5rem);
+  line-height: 1;
+}
+
+.beren-sequence {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.beren-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.beren-dir-btn,
+.beren-clear-btn {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 2px solid #2a9d8f;
+  background: linear-gradient(180deg, #e8f8f5 0%, #d0ede8 100%);
+  color: #1d6b5c;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.beren-dir-btn:hover,
+.beren-clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(42, 157, 143, 0.3);
+}
+
+.beren-clear-btn {
+  border-color: #8b7355;
+  background: linear-gradient(180deg, #f5f0e8 0%, #e8e0d4 100%);
+  color: #5c4a3a;
+}
+
+.beren-run {
+  padding: 10px 24px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #2a9d8f;
+  background: linear-gradient(180deg, #2a9d8f 0%, #238276 100%);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.beren-run:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(42, 157, 143, 0.4);
+}
+
+.beren-again {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #8b7355;
+  background: linear-gradient(180deg, #d4c4a0 0%, #c4b490 100%);
+  color: #3e3228;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Leeuwen – Jacht Planning: doolhofgrid met leeuw en prooi */
+.leeuwen-instruction {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.leeuwen-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  width: 100%;
+  max-width: min(280px, 85vw);
+  aspect-ratio: 1;
+  gap: 4px;
+  margin: 1rem 0;
+  padding: 8px;
+  background: linear-gradient(180deg, #e8dcb4 0%, #d4c494 100%);
+  border-radius: 12px;
+  border: 2px solid #b8860b;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.leeuwen-cell {
+  min-height: 0;
+  min-width: 0;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5ecd8;
+  border: 2px solid #c4b078;
+}
+
+.leeuwen-cell.leeuwen-start {
+  background: linear-gradient(180deg, #e8d4a0 0%, #d4b870 100%);
+  border-color: #b8860b;
+}
+
+.leeuwen-cell.leeuwen-prooi {
+  background: linear-gradient(180deg, #e8e0c8 0%, #d8d0b0 100%);
+  border-color: #8b7355;
+}
+
+.leeuwen-cell.leeuwen-wall {
+  background: #5c4a3a;
+  border-color: #3e3228;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.leeuwen-lion {
+  width: 75%;
+  height: 75%;
+  object-fit: contain;
+}
+
+.leeuwen-lion-emoji {
+  font-size: min(10vw, 2rem);
+  line-height: 1;
+}
+
+.leeuwen-prooi-icon {
+  font-size: min(10vw, 2rem);
+  line-height: 1;
+}
+
+.leeuwen-sequence {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.leeuwen-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.leeuwen-dir-btn,
+.leeuwen-clear-btn {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 2px solid #b8860b;
+  background: linear-gradient(180deg, #fff8e8 0%, #f0e6c8 100%);
+  color: #6b5410;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.leeuwen-dir-btn:hover,
+.leeuwen-clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+}
+
+.leeuwen-clear-btn {
+  border-color: #8b7355;
+  background: linear-gradient(180deg, #f5f0e8 0%, #e8e0d4 100%);
+  color: #5c4a3a;
+}
+
+.leeuwen-run {
+  padding: 10px 24px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #b8860b;
+  background: linear-gradient(180deg, #b8860b 0%, #9a7009 100%);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.leeuwen-run:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.4);
+}
+
+.leeuwen-again {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #8b7355;
+  background: linear-gradient(180deg, #d4c494 0%, #c4b484 100%);
+  color: #3e3228;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Vlinders – Vlinder vliegt naar de bloem */
+.vlinders-instruction {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.vlinders-arena {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%);
+  border-radius: 16px;
+  border: 2px solid #81c784;
+  box-shadow: inset 0 0 40px rgba(255,255,255,0.4);
+}
+
+.vlinders-butterfly {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  left: 50%;
+  bottom: 24px;
+  margin-left: -24px;
+  margin-top: -24px;
+  transition: left 0.5s ease-out, top 0.5s ease-out;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.vlinders-butterfly.vlinders-vlieg {
+  transition: left 0.5s ease-out, top 0.5s ease-out;
+}
+
+.vlinders-sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+.vlinders-emoji-fallback {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
+}
+
+.vlinders-flowers {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 1rem;
+}
+
+.vlinders-flower {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  padding: 12px;
+  border: 3px solid var(--flower-color, #81c784);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff 0%, #f1f8e9 100%);
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.vlinders-flower:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.vlinders-flower-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+/* Panda's – Bamboe Labyrint: doolhofgrid met panda en bamboe */
+.pandas-instruction {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.pandas-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  width: 100%;
+  max-width: min(300px, 90vw);
+  aspect-ratio: 1;
+  gap: 3px;
+  margin: 1rem 0;
+  padding: 6px;
+  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 50%, #81c784 100%);
+  border-radius: 12px;
+  border: 2px solid #2e7d32;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.pandas-cell {
+  min-height: 0;
+  min-width: 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+}
+
+.pandas-cell.pandas-start {
+  background: linear-gradient(180deg, #fff8e1 0%, #fff3e0 100%);
+  border-color: #5d4037;
+}
+
+.pandas-cell.pandas-bamboo {
+  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-color: #2e7d32;
+}
+
+.pandas-cell.pandas-wall {
+  background: #4e342e;
+  border-color: #3e2723;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.pandas-panda {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.pandas-panda-emoji {
+  font-size: min(8vw, 1.8rem);
+  line-height: 1;
+}
+
+.pandas-bamboo-icon {
+  font-size: min(8vw, 1.8rem);
+  line-height: 1;
+}
+
+.pandas-sequence {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pandas-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.pandas-dir-btn,
+.pandas-clear-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #1b5e20;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pandas-dir-btn:hover,
+.pandas-clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+}
+
+.pandas-clear-btn {
+  border-color: #5d4037;
+  background: linear-gradient(180deg, #efebe9 0%, #d7ccc8 100%);
+  color: #4e342e;
+}
+
+.pandas-run {
+  padding: 10px 24px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #2e7d32;
+  background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pandas-run:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+}
+
+.pandas-again {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #5d4037;
+  background: linear-gradient(180deg, #a5d6a7 0%, #81c784 100%);
+  color: #1b5e20;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Zebra's – Patroon Logica (5e leerjaar, 10-11 jaar) */
+.zebras-instruction {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.zebras-sequence {
+  font-size: 1.2rem;
+  margin: 0.75rem 0;
+  color: var(--text);
+}
+
+.zebras-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.zebras-btn {
+  padding: 12px 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #333;
+  background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
+  color: #222;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.zebras-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Giraffen – Hoge Bladeren (5e leerjaar, 10-11 jaar): doolhof 6x6 */
+.giraffen-instruction {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.giraffen-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  width: 100%;
+  max-width: min(280px, 88vw);
+  aspect-ratio: 1;
+  gap: 3px;
+  margin: 1rem 0;
+  padding: 6px;
+  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-radius: 12px;
+  border: 2px solid #2e7d32;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.giraffen-cell {
+  min-height: 0;
+  min-width: 0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+}
+
+.giraffen-cell.giraffen-start {
+  background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
+  border-color: #7cb342;
+}
+
+.giraffen-cell.giraffen-leaf {
+  background: linear-gradient(180deg, #dcedc8 0%, #c5e1a5 100%);
+  border-color: #558b2f;
+}
+
+.giraffen-cell.giraffen-wall {
+  background: #5d4037;
+  border-color: #3e2723;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.giraffen-giraf {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.giraffen-emoji-fallback {
+  font-size: min(7vw, 1.6rem);
+  line-height: 1;
+}
+
+.giraffen-leaf-icon {
+  font-size: min(7vw, 1.6rem);
+  line-height: 1;
+}
+
+.giraffen-sequence {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.giraffen-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+}
+
+.giraffen-dir-btn,
+.giraffen-clear-btn {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 2px solid #7cb342;
+  background: linear-gradient(180deg, #f1f8e9 0%, #dcedc8 100%);
+  color: #33691e;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.giraffen-clear-btn {
+  border-color: #5d4037;
+  background: #efebe9;
+  color: #4e342e;
+}
+
+.giraffen-run {
+  padding: 10px 24px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #7cb342;
+  background: linear-gradient(180deg, #7cb342 0%, #558b2f 100%);
+  color: white;
+  cursor: pointer;
+}
+
+.giraffen-again {
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #5d4037;
+  background: linear-gradient(180deg, #c5e1a5 0%, #a5d6a7 100%);
+  color: #1b5e20;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Zwaluwen – Vang de vliegjes: reactiespel */
+.zwaluwen-instruction {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.zwaluwen-arena {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1rem;
+  background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 40%, #e0f4ff 100%);
+  border-radius: 16px;
+  border: 2px solid #5a9fb8;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(255,255,255,0.3);
+}
+
+.zwaluwen-bird {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.zwaluwen-sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+.zwaluwen-emoji-fallback {
+  font-size: 2rem;
+  line-height: 1;
+  display: block;
+}
+
+.zwaluwen-bugs {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.zwaluwen-bugs > * {
+  pointer-events: auto;
+}
+
+.zwaluwen-bug {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  margin-top: -22px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.15s, opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: zwaluwen-bug-appear 0.2s ease-out;
+}
+
+@keyframes zwaluwen-bug-appear {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.zwaluwen-bug:hover {
+  transform: scale(1.15);
+  background: rgba(255,255,255,0.95);
+}
+
+.zwaluwen-bug.zwaluwen-caught {
+  animation: zwaluwen-caught 0.15s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes zwaluwen-caught {
+  to { transform: scale(0); opacity: 0; }
+}
+
+.zwaluwen-bug.zwaluwen-missed {
+  opacity: 0.4;
+  animation: zwaluwen-missed 0.3s ease-out forwards;
+}
+
+@keyframes zwaluwen-missed {
+  to { transform: scale(1.2); opacity: 0; }
+}
+
+.zwaluwen-hud {
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c5282;
+  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+}
+
+.zwaluwen-again {
+  margin-top: 1rem;
+  padding: 10px 24px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #5a9fb8;
+  background: linear-gradient(180deg, #87ceeb 0%, #6bb6d6 100%);
+  color: #1a365d;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Kangoeroes – Spring naar het getal: pad met stenen en springende kangoeroe */
+.kangoeroe-vraag {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.kangoeroe-pad {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 120px;
+  padding: 8px 4px 0;
+  margin-top: 0.5rem;
+  background: linear-gradient(180deg, #e8f5e0 0%, #c8e6c9 50%, #a5d6a7 100%);
+  border-radius: 16px;
+  border: 2px solid #81c784;
+  box-shadow: inset 0 2px 8px rgba(255,255,255,0.5);
+}
+
+.kangoeroe-steen {
+  flex: 1;
+  min-width: 44px;
+  max-width: 56px;
+  height: 52px;
+  padding: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #2e7d32;
+  background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
+  border: 2px solid #ffb74d;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+.kangoeroe-steen:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+.kangoeroe-steen.kangoeroe-goed {
+  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%);
+  border-color: #4caf50;
+  color: #1b5e20;
+}
+
+.kangoeroe-steen.kangoeroe-fout {
+  animation: kangoeroe-shake 0.4s ease;
+  border-color: #e57373;
+  background: #ffebee;
+}
+
+@keyframes kangoeroe-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.kangoeroe-figuur {
+  position: absolute;
+  bottom: 58px;
+  left: 12px;
+  width: 56px;
+  height: 56px;
+  transition: left 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.kangoeroe-figuur.kangoeroe-spring {
+  animation: kangoeroe-bounce 0.5s ease-out;
+}
+
+@keyframes kangoeroe-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-24px) scale(1.08); }
+  70% { transform: translateY(-8px) scale(1.02); }
+}
+
+.kangoeroe-figuur .kangoeroe-sprite {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+}
+
+/* Pinguins – shake animatie voor slechte items */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.pinguins-bad-item {
+  animation: none;
+}
+
+/* Eenden – animaties voor positie wisselen */
+@keyframes duck-wobble {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-5px) rotate(-3deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-5px) rotate(3deg); }
+}
+
+@keyframes duck-fade-out {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.3; transform: scale(0.95); }
+}
+
+@keyframes duck-fade-in {
+  0% { opacity: 0.3; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.eenden-shuffling {
+  animation: duck-wobble 0.5s ease-in-out;
+}
+
+.eenden-fade-out {
+  animation: duck-fade-out 0.3s ease-out forwards;
+}
+
+.eenden-fade-in {
+  animation: duck-fade-in 0.3s ease-in forwards;
+}
+
+/* Uilen – memory game animations */
+@keyframes uilen-success {
+  0% {
+    transform: scale(1) rotateY(180deg);
+  }
+  50% {
+    transform: scale(1.2) rotateY(180deg);
+    box-shadow: 0 0 20px rgba(106, 76, 147, 0.6);
+  }
+  100% {
+    transform: scale(1) rotateY(180deg);
+    box-shadow: 0 0 10px rgba(106, 76, 147, 0.3);
+  }
+}
+
+@keyframes uilen-shake {
+  0%, 100% {
+    transform: translateX(0) rotateY(180deg);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px) rotateY(180deg);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px) rotateY(180deg);
+  }
+}
+
+.uilen-match {
+  background: #d4edda !important;
+  border-color: #28a745 !important;
+  opacity: 0.8;
+}
+
+.uilen-grid button.flipped {
+  background: #fff;
+  border-color: #6a4c93;
+}
