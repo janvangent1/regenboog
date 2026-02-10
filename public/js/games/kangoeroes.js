@@ -19,6 +19,33 @@
     return document.getElementById('kangoeroe-figuur');
   }
 
+  function getKangoeroeWrapper() {
+    return area.querySelector('.kangoeroe-figuur-wrapper');
+  }
+
+  // Zelfde geluiden als in andere spellen (uilen, dolfijnen)
+  function playSound(frequency, duration, type) {
+    try {
+      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      var oscillator = audioContext.createOscillator();
+      var gainNode = audioContext.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.frequency.value = frequency;
+      oscillator.type = type || 'sine';
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    } catch (e) {}
+  }
+  function playCorrectSound() {
+    playSound(600, 0.2, 'sine');
+  }
+  function playWrongSound() {
+    playSound(200, 0.3, 'sawtooth');
+  }
+
   function calculateLiveScore() {
     if (startTime === 0) {
       // Return base score if timer hasn't started yet
@@ -139,21 +166,22 @@
 
   function jumpToStone(targetIndex, onDone) {
     var el = getKangoeroeEl();
-    if (!el) {
-        if (onDone) onDone();
-        return;
+    var wrapper = getKangoeroeWrapper();
+    if (!el || !wrapper) {
+      if (onDone) onDone();
+      return;
     }
     el.classList.add('kangoeroe-spring');
     var stones = area.querySelectorAll('.kangoeroe-steen');
     var targetStone = stones[targetIndex];
     if (!targetStone) {
-        if (onDone) onDone();
-        return;
+      el.classList.remove('kangoeroe-spring');
+      if (onDone) onDone();
+      return;
     }
     var rect = targetStone.getBoundingClientRect();
-    var container = area.querySelector('.kangoeroe-pad');
-    var containerRect = container.getBoundingClientRect();
-    var left = rect.left - containerRect.left + rect.width / 2 - 28;
+    var wrapperRect = wrapper.getBoundingClientRect();
+    var left = rect.left - wrapperRect.left + rect.width / 2 - 28;
     el.style.left = left + 'px';
     setTimeout(function () {
       el.classList.remove('kangoeroe-spring');
@@ -172,24 +200,27 @@
     
     area.innerHTML =
       window.RegenboogCore.createHUD(CLASS_ID, round, TOTAL_ROUNDS, false, true) +
-      '<p class="kangoeroe-vraag" style="font-size: 1.3rem; margin-bottom: 1.5rem;">Ronde ' + round + '/' + TOTAL_ROUNDS + ' – Som ' + (questionInRound + 1) + '/' + QUESTIONS_PER_ROUND + '. ' + question + '</p>' +
+      '<p class="kangoeroe-ronde-som">Ronde ' + round + '/' + TOTAL_ROUNDS + ' – Som ' + (questionInRound + 1) + '/' + QUESTIONS_PER_ROUND + '</p>' +
+      '<p class="kangoeroe-vraag">' + question + '</p>' +
       '<div class="kangoeroe-pad">' +
+      '<div class="kangoeroe-stones-row">' + stonesHtml + '</div>' +
+      '<div class="kangoeroe-figuur-wrapper">' +
       '<div id="kangoeroe-figuur" class="kangoeroe-figuur">' + kangoeroeImg + '</div>' +
-      stonesHtml +
+      '</div>' +
       '</div>';
     
     window.RegenboogCore.updateHUDRound(CLASS_ID, round);
     setTimeout(() => updateLiveScore(), 50);
     
-    var pad = area.querySelector('.kangoeroe-pad');
     var kangoeroeEl = getKangoeroeEl();
-    if (kangoeroeEl && pad) {
+    var wrapper = getKangoeroeWrapper();
+    if (kangoeroeEl && wrapper) {
       requestAnimationFrame(function () {
         var firstStone = area.querySelector('.kangoeroe-steen[data-index="0"]');
         if (firstStone) {
           var r = firstStone.getBoundingClientRect();
-          var cr = pad.getBoundingClientRect();
-          kangoeroeEl.style.left = (r.left - cr.left + r.width / 2 - 28) + 'px';
+          var wr = wrapper.getBoundingClientRect();
+          kangoeroeEl.style.left = (r.left - wr.left + r.width / 2 - 28) + 'px';
         }
       });
     }
@@ -201,11 +232,17 @@
         var selectedAnswer = parseInt(btn.dataset.n, 10);
         var idx = parseInt(btn.dataset.index, 10);
         
+        busy = true;
+        btn.classList.add(selectedAnswer === answer ? 'kangoeroe-goed' : 'kangoeroe-fout');
         if (selectedAnswer === answer) {
-          busy = true;
           correct++;
-          btn.classList.add('kangoeroe-goed');
-          jumpToStone(idx, function () {
+        } else {
+          mistakes++;
+          updateLiveScore();
+        }
+        jumpToStone(idx, function () {
+          if (selectedAnswer === answer) {
+            playCorrectSound();
             questionInRound++;
             if (questionInRound < QUESTIONS_PER_ROUND) {
               showQuestion();
@@ -224,23 +261,19 @@
                 newRound();
               }
             }
-          });
-        } else {
-          mistakes++;
-          updateLiveScore();
-          busy = true;
-          btn.classList.add('kangoeroe-fout');
-          // Korte feedback: strafpunten, daarna nieuwe som
-          setTimeout(function () {
-            area.innerHTML =
-              window.RegenboogCore.createHUD(CLASS_ID, round, TOTAL_ROUNDS, false, true) +
-              '<p class="kangoeroe-vraag" style="font-size: 1.3rem; margin-bottom: 1rem;">Fout! Het juiste antwoord was <strong>' + answer + '</strong>. −' + PENALTY_PER_MISTAKE + ' punten.</p>' +
-              '<p style="color: #666;">Nieuwe som...</p>';
-            window.RegenboogCore.updateHUDScore(CLASS_ID, calculateLiveScore());
-            window.RegenboogCore.updateHUDRound(CLASS_ID, round);
-            setTimeout(showQuestion, 1200);
-          }, 500);
-        }
+          } else {
+            playWrongSound();
+            setTimeout(function () {
+              area.innerHTML =
+                window.RegenboogCore.createHUD(CLASS_ID, round, TOTAL_ROUNDS, false, true) +
+                '<p class="kangoeroe-vraag" style="font-size: 1.3rem; margin-bottom: 1rem;">Fout! Het juiste antwoord was <strong>' + answer + '</strong>. −' + PENALTY_PER_MISTAKE + ' punten.</p>' +
+                '<p style="color: #666;">Nieuwe som...</p>';
+              window.RegenboogCore.updateHUDScore(CLASS_ID, calculateLiveScore());
+              window.RegenboogCore.updateHUDRound(CLASS_ID, round);
+              setTimeout(showQuestion, 1200);
+            }, 500);
+          }
+        });
       });
     });
   }

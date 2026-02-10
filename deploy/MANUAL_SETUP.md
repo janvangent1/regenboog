@@ -20,6 +20,7 @@ Deze handleiding legt stap-voor-stap uit hoe je de Regenboog applicatie handmati
 6. [Dependencies installeren](#6-dependencies-installeren)
 7. [App starten met PM2](#7-app-starten-met-pm2)
 8. [Nginx configureren](#8-nginx-configureren)
+8b. [Firewall (UFW) configureren](#8b-firewall-ufw-configureren)
 9. [SSL certificaat installeren](#9-ssl-certificaat-installeren)
 10. [Verificatie](#10-verificatie)
 
@@ -293,7 +294,51 @@ sudo systemctl reload nginx
 
 ---
 
+## 8b. Firewall (UFW) configureren
+
+Als je de Pi niet kunt bereiken vanaf je PC of telefoon in hetzelfde netwerk, blokkeert de firewall waarschijnlijk de poorten. Configureer UFW als volgt:
+
+**Controleer of UFW actief is:**
+
+```bash
+sudo ufw status
+```
+
+**Stel de regels in (voer uit op de Pi):**
+
+```bash
+# SSH toestaan (anders verlies je verbinding!)
+sudo ufw allow 22/tcp
+
+# HTTP en HTTPS voor nginx (voor regenboog.jbouquet.be)
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+# Optioneel: directe toegang tot de app op poort 3001 (bv. voor testen als http://<pi-ip>:3001)
+sudo ufw allow 3001/tcp
+
+# Firewall activeren (als nog niet actief)
+sudo ufw enable
+
+# Status controleren
+sudo ufw status numbered
+```
+
+**Belangrijk:** Zonder `allow 22/tcp` kun je na `ufw enable` geen SSH meer! Als UFW al actief was en 22 nog niet open stond, voeg die regel toe en herlaad: `sudo ufw reload`.
+
+Na het openen van de poorten kun je:
+- vanaf je PC: **http://\<IP-van-de-Pi\>:3001** (direct naar de app), of
+- via domein: **https://regenboog.jbouquet.be** (via nginx, poorten 80/443).
+
+---
+
 ## 9. SSL certificaat installeren
+
+Nginx kan meerdere domeinen op dezelfde poorten 80 en 443 bedienen (SNI). Je hoeft dus **geen extra poorten** te openen als jbouquet.be al op de Pi draait.
+
+---
+
+### Situatie A: Certbot staat nog niet op de Pi
 
 Installeer Certbot (Let's Encrypt client):
 
@@ -301,29 +346,40 @@ Installeer Certbot (Let's Encrypt client):
 sudo apt-get install -y certbot python3-certbot-nginx
 ```
 
-**BELANGRIJK:** Zorg ervoor dat:
-- DNS A-record voor `regenboog.jbouquet.be` naar het IP-adres van je Pi wijst
-- Port 80 is bereikbaar van buitenaf (voor DNS validatie)
+Ga daarna door naar [Certificaat voor regenboog.jbouquet.be](#certificaat-voor-regenboogjbouquetbe) hieronder.
 
-Installeer het SSL certificaat:
+---
+
+### Situatie B: Certbot is al geïnstalleerd (bijv. voor jbouquet.be)
+
+Je hoeft niets extra te installeren. Certbot kan een **extra certificaat** voor het subdomein aanmaken zonder het bestaande certificaat van jbouquet.be te wijzigen.
+
+Ga direct door naar [Certificaat voor regenboog.jbouquet.be](#certificaat-voor-regenboogjbouquetbe).
+
+---
+
+### Certificaat voor regenboog.jbouquet.be
+
+**Voorwaarden:**
+- DNS A-record voor `regenboog.jbouquet.be` wijst naar het IP-adres van je Pi
+- Nginx-configuratie voor regenboog.jbouquet.be staat in plaats (stap 8)
+- Poorten 80 en 443 zijn bereikbaar (zelfde als voor jbouquet.be)
+
+Voer op de Pi uit:
 
 ```bash
 sudo certbot --nginx -d regenboog.jbouquet.be
 ```
 
-Volg de instructies:
-- Voer je email adres in
-- Accepteer de voorwaarden
-- Kies of je email updates wilt ontvangen (optioneel)
+- Als om een e-mailadres wordt gevraagd: hetzelfde als voor jbouquet.be mag, of een ander.
+- Accepteer de voorwaarden als dat gevraagd wordt.
 
-Certbot zal automatisch:
-- Het SSL certificaat ophalen
-- De Nginx configuratie aanpassen om HTTPS te gebruiken
-- Een automatische HTTP → HTTPS redirect toevoegen
+Certbot zal:
+- Een apart certificaat voor `regenboog.jbouquet.be` aanmaken (naast dat van jbouquet.be),
+- De bestaande Nginx-config voor regenboog.jbouquet.be aanpassen voor HTTPS,
+- Een HTTP → HTTPS redirect voor dat subdomein toevoegen.
 
-**Automatische verlenging configureren:**
-
-Certbot maakt automatisch een cron job of systemd timer aan. Test de verlenging:
+**Verlenging:** De bestaande Certbot-timer/cron verlengt alle certificaten (inclusief dit nieuwe). Controleren kan met:
 
 ```bash
 sudo certbot renew --dry-run
@@ -414,6 +470,23 @@ sudo certbot renew             # Certificaat verlengen
    ```bash
    sudo tail -f /var/log/nginx/regenboog_error.log
    ```
+
+### Niet bereikbaar vanaf PC/telefoon in hetzelfde netwerk
+
+Als `localhost:3001` op de Pi werkt maar `http://<pi-ip>:3001` vanaf je PC niet, blokkeert waarschijnlijk de firewall (UFW) poort 3001.
+
+**Oplossing:** Open de benodigde poorten (zie [8b. Firewall (UFW) configureren](#8b-firewall-ufw-configureren)):
+
+```bash
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw allow 3001/tcp
+sudo ufw enable
+sudo ufw status
+```
+
+Daarna zou `http://<IP-van-de-Pi>:3001` vanaf je PC moeten werken.
 
 ### SSL certificaat installatie mislukt
 

@@ -12,6 +12,29 @@
   let currentRound = 1;
   let totalScore = 0;
 
+  function playCorrectSound() {
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      function play() {
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.value = 600;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.2);
+      }
+      if (ctx.state === 'suspended') {
+        ctx.resume().then(play).catch(function () {});
+      } else {
+        play();
+      }
+    } catch (e) {}
+  }
+
   /** BFS: is goal reachable from (0,0) without stepping on walls? */
   function isMazeSolvable() {
     var startR = 0, startC = 0;
@@ -91,9 +114,13 @@
         wrap.appendChild(cell);
       }
     }
-    area.innerHTML = '';
+    area.innerHTML = window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, false, true);
+    var liveScore = totalScore + Math.max(10, 200 - moves * 3);
+    window.RegenboogCore.updateHUDScore(CLASS_ID, liveScore);
+    window.RegenboogCore.updateHUDRound(CLASS_ID, currentRound);
+
     area.appendChild(wrap);
-    const hint = document.createElement('p');
+    var hint = document.createElement('p');
     hint.className = 'game-score vossen-hint';
     hint.textContent = 'Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Zetten: ' + moves + ' – Gebruik pijltjestoetsen om het hol te bereiken.';
     area.appendChild(hint);
@@ -109,6 +136,7 @@
     moves++;
     render();
     if (fox.r === goal.r && fox.c === goal.c) {
+      playCorrectSound();
       // Score: basis van 200 punten per ronde, minus 3 punten per move
       // Minimum score is altijd 10 per ronde
       const roundScore = Math.max(10, 200 - moves * 3);
@@ -147,7 +175,20 @@
     }
   }
 
-  document.addEventListener('keydown', handleKey);
+  var audioUnlocked = false;
+  function ensureAudioUnlock() {
+    if (audioUnlocked) return;
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume().then(function () { audioUnlocked = true; }).catch(function () {});
+      else audioUnlocked = true;
+    } catch (e) {}
+  }
+
+  document.addEventListener('keydown', function (e) {
+    ensureAudioUnlock();
+    handleKey(e);
+  });
   area.addEventListener('click', function () {
     var wrap = area.querySelector('.vossen-grid-wrap');
     if (wrap) wrap.focus();

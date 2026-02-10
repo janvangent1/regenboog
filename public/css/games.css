@@ -534,6 +534,15 @@
   box-shadow: 0 6px 16px rgba(0,0,0,0.25);
 }
 
+.draken-target.draken-forbidden {
+  background: linear-gradient(145deg, #c8e6c9 0%, #81c784 50%, #4caf50 100%);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.4);
+}
+
+.draken-target.draken-forbidden:hover {
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.4);
+}
+
 .draken-target-getroffen {
   pointer-events: none;
   animation: draken-pop 0.25s ease-out forwards;
@@ -609,11 +618,13 @@
   width: 75%;
   height: 75%;
   object-fit: contain;
+  pointer-events: none;
 }
 
 .beren-bear-emoji {
   font-size: min(12vw, 2.5rem);
   line-height: 1;
+  pointer-events: none;
 }
 
 .beren-honey-icon {
@@ -622,9 +633,16 @@
 }
 
 .beren-sequence {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text);
+}
+
+.beren-sequence-arrows {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   color: var(--text);
 }
 
@@ -652,6 +670,12 @@
 .beren-clear-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(42, 157, 143, 0.3);
+}
+
+.beren-arrow-btn {
+  font-size: 1.5rem;
+  padding: 10px 14px;
+  min-width: 48px;
 }
 
 .beren-clear-btn {
@@ -745,11 +769,13 @@
   width: 75%;
   height: 75%;
   object-fit: contain;
+  pointer-events: none;
 }
 
 .leeuwen-lion-emoji {
   font-size: min(10vw, 2rem);
   line-height: 1;
+  pointer-events: none;
 }
 
 .leeuwen-prooi-icon {
@@ -758,9 +784,16 @@
 }
 
 .leeuwen-sequence {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
+  margin: 0.75rem 0;
+  font-size: 1.1rem;
   font-weight: 600;
+  color: var(--text);
+}
+
+.leeuwen-sequence-arrows {
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   color: var(--text);
 }
 
@@ -788,6 +821,12 @@
 .leeuwen-clear-btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+}
+
+.leeuwen-arrow-btn {
+  font-size: 1.5rem;
+  padding: 10px 14px;
+  min-width: 48px;
 }
 
 .leeuwen-clear-btn {
@@ -1338,26 +1377,43 @@
 }
 
 /* Kangoeroes – Spring naar het getal: pad met stenen en springende kangoeroe */
+.kangoeroe-ronde-som {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
 .kangoeroe-vraag {
-  font-size: 1.25rem;
+  font-size: 1.9rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .kangoeroe-pad {
-  position: relative;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 6px;
-  min-height: 120px;
-  padding: 8px 4px 0;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 4px 8px;
   margin-top: 0.5rem;
   background: linear-gradient(180deg, #e8f5e0 0%, #c8e6c9 50%, #a5d6a7 100%);
   border-radius: 16px;
   border: 2px solid #81c784;
   box-shadow: inset 0 2px 8px rgba(255,255,255,0.5);
+}
+
+.kangoeroe-stones-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 52px;
+}
+
+.kangoeroe-figuur-wrapper {
+  position: relative;
+  height: 64px;
+  margin-top: 4px;
 }
 
 .kangoeroe-steen {
@@ -1402,7 +1458,7 @@
 
 .kangoeroe-figuur {
   position: absolute;
-  bottom: 58px;
+  bottom: 0;
   left: 12px;
   width: 56px;
   height: 56px;
