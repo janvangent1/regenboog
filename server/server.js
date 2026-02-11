@@ -13,8 +13,12 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
 app.use(cors());
 app.use(express.json());
+// Trust proxy to get correct IP addresses
+app.set('trust proxy', true);
 
 initDatabase();
+
+// Register API routes BEFORE static files
 registerRoutes(app);
 
 app.use(express.static(publicDir));

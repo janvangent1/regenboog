@@ -1121,127 +1121,231 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Giraffen – Hoge Bladeren (5e leerjaar, 10-11 jaar): doolhof 6x6 */
+/* Giraffen – Dierentetris (1 ronde) */
 .giraffen-instruction {
   font-size: 1rem;
   font-weight: 600;
+  margin-bottom: 0.65rem;
+  color: #6d4c1c;
+}
+
+.giraffen-hud {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
   margin-bottom: 0.75rem;
-  color: var(--text);
+}
+
+.giraffen-score-card,
+.giraffen-next-card {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 2px solid #e1b96d;
+  background: linear-gradient(180deg, #fff8e8 0%, #f9e4bd 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 92px;
+  box-sizing: border-box;
+}
+
+.giraffen-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8b5e1a;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.giraffen-score {
+  margin: 0;
+  color: var(--rainbow-5);
+}
+
+.giraffen-next-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: #7a5419;
 }
 
 .giraffen-grid {
+  --giraffen-cell-size: min(6.8vw, 34px);
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  width: 100%;
-  max-width: min(280px, 88vw);
-  aspect-ratio: 1;
-  gap: 3px;
-  margin: 1rem 0;
-  padding: 6px;
-  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%);
-  border-radius: 12px;
-  border: 2px solid #2e7d32;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
+  grid-template-columns: repeat(10, var(--giraffen-cell-size));
+  grid-template-rows: repeat(16, var(--giraffen-cell-size));
+  width: max-content;
+  gap: 2px;
+  margin: 0.75rem auto;
+  padding: 8px;
+  background-image:
+    linear-gradient(180deg, rgba(255, 248, 232, 0.88) 0%, rgba(245, 214, 149, 0.84) 100%),
+    url('/assets/images/classes/giraffen.png');
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: normal, normal;
+  border-radius: 14px;
+  border: 2px solid #b7863a;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.14);
 }
 
-.giraffen-cell {
-  min-height: 0;
-  min-width: 0;
-  border-radius: 6px;
+.giraffen-next-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 18px);
+  grid-template-rows: repeat(4, 18px);
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.giraffen-next-cell {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(160, 116, 34, 0.28);
+  background: #fff8ea;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
 }
 
-.giraffen-cell.giraffen-start {
-  background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
-  border-color: #7cb342;
+.giraffen-next-cell-filled {
+  background: linear-gradient(180deg, #ffffff 0%, var(--piece-color) 35%, var(--piece-color) 100%);
+  border-color: rgba(0,0,0,0.2);
 }
 
-.giraffen-cell.giraffen-leaf {
-  background: linear-gradient(180deg, #dcedc8 0%, #c5e1a5 100%);
-  border-color: #558b2f;
+.giraffen-next-cell-filled span {
+  font-size: 0.65rem;
+  line-height: 1;
 }
 
-.giraffen-cell.giraffen-wall {
-  background: #5d4037;
-  border-color: #3e2723;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.giraffen-giraf {
-  width: 70%;
-  height: 70%;
+.giraffen-next-logo {
+  width: 80%;
+  height: 80%;
   object-fit: contain;
 }
 
-.giraffen-emoji-fallback {
-  font-size: min(7vw, 1.6rem);
-  line-height: 1;
-}
-
-.giraffen-leaf-icon {
-  font-size: min(7vw, 1.6rem);
-  line-height: 1;
-}
-
-.giraffen-sequence {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.giraffen-buttons {
+.giraffen-cell {
+  width: var(--giraffen-cell-size);
+  height: var(--giraffen-cell-size);
+  border-radius: 5px;
+  border: 1px solid rgba(141, 100, 27, 0.24);
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 0.5rem 0;
+  align-items: center;
+  justify-content: center;
 }
 
-.giraffen-dir-btn,
-.giraffen-clear-btn {
-  padding: 6px 12px;
-  font-size: 0.9rem;
+.giraffen-cell-empty {
+  background: rgba(255, 248, 232, 0.72);
+}
+
+.giraffen-cell-filled {
+  background: linear-gradient(180deg, #ffffff 0%, var(--piece-color) 35%, var(--piece-color) 100%);
+  border-color: rgba(0,0,0,0.25);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.35);
+}
+
+.giraffen-piece-logo {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+}
+
+.giraffen-cell-active {
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.5), inset 0 1px 2px rgba(255,255,255,0.35);
+}
+
+.giraffen-cell-line-clear {
+  animation: giraffen-line-clear 0.22s ease-in-out 2 alternate;
+}
+
+@keyframes giraffen-line-clear {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.35);
+  }
+  100% {
+    transform: scale(1.04);
+    filter: brightness(1.55);
+    box-shadow: 0 0 10px rgba(255,255,255,0.75), inset 0 1px 2px rgba(255,255,255,0.35);
+  }
+}
+
+.giraffen-controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0.75rem;
+  align-items: stretch;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.giraffen-btn {
+  padding: 8px 12px;
   border-radius: 8px;
-  border: 2px solid #7cb342;
-  background: linear-gradient(180deg, #f1f8e9 0%, #dcedc8 100%);
-  color: #33691e;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.giraffen-clear-btn {
-  border-color: #5d4037;
-  background: #efebe9;
-  color: #4e342e;
-}
-
-.giraffen-run {
-  padding: 10px 24px;
-  margin-top: 0.5rem;
-  font-size: 1rem;
+  border: 2px solid #cc9b4b;
+  background: linear-gradient(180deg, #fff8e8 0%, #f5d695 100%);
+  color: #6f4a14;
+  font-size: 0.92rem;
   font-weight: 700;
-  border-radius: 10px;
-  border: 2px solid #7cb342;
-  background: linear-gradient(180deg, #7cb342 0%, #558b2f 100%);
-  color: white;
   cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  min-height: 44px;
+  width: 100%;
+}
+
+.giraffen-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(204, 155, 75, 0.4);
+}
+
+.giraffen-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.giraffen-btn-down {
+  grid-column: 2;
+}
+
+.giraffen-help {
+  margin-top: 0.65rem;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  color: #7c6131;
 }
 
 .giraffen-again {
-  margin-top: 1rem;
+  margin-top: 0.9rem;
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: 10px;
-  border: 2px solid #5d4037;
-  background: linear-gradient(180deg, #c5e1a5 0%, #a5d6a7 100%);
-  color: #1b5e20;
-  font-weight: 600;
+  border: 2px solid #9d6f2d;
+  background: linear-gradient(180deg, #f5d695 0%, #ebb66a 100%);
+  color: #59370f;
+  font-weight: 700;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .giraffen-hud {
+    grid-template-columns: 1fr;
+  }
+
+  .giraffen-grid {
+    --giraffen-cell-size: min(7.3vw, 30px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .giraffen-btn-down {
+    grid-column: 2;
+  }
 }
 
 /* Zwaluwen – Vang de vliegjes: reactiespel */

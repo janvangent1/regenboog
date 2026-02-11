@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Basisschool De Regenboog - Spellen</title>
+  <title>Dierenspelletjes</title>
   <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
   <a href="#main" class="skip-link">Direct naar de spellen</a>
   <header class="header" role="banner">
     <div class="logo-wrap">
-      <h1>Basisschool De Regenboog</h1>
-      <p class="tagline">Kies je klas en speel!</p>
+      <h1>Dierenspelletjes</h1>
+      <p class="tagline">Kies je spel en speel!</p>
     </div>
   </header>
   <main id="main" class="main" role="main">
@@ -48,12 +48,18 @@
       <div class="class-grid" id="classes-6e-leerjaar"></div>
     </section>
     <section class="grade" style="margin-top: 4rem; padding-top: 2rem; border-top: 2px solid var(--border);">
-      <div style="text-align: center; padding: 2rem 0;">
-        <a href="/admin.html" style="color: #000000 !important; font-size: 1.2rem !important; text-decoration: underline !important; font-weight: 700 !important; display: inline-block; padding: 1rem 2rem; background: #ffffff; border: 2px solid #000000; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">Admin</a>
+      <div style="text-align: center; padding: 2rem 0; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/class-rankings.html" style="color: #000000 !important; font-size: 1.2rem !important; text-decoration: none !important; font-weight: 700 !important; display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #f5d65d, #f0a050); border: 2px solid #000000; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;">
+          🏆 Klassen Score
+        </a>
+        <a href="/admin.html" style="color: #000000 !important; font-size: 1.2rem !important; text-decoration: none !important; font-weight: 700 !important; display: inline-block; padding: 1rem 2rem; background: #ffffff; border: 2px solid #000000; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: transform 0.2s;">
+          Admin
+        </a>
       </div>
     </section>
   </main>
   <script src="/js/classes.js"></script>
   <script src="/js/main.js"></script>
+  <script src="/js/analytics-tracker.js"></script>
 </body>
 </html>

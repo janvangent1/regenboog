@@ -1,0 +1,27 @@
+---
+description: PixiJS API
+globs: **/*.{js,ts,jsx,tsx}
+alwaysApply: false
+---
+
+# PixiJS – Project context
+
+Use this rule when building or editing games or graphics that use PixiJS.
+
+## Official documentation (LLM reference)
+
+@https://pixijs.com/llms.txt
+
+## Summary (from pixijs.com/llms.txt)
+
+PixiJS is a fast, lightweight 2D library for the web (WebGL/WebGPU). Use it for rich, interactive graphics and cross-platform apps.
+
+**Concepts:** Scene graph, render loop, render layers/groups, ticker, garbage collection, performance tips, architecture, environments.
+
+**Components:** Application, Container, Sprite, Graphics, Text (Canvas/Bitmap/HTML), Mesh, TilingSprite, NineSliceSprite, ParticleContainer. Events/interaction, filters/blend modes, textures, assets (manifests, bundles, resolver), color, math. Culler plugin, resize plugin, ticker plugin.
+
+**Guides:** Quick start, ecosystem, v8 migration, mixing PixiJS and Three.js, accessibility, compressed textures, SVGs, cache-as-texture, graphics fill/pixelLine.
+
+**Docs base:** https://pixijs.com/8.x/guides/
+
+When writing PixiJS code, prefer the official API and patterns from the guides above.

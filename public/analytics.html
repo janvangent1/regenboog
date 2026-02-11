@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bezoekers Analytics – De Regenboog</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/games.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .admin-section {
+      background: var(--card);
+      border-radius: 16px;
+      border: 2px solid var(--border);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 12px var(--shadow);
+    }
+    .admin-section h2 {
+      color: var(--rainbow-5);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    .admin-section h3 {
+      color: var(--text);
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+    .password-form {
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+    .password-form input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .password-form button {
+      width: 100%;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5));
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .stats-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: linear-gradient(180deg, #f8f6f2 0%, #f0ede8 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-card h4 {
+      margin: 0 0 0.5rem;
+      color: var(--rainbow-5);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .stat-card .value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0.5rem 0;
+    }
+    .stat-card .label {
+      font-size: 0.85rem;
+      color: var(--text-soft);
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-top: 1rem;
+    }
+    .chart-container.large {
+      height: 400px;
+    }
+    .date-range-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .date-range-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+    .date-range-btn:hover {
+      background: var(--rainbow-5);
+      color: white;
+      border-color: var(--rainbow-5);
+    }
+    .date-range-btn.active {
+      background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5));
+      color: white;
+      border-color: var(--rainbow-5);
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-soft);
+    }
+    .error {
+      background: #ffebee;
+      color: #c62828;
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1rem 0;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--rainbow-5);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    .two-column {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="logo-wrap">
+      <a href="/" class="header-link">
+        <h1>Basisschool De Regenboog</h1>
+        <p class="tagline">Bezoekers Analytics</p>
+      </a>
+    </div>
+  </header>
+  <div class="admin-container">
+    <div id="password-screen" class="admin-section">
+      <h2>Admin Toegang</h2>
+      <form class="password-form" id="password-form">
+        <input type="password" id="password-input" placeholder="Wachtwoord" required autofocus>
+        <button type="submit">Inloggen</button>
+      </form>
+      <div id="password-error" class="error" style="display: none;"></div>
+    </div>
+
+    <div id="admin-content" style="display: none;">
+      <a href="/admin.html" class="back-link">← Terug naar Admin</a>
+      
+      <div class="admin-section">
+        <h2>Periode Selectie</h2>
+        <div class="date-range-selector">
+          <button class="date-range-btn active" data-days="7">Laatste 7 dagen</button>
+          <button class="date-range-btn" data-days="30">Laatste 30 dagen</button>
+          <button class="date-range-btn" data-days="90">Laatste 90 dagen</button>
+          <button class="date-range-btn" data-days="365">Laatste jaar</button>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Overzicht</h2>
+        <div class="stats-overview" id="overview-stats">
+          <div class="stat-card">
+            <h4>Unieke Bezoekers</h4>
+            <div class="value" id="stat-unique-visitors">-</div>
+            <div class="label">Bezoekers</div>
+          </div>
+          <div class="stat-card">
+            <h4>Totaal Page Views</h4>
+            <div class="value" id="stat-total-visits">-</div>
+            <div class="label">Bezoeken</div>
+          </div>
+          <div class="stat-card">
+            <h4>Gemiddelde Bezoekduur</h4>
+            <div class="value" id="stat-avg-duration">-</div>
+            <div class="label">Seconden</div>
+          </div>
+          <div class="stat-card">
+            <h4>Return Bezoekers</h4>
+            <div class="value" id="stat-return-rate">-</div>
+            <div class="label">Percentage</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Bezoekers over Tijd</h2>
+        <div class="chart-container large">
+          <canvas id="visitors-over-time-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Meest Bezochte Pagina's</h2>
+        <div class="chart-container">
+          <canvas id="page-views-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div class="admin-section">
+          <h2>Piekuren</h2>
+          <div class="chart-container">
+            <canvas id="peak-hours-chart"></canvas>
+          </div>
+        </div>
+        <div class="admin-section">
+          <h2>Bezoekduur Distributie</h2>
+          <div class="chart-container">
+            <canvas id="duration-distribution-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-column">
+        <div class="admin-section">
+          <h2>Device Type</h2>
+          <div class="chart-container">
+            <canvas id="device-chart"></canvas>
+          </div>
+        </div>
+        <div class="admin-section">
+          <h2>Browser Breakdown</h2>
+          <div class="chart-container">
+            <canvas id="browser-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Nieuwe vs Return Bezoekers</h2>
+        <div class="chart-container">
+          <canvas id="return-visitors-chart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const ADMIN_PASSWORD = 'jeroom';
+      let isAuthenticated = false;
+      let charts = {};
+      let currentDays = 7;
+
+      const passwordScreen = document.getElementById('password-screen');
+      const adminContent = document.getElementById('admin-content');
+      const passwordForm = document.getElementById('password-form');
+      const passwordInput = document.getElementById('password-input');
+      const passwordError = document.getElementById('password-error');
+
+      function checkPassword() {
+        const stored = sessionStorage.getItem('admin_authenticated');
+        if (stored === 'true') {
+          isAuthenticated = true;
+          passwordScreen.style.display = 'none';
+          adminContent.style.display = 'block';
+          loadAnalytics();
+        }
+      }
+
+      passwordForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const pwd = passwordInput.value;
+        if (pwd === ADMIN_PASSWORD) {
+          isAuthenticated = true;
+          sessionStorage.setItem('admin_authenticated', 'true');
+          passwordScreen.style.display = 'none';
+          adminContent.style.display = 'block';
+          loadAnalytics();
+        } else {
+          passwordError.textContent = 'Ongeldig wachtwoord';
+          passwordError.style.display = 'block';
+          passwordInput.value = '';
+        }
+      });
+
+      function getAuthHeaders() {
+        return {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': ADMIN_PASSWORD
+        };
+      }
+
+      function formatDuration(seconds) {
+        if (seconds < 60) return seconds + 's';
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return minutes + 'm ' + secs + 's';
+      }
+
+      function getDateRange(days) {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - days);
+        return {
+          startDate: start.toISOString(),
+          endDate: end.toISOString()
+        };
+      }
+
+      function loadAnalytics() {
+        const { startDate, endDate } = getDateRange(currentDays);
+        const url = `/api/admin/analytics?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`;
+        
+        fetch(url, { headers: getAuthHeaders() })
+          .then(r => {
+            if (!r.ok) {
+              return r.text().then(text => {
+                throw new Error('HTTP ' + r.status + ': ' + text);
+              });
+            }
+            return r.json();
+          })
+          .then(data => {
+            updateOverview(data);
+            updateCharts(data);
+          })
+          .catch(err => {
+            console.error('Error loading analytics:', err);
+            document.getElementById('admin-content').innerHTML = 
+              '<div class="error">Fout bij laden analytics: ' + escapeHtml(err.message) + '</div>';
+          });
+      }
+
+      function updateOverview(data) {
+        const stats = data.visitorStats || {};
+        const durations = data.durations || {};
+        const returnVisitors = data.returnVisitors || {};
+
+        document.getElementById('stat-unique-visitors').textContent = 
+          (stats.uniqueVisitors || 0).toLocaleString('nl-NL');
+        document.getElementById('stat-total-visits').textContent = 
+          (stats.totalVisits || 0).toLocaleString('nl-NL');
+        document.getElementById('stat-avg-duration').textContent = 
+          formatDuration(durations.average || 0);
+        document.getElementById('stat-return-rate').textContent = 
+          (returnVisitors.returnRate || 0) + '%';
+      }
+
+      function updateCharts(data) {
+        // Destroy existing charts
+        Object.values(charts).forEach(chart => {
+          if (chart) chart.destroy();
+        });
+        charts = {};
+
+        const rainbowColors = [
+          '#e85d5d', '#f0a050', '#f5d65d', '#5cb85c', '#5ba3d9', '#8b6fb8'
+        ];
+
+        // Visitors over time
+        const visitorsOverTime = data.visitorsOverTime || [];
+        const ctx1 = document.getElementById('visitors-over-time-chart').getContext('2d');
+        charts.visitorsOverTime = new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: visitorsOverTime.map(v => new Date(v.date).toLocaleDateString('nl-NL')),
+            datasets: [{
+              label: 'Unieke Bezoekers',
+              data: visitorsOverTime.map(v => v.uniqueVisitors),
+              borderColor: rainbowColors[4],
+              backgroundColor: rainbowColors[4] + '20',
+              tension: 0.4,
+              fill: true
+            }, {
+              label: 'Totaal Bezoeken',
+              data: visitorsOverTime.map(v => v.totalVisits),
+              borderColor: rainbowColors[3],
+              backgroundColor: rainbowColors[3] + '20',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top' }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+
+        // Page views
+        const pageViews = (data.pageViews || []).slice(0, 10);
+        const ctx2 = document.getElementById('page-views-chart').getContext('2d');
+        charts.pageViews = new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: pageViews.map(p => p.page.length > 30 ? p.page.substring(0, 30) + '...' : p.page),
+            datasets: [{
+              label: 'Page Views',
+              data: pageViews.map(p => p.views),
+              backgroundColor: rainbowColors.map(c => c + '80')
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+
+        // Peak hours
+        const peakHours = data.peakHours || {};
+        const hours = Array.from({ length: 24 }, (_, i) => i);
+        const ctx3 = document.getElementById('peak-hours-chart').getContext('2d');
+        charts.peakHours = new Chart(ctx3, {
+          type: 'bar',
+          data: {
+            labels: hours.map(h => h + ':00'),
+            datasets: [{
+              label: 'Bezoeken',
+              data: hours.map(h => peakHours[h] || 0),
+              backgroundColor: rainbowColors[2] + '80'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+
+        // Duration distribution
+        const durationDist = data.durations?.distribution || {};
+        const ctx4 = document.getElementById('duration-distribution-chart').getContext('2d');
+        charts.durationDist = new Chart(ctx4, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(durationDist),
+            datasets: [{
+              label: 'Aantal Bezoeken',
+              data: Object.values(durationDist),
+              backgroundColor: rainbowColors.map(c => c + '80')
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        });
+
+        // Device type
+        const devices = data.deviceStats?.devices || {};
+        const ctx5 = document.getElementById('device-chart').getContext('2d');
+        charts.devices = new Chart(ctx5, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(devices).map(k => k.charAt(0).toUpperCase() + k.slice(1)),
+            datasets: [{
+              data: Object.values(devices),
+              backgroundColor: rainbowColors
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+
+        // Browser breakdown
+        const browsers = data.deviceStats?.browsers || {};
+        const ctx6 = document.getElementById('browser-chart').getContext('2d');
+        charts.browsers = new Chart(ctx6, {
+          type: 'pie',
+          data: {
+            labels: Object.keys(browsers),
+            datasets: [{
+              data: Object.values(browsers),
+              backgroundColor: rainbowColors
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+
+        // Return visitors
+        const returnVisitors = data.returnVisitors || {};
+        const ctx7 = document.getElementById('return-visitors-chart').getContext('2d');
+        charts.returnVisitors = new Chart(ctx7, {
+          type: 'pie',
+          data: {
+            labels: ['Nieuwe Bezoekers', 'Return Bezoekers'],
+            datasets: [{
+              data: [returnVisitors.newVisitors || 0, returnVisitors.returnVisitors || 0],
+              backgroundColor: [rainbowColors[0], rainbowColors[4]]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+
+      // Date range selector
+      document.querySelectorAll('.date-range-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.date-range-btn').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentDays = parseInt(this.dataset.days, 10);
+          loadAnalytics();
+        });
+      });
+
+      function escapeHtml(s) {
+        const div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      checkPassword();
+    })();
+  </script>
+</body>
+</html>

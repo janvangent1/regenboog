@@ -43,8 +43,8 @@
     var duration = ROUND_DURATIONS_MS[currentRound];
     endTime = Date.now() + duration;
     
-    // Gebruik consistente HUD layout (timer verborgen)
-    area.innerHTML = window.RegenboogCore.createHUD(CLASS_ID, currentRound + 1, TOTAL_ROUNDS, false, true);
+    // Gebruik consistente HUD layout met timer
+    area.innerHTML = window.RegenboogCore.createHUD(CLASS_ID, currentRound + 1, TOTAL_ROUNDS, true, true);
     area.style.position = 'relative';
     area.style.minHeight = '340px';
     

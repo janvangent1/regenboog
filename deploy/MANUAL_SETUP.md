@@ -526,9 +526,54 @@ Daarna zou `http://<IP-van-de-Pi>:3001` vanaf je PC moeten werken.
 
 ---
 
+## Raspberry Pi updaten met de laatste code van GitHub
+
+### Optie 1: Python-script vanaf je PC (aanbevolen)
+
+Op je **Windows PC** (in de projectmap), één commando:
+
+```bash
+python deploy/update_pi.py
+```
+
+Het script verbindt via SSH met de Pi (gebruikt dezelfde gegevens als `setup_regenboog_pi.py` uit `deploy/setup_config.json`), voert uit: `git pull`, `npm install`, `pm2 restart regenboog`, en klaar.
+
+- **Eerste keer:** zorg dat je ooit `setup_regenboog_pi.py` hebt gedraaid zodat host/wachtwoord in `deploy/setup_config.json` staan, of zet bijvoorbeeld:  
+  `set REGENBOOG_PI_PASSWORD=je_wachtwoord` (Windows) voor die ene run.
+- **Vereiste:** Op de Pi moet de app uit een **git clone** komen (map met `.git`), anders heeft `git pull` geen effect.
+
+### Optie 2: Handmatig via SSH op de Pi
+
+**Als de app op de Pi via Git is geïnstalleerd** (je hebt ooit `git clone` gedaan):
+
+1. SSH in op de Pi:
+   ```bash
+   ssh pi@<IP-van-je-Pi>
+   ```
+2. Ga naar de projectmap (pas aan als je andere map gebruikt):
+   ```bash
+   cd /home/pi/regenboog-game
+   ```
+3. Haal de laatste wijzigingen op:
+   ```bash
+   git pull
+   ```
+4. Installeer eventueel nieuwe npm-pakketten (na wijzigingen in `package.json`):
+   ```bash
+   npm install
+   ```
+5. Herstart de app:
+   ```bash
+   pm2 restart regenboog
+   ```
+
+**Als je de app via het deploy-script (SFTP) hebt geplaatst:** run het deploy-script opnieuw vanaf je PC om bestanden te uploaden, en herstart daarna op de Pi met `pm2 restart regenboog` (of via het script als dat herstart ondersteunt).
+
+---
+
 ## Volgende stappen
 
-- **Updates deployen:** Gebruik het `deploy_regenboog.py` script of kopieer handmatig nieuwe bestanden en herstart met `pm2 restart regenboog`
+- **Updates deployen:** Zie hierboven (Git pull of deploy-script) en herstart met `pm2 restart regenboog`
 - **Monitoring:** Overweeg PM2 monitoring of andere monitoring tools
 - **Backups:** Maak regelmatig backups van de database en configuratie bestanden
 
