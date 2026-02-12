@@ -58,6 +58,9 @@ function registerRoutes(app) {
       return res.status(400).json({ error: 'visitor_id en page zijn verplicht' });
     }
     const ipAddress = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
+    if (process.env.LOG_ANALYTICS) {
+      console.log('[track-visit]', page, ipAddress || '(no ip)');
+    }
     trackVisit(visitor_id, page, user_agent, referrer, ipAddress)
       .then((result) => res.json(result))
       .catch((err) => {
@@ -83,6 +86,9 @@ function registerRoutes(app) {
     const { visitor_id, page } = req.body;
     if (!visitor_id || !page) {
       return res.status(400).json({ error: 'visitor_id en page zijn verplicht' });
+    }
+    if (process.env.LOG_ANALYTICS) {
+      console.log('[track-visit-heartbeat]', page);
     }
     pingVisit(visitor_id, page)
       .then((result) => res.json(result))

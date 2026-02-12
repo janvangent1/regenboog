@@ -579,6 +579,27 @@ Het script verbindt via SSH met de Pi (gebruikt dezelfde gegevens als `setup_reg
 
 ---
 
+## Troubleshooting
+
+### "Actieve bezoekers" blijft op 0 op de Pi
+
+De teller **Actieve bezoekers** toont bezoekers van de **server waarop je de analytics-pagina opent**. Als je de analytics op je PC opent (bijv. `http://localhost:3000/analytics.html`), zie je alleen bezoekers van je lokale server, niet van de Pi.
+
+- **Om bezoekers op de Pi te zien:** open de analytics-pagina **op het adres van de Pi**, bijvoorbeeld:
+  - `https://regenboog.jbouquet.be/analytics.html`  
+  - of `http://<IP-van-de-Pi>:3001/analytics.html` als je direct op de app gaat.
+- **Controleren of tracking op de Pi aankomt:** zet op de Pi (in de projectmap) de omgevingsvariabele `LOG_ANALYTICS=1` en herstart de app zodat die variabele wordt gebruikt. Bijvoorbeeld:
+  ```bash
+  cd /home/pi/regenboog-game
+  pm2 delete regenboog
+  LOG_ANALYTICS=1 PORT=3001 pm2 start server/server.js --name regenboog
+  pm2 save
+  pm2 logs regenboog
+  ```
+  Open daarna vanaf een ander device (telefoon/PC) de site op de Pi (bijv. https://regenboog.jbouquet.be). Je zou in de logs regels moeten zien zoals `[track-visit] / ...` en `[track-visit-heartbeat] ...`. Zie je die niet, dan komen de verzoeken niet aan op de Pi (firewall, Nginx, of verkeerde URL). Zie je ze wel maar blijft de teller 0, controleer dan of de servertijd op de Pi klopt (`date`) en of de database schrijfbaar is (`data/scores.db`). Na het debuggen kun je `LOG_ANALYTICS` weglaten en de app opnieuw starten als je geen tracking-logs meer wilt.
+
+---
+
 ## Hulp nodig?
 
 - Check de logs: `pm2 logs` en `sudo tail -f /var/log/nginx/regenboog_error.log`

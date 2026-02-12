@@ -20,6 +20,7 @@
   let hintPenaltyThisRound = 0;
   let wrongGuessesThisRound = 0;
   let answered = false;
+  let lastPatternLabel = null; // voorkomt hetzelfde patroon twee keer na elkaar
 
   function playSound(frequency, duration, type) {
     try {
@@ -103,6 +104,27 @@
   }
 
   function createQuestion(round) {
+    // Ronde 1: alleen heel eenvoudige patronen (korte reeks, kleine getallen, +2 t/m +4)
+    var round1Generators = [
+      function () {
+        var step = randInt(2, 3);
+        var start = randInt(2, 10);
+        var g = buildArithmetic(start, step, 4);
+        return { seq: g.seq, next: g.next, hint: 'Elke stap tel je ' + step + ' bij.', label: '+' + step };
+      },
+      function () {
+        var step = 4;
+        var start = randInt(2, 8);
+        var g = buildArithmetic(start, step, 4);
+        return { seq: g.seq, next: g.next, hint: 'Elke stap tel je 4 bij.', label: '+4' };
+      },
+      function () {
+        var start = randInt(3, 12);
+        var g = buildAlternatingAdd(start, 1, 2, 4);
+        return { seq: g.seq, next: g.next, hint: 'Om en om: +1, dan +2.', label: '+1,+2' };
+      }
+    ];
+
     var easyGenerators = [
       function () {
         var step = randInt(2, 4);
@@ -302,19 +324,24 @@
       }
     ];
 
-    var pool = round === 1 ? easyGenerators : (round === 2 ? mediumGenerators : hardGenerators);
+    var pool = round === 1 ? round1Generators : (round === 2 ? mediumGenerators : hardGenerators);
     var picked = null;
-    for (var tries = 0; tries < 40; tries++) {
+    for (var tries = 0; tries < 60; tries++) {
       var make = pool[Math.floor(Math.random() * pool.length)];
       var candidate = make();
       if (candidate && isQuestionValid(candidate.seq, candidate.next)) {
+        if (lastPatternLabel !== null && candidate.label === lastPatternLabel) continue;
         picked = candidate;
         break;
       }
     }
     if (!picked) {
-      picked = { seq: [2, 4, 6, 8, 10], next: 12, hint: 'Elke stap tel je 2 bij.', label: '+2' };
+      picked = { seq: [2, 4, 6, 8], next: 10, hint: 'Elke stap tel je 2 bij.', label: '+2' };
+      if (lastPatternLabel === '+2') {
+        picked = { seq: [3, 6, 9, 12], next: 15, hint: 'Elke stap tel je 3 bij.', label: '+3' };
+      }
     }
+    lastPatternLabel = picked.label;
 
     var next = picked.next;
     var wrongPool = [
@@ -487,8 +514,13 @@
       setFeedback('Goed gezien! +' + roundScore + ' punten', 'zebras-feedback-success');
       var nextBtn = document.getElementById('zebras-next-btn');
       if (nextBtn) {
-        nextBtn.style.display = 'inline-block';
-        nextBtn.textContent = currentRound >= TOTAL_ROUNDS ? 'Bekijk score' : 'Volgende ronde';
+        if (currentRound >= TOTAL_ROUNDS) {
+          nextBtn.style.display = 'none';
+          setTimeout(function () { finishGame(); }, 1200);
+        } else {
+          nextBtn.style.display = 'inline-block';
+          nextBtn.textContent = 'Volgende ronde';
+        }
       }
       return;
     }
