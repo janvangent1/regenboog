@@ -125,44 +125,72 @@
       }
     ];
 
-    var easyGenerators = [
+    // Ronde 2: iets moeilijker dan ronde 1, maar lage getallen (tot ~50)
+    var round2Generators = [
       function () {
-        var step = randInt(2, 4);
-        var start = randInt(2, 18);
+        var step = randInt(3, 5);
+        var start = randInt(2, 15);
         var g = buildArithmetic(start, step, 5);
         return { seq: g.seq, next: g.next, hint: 'Elke stap tel je ' + step + ' bij.', label: '+' + step };
       },
       function () {
-        var step = randInt(5, 10);
-        var start = randInt(5, 40);
+        var step = randInt(4, 6);
+        var start = randInt(3, 12);
         var g = buildArithmetic(start, step, 4);
-        return { seq: g.seq, next: g.next, hint: 'Dit zijn sprongen van ' + step + '.', label: 'sprongen van ' + step };
+        return { seq: g.seq, next: g.next, hint: 'Dit zijn sprongen van ' + step + '.', label: 'sprongen r2' };
       },
       function () {
-        var start = randInt(3, 18);
-        var g = buildAlternatingAdd(start, 1, 2, 6);
+        var start = randInt(2, 12);
+        var g = buildAlternatingAdd(start, 1, 2, 5);
         return { seq: g.seq, next: g.next, hint: 'Om en om: +1, dan +2.', label: '+1,+2' };
       },
       function () {
-        var start = randInt(2, 16);
-        var g = buildAlternatingAdd(start, 2, 3, 6);
+        var start = randInt(2, 10);
+        var g = buildAlternatingAdd(start, 2, 3, 5);
         return { seq: g.seq, next: g.next, hint: 'Om en om: +2, dan +3.', label: '+2,+3' };
       },
       function () {
-        var start = randInt(1, 10);
-        var g = buildRepeatingDiff(start, [2, 2, 4], 7);
+        var start = randInt(1, 8);
+        var g = buildRepeatingDiff(start, [2, 2, 4], 5);
         return { seq: g.seq, next: g.next, hint: 'Het verschil herhaalt: +2, +2, +4.', label: 'herhaal +2,+2,+4' };
       },
       function () {
-        var start = randInt(4, 20);
-        var g = buildRepeatingDiff(start, [3, 1, 3], 7);
+        var start = randInt(2, 10);
+        var g = buildRepeatingDiff(start, [3, 1, 3], 5);
         return { seq: g.seq, next: g.next, hint: 'Het verschil herhaalt: +3, +1, +3.', label: 'herhaal +3,+1,+3' };
       },
       function () {
-        var base = randInt(2, 6);
+        var base = randInt(2, 4);
         var seq = [];
         for (var i = 1; i <= 5; i++) seq.push(base * i);
         return { seq: seq, next: base * 6, hint: 'Dit zijn veelvouden van ' + base + '.', label: 'veelvouden van ' + base };
+      },
+      function () {
+        var start = randInt(1, 3);
+        var g = buildGeometric(start, 2, 5);
+        return { seq: g.seq, next: g.next, hint: 'Elk getal is het dubbele van het vorige.', label: 'x2' };
+      },
+      function () {
+        var start = randInt(1, 5);
+        var seq = [start];
+        for (var i = 1; i < 5; i++) seq.push(seq[i - 1] + i);
+        return { seq: seq, next: seq[seq.length - 1] + 5, hint: 'Je telt telkens 1 meer bij: +1, +2, +3 ...', label: 'groeiende stappen' };
+      },
+      function () {
+        var start = randInt(15, 28);
+        var step = randInt(2, 3);
+        var g = buildArithmetic(start, -step, 5);
+        return { seq: g.seq, next: g.next, hint: 'Het patroon daalt telkens met ' + step + '.', label: '-' + step };
+      }
+    ];
+
+    // Ronde 3: nog een stap moeilijker dan ronde 2, lage getallen (tot ~80)
+    var round3Generators = [
+      function () {
+        var step = randInt(5, 8);
+        var start = randInt(3, 20);
+        var g = buildArithmetic(start, step, 5);
+        return { seq: g.seq, next: g.next, hint: 'Elke stap tel je ' + step + ' bij.', label: '+' + step };
       },
       function () {
         var start = randInt(1, 4);
@@ -170,161 +198,62 @@
         return { seq: g.seq, next: g.next, hint: 'Elk getal is het dubbele van het vorige.', label: 'x2' };
       },
       function () {
-        var start = randInt(1, 4);
-        var seq = [start];
-        for (var i = 1; i < 6; i++) seq.push(seq[i - 1] + i);
-        return { seq: seq, next: seq[seq.length - 1] + 6, hint: 'Je telt telkens 1 meer bij: +1, +2, +3 ...', label: 'groeiende stappen' };
-      },
-      function () {
-        var start = randInt(12, 40);
-        var step = randInt(2, 4);
-        var g = buildArithmetic(start, -step, 5);
-        return { seq: g.seq, next: g.next, hint: 'Het patroon daalt telkens met ' + step + '.', label: '-' + step };
-      }
-    ];
-
-    var mediumGenerators = [
-      function () {
-        var step = randInt(6, 12);
-        var start = randInt(6, 45);
-        var g = buildArithmetic(start, step, 5);
-        return { seq: g.seq, next: g.next, hint: 'Elke stap tel je ' + step + ' bij.', label: '+' + step };
-      },
-      function () {
-        var start = randInt(1, 4);
-        var g = buildGeometric(start, 2, 6);
-        return { seq: g.seq, next: g.next, hint: 'Elk getal is het dubbele van het vorige.', label: 'x2' };
-      },
-      function () {
-        var start = randInt(2, 12);
-        var g = buildAlternatingAdd(start, 2, 4, 7);
+        var start = randInt(2, 10);
+        var g = buildAlternatingAdd(start, 2, 4, 5);
         return { seq: g.seq, next: g.next, hint: 'Om en om: +2, dan +4.', label: '+2,+4' };
       },
       function () {
-        var start = randInt(2, 10);
-        var g = buildAlternatingAdd(start, 3, 5, 7);
+        var start = randInt(2, 8);
+        var g = buildAlternatingAdd(start, 3, 5, 5);
         return { seq: g.seq, next: g.next, hint: 'Om en om: +3, dan +5.', label: '+3,+5' };
       },
       function () {
-        var start = randInt(2, 12);
-        var g = buildRepeatingDiff(start, [2, 4, 6], 7);
+        var start = randInt(2, 10);
+        var g = buildRepeatingDiff(start, [2, 4, 6], 5);
         return { seq: g.seq, next: g.next, hint: 'Het verschil herhaalt: +2, +4, +6.', label: 'herhaal +2,+4,+6' };
       },
       function () {
-        var start = randInt(3, 18);
-        var g = buildRepeatingDiff(start, [5, 2], 8);
+        var start = randInt(3, 12);
+        var g = buildRepeatingDiff(start, [5, 2], 6);
         return { seq: g.seq, next: g.next, hint: 'Het verschil herhaalt: +5, +2.', label: 'herhaal +5,+2' };
       },
       function () {
-        var start = randInt(45, 90);
-        var step = randInt(3, 6);
-        var g = buildArithmetic(start, -step, 6);
+        var start = randInt(20, 35);
+        var step = randInt(3, 5);
+        var g = buildArithmetic(start, -step, 5);
         return { seq: g.seq, next: g.next, hint: 'Het patroon daalt telkens met ' + step + '.', label: '-' + step };
       },
       function () {
-        var a = randInt(2, 5);
-        var b = randInt(2, 7);
+        var a = randInt(2, 4);
+        var b = randInt(a + 1, a + 4);
         var seq = [a, b];
-        while (seq.length < 6) seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
+        while (seq.length < 5) seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
         return { seq: seq, next: seq[seq.length - 1] + seq[seq.length - 2], hint: 'Elk getal is de som van de vorige twee.', label: 'som vorige 2' };
       },
       function () {
-        var start = randInt(1, 8);
+        var start = randInt(1, 5);
         var seq = [start];
-        for (var i = 1; i < 6; i++) seq.push(seq[i - 1] * 2 + 1);
+        for (var i = 1; i < 5; i++) seq.push(seq[i - 1] * 2 + 1);
         return { seq: seq, next: seq[seq.length - 1] * 2 + 1, hint: 'Eerst x2, daarna +1.', label: 'x2 +1' };
       },
       function () {
-        var start = randInt(2, 9);
         var seq = [];
-        for (var i = 0; i < 6; i++) seq.push(start + i * i);
-        return { seq: seq, next: start + 36, hint: 'Je telt kwadraten op: +0, +1, +4, +9 ...', label: 'start + n²' };
-      }
-    ];
-
-    var hardGenerators = [
-      function () {
-        var start = randInt(1, 3);
-        var g = buildGeometric(start, 3, 5);
-        return { seq: g.seq, next: g.next, hint: 'Elk getal is 3 keer het vorige.', label: 'x3' };
-      },
-      function () {
-        var start = randInt(3, 7);
-        var g = buildGeometric(start, 2, 6);
-        return { seq: g.seq, next: g.next, hint: 'Elk getal is het dubbele van het vorige.', label: 'x2 (grote start)' };
-      },
-      function () {
-        var a = randInt(2, 6);
-        var b = randInt(a + 1, a + 6);
-        var seq = [a, b];
-        while (seq.length < 7) seq.push(seq[seq.length - 1] + seq[seq.length - 2]);
-        return { seq: seq, next: seq[seq.length - 1] + seq[seq.length - 2], hint: 'Elk getal is de som van de vorige twee.', label: 'fibonacci-achtig' };
-      },
-      function () {
-        var seq = [];
-        for (var i = 2; i <= 7; i++) seq.push(i * i);
-        return { seq: seq, next: 64, hint: 'Dit zijn opeenvolgende kwadraten.', label: 'kwadraten' };
-      },
-      function () {
-        var seq = [];
-        for (var i = 1; i <= 5; i++) seq.push(i * i * i);
-        return { seq: seq, next: 216, hint: 'Dit zijn derdemachten: 1³, 2³, 3³ ...', label: 'kubussen' };
-      },
-      function () {
-        var start = randInt(3, 12);
-        var g = buildRepeatingDiff(start, [3, 6, 3, 6], 8);
-        return { seq: g.seq, next: g.next, hint: 'Het verschil wisselt: +3, +6, +3, +6 ...', label: '+3,+6' };
+        for (var i = 1; i <= 5; i++) seq.push(i * i);
+        return { seq: seq, next: 36, hint: 'Dit zijn kwadraten: 1², 2², 3² ...', label: 'kwadraten' };
       },
       function () {
         var start = randInt(2, 6);
         var seq = [start];
-        for (var i = 1; i < 6; i++) {
-          if (i % 2 === 1) seq.push(seq[i - 1] * 2);
-          else seq.push(seq[i - 1] + 3);
-        }
-        var next = 6 % 2 === 1 ? seq[seq.length - 1] * 2 : seq[seq.length - 1] + 3;
-        return { seq: seq, next: next, hint: 'Wissel steeds: x2, dan +3.', label: 'x2,+3 afwisselend' };
-      },
-      function () {
-        var start = randInt(10, 30);
-        var seq = [start];
         var add = 2;
-        while (seq.length < 7) {
+        while (seq.length < 5) {
           seq.push(seq[seq.length - 1] + add);
           add++;
         }
         return { seq: seq, next: seq[seq.length - 1] + add, hint: 'De sprongen groeien: +2, +3, +4 ...', label: 'groeiende sprongen' };
-      },
-      function () {
-        var start = randInt(20, 45);
-        var seq = [start];
-        for (var i = 1; i < 7; i++) {
-          if (i % 2 === 1) seq.push(seq[i - 1] - 4);
-          else seq.push(seq[i - 1] + 9);
-        }
-        var next = 7 % 2 === 1 ? seq[seq.length - 1] - 4 : seq[seq.length - 1] + 9;
-        return { seq: seq, next: next, hint: 'Wissel: -4, daarna +9.', label: '-4,+9' };
-      },
-      function () {
-        var base = randInt(2, 4);
-        var seq = [];
-        for (var i = 1; i <= 6; i++) seq.push(base * i * i);
-        return { seq: seq, next: base * 49, hint: 'Het zijn kwadraten, telkens vermenigvuldigd met ' + base + '.', label: base + ' x n²' };
-      },
-      function () {
-        var start = randInt(2, 8);
-        var seq = [start];
-        for (var i = 1; i < 6; i++) seq.push(seq[i - 1] * 3 - 1);
-        return { seq: seq, next: seq[seq.length - 1] * 3 - 1, hint: 'Steeds x3 en dan -1.', label: 'x3 -1' };
-      },
-      function () {
-        var start = randInt(12, 35);
-        var g = buildArithmetic(start, -randInt(5, 8), 6);
-        return { seq: g.seq, next: g.next, hint: 'Het patroon daalt met een vaste, grotere stap.', label: 'dalend (grote stap)' };
       }
     ];
 
-    var pool = round === 1 ? round1Generators : (round === 2 ? mediumGenerators : hardGenerators);
+    var pool = round === 1 ? round1Generators : (round === 2 ? round2Generators : round3Generators);
     var picked = null;
     for (var tries = 0; tries < 60; tries++) {
       var make = pool[Math.floor(Math.random() * pool.length)];
