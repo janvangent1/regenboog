@@ -145,6 +145,13 @@
     heartbeatInterval = setInterval(sendHeartbeat, 30000);
   }
 
+  function stopHeartbeat() {
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+    }
+  }
+
   // Track visit end
   function trackVisitEnd() {
     const visitStart = sessionStorage.getItem('regenboog_visit_start');
@@ -177,10 +184,18 @@
     // Clean up session storage
     sessionStorage.removeItem('regenboog_visit_start');
     sessionStorage.removeItem('regenboog_visit_page');
-    if (heartbeatInterval) {
-      clearInterval(heartbeatInterval);
-      heartbeatInterval = null;
+    stopHeartbeat();
+  }
+
+  function ensureVisitActive() {
+    const visitStart = sessionStorage.getItem('regenboog_visit_start');
+    const page = sessionStorage.getItem('regenboog_visit_page');
+    const visitorId = getVisitorId();
+    if (!visitStart || !page) {
+      trackVisitStart();
+      return;
     }
+    startHeartbeat(visitorId, page);
   }
 
   // Initialize tracking
@@ -196,14 +211,14 @@
   // Also track on pagehide (for mobile browsers)
   window.addEventListener('pagehide', trackVisitEnd);
 
-  // Track visibility change (when tab becomes hidden)
+  // Track visibility changes:
+  // - hidden: don't end visit immediately; pause heartbeat
+  // - visible: ensure tracking/heartbeat are active again
   document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
-      // Page is being hidden, track end
-      trackVisitEnd();
+      stopHeartbeat();
     } else {
-      // Page is visible again, start new visit
-      trackVisitStart();
+      ensureVisitActive();
     }
   });
 })();
