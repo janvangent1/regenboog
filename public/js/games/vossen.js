@@ -3,11 +3,16 @@
   const area = document.getElementById('game-area');
   const leaderboardEl = document.getElementById('leaderboard');
   const TOTAL_ROUNDS = 3;
-  const ROWS = 6;
-  const COLS = 8;
+  const GRID_SIZES = [
+    { rows: 6, cols: 8 },   // ronde 1
+    { rows: 6, cols: 8 },   // ronde 2
+    { rows: 8, cols: 10 }   // ronde 3 moeilijker: groter grid
+  ];
+  let rows = GRID_SIZES[0].rows;
+  let cols = GRID_SIZES[0].cols;
   let grid = [];
   let fox = { r: 0, c: 0 };
-  let goal = { r: ROWS - 1, c: COLS - 1 };
+  let goal = { r: rows - 1, c: cols - 1 };
   let moves = 0;
   let currentRound = 1;
   let totalScore = 0;
@@ -38,7 +43,7 @@
   /** BFS: is goal reachable from (0,0) without stepping on walls? */
   function isMazeSolvable() {
     var startR = 0, startC = 0;
-    var goalR = ROWS - 1, goalC = COLS - 1;
+    var goalR = rows - 1, goalC = cols - 1;
     if (grid[startR][startC] === 1 || grid[goalR][goalC] === 1) return false;
     var seen = {};
     seen['0,0'] = true;
@@ -49,7 +54,7 @@
       if (cell.r === goalR && cell.c === goalC) return true;
       for (var d = 0; d < 4; d++) {
         var nr = cell.r + dr[d], nc = cell.c + dc[d];
-        if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS) continue;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
         if (grid[nr][nc] === 1) continue;
         var key = nr + ',' + nc;
         if (seen[key]) continue;
@@ -63,20 +68,20 @@
   function createMaze(wallChance) {
     var maxAttempts = 50;
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
-      for (var r = 0; r < ROWS; r++) {
+      for (var r = 0; r < rows; r++) {
         grid[r] = [];
-        for (var c = 0; c < COLS; c++) {
-          grid[r][c] = r === 0 && c === 0 ? 0 : r === ROWS - 1 && c === COLS - 1 ? 0 : Math.random() < wallChance ? 1 : 0;
+        for (var c = 0; c < cols; c++) {
+          grid[r][c] = r === 0 && c === 0 ? 0 : r === rows - 1 && c === cols - 1 ? 0 : Math.random() < wallChance ? 1 : 0;
         }
       }
       grid[0][0] = 0;
-      grid[ROWS - 1][COLS - 1] = 0;
+      grid[rows - 1][cols - 1] = 0;
       if (isMazeSolvable()) return;
     }
     /* Fallback: no walls so path is straight (should not happen often) */
-    for (var r = 0; r < ROWS; r++) {
+    for (var r = 0; r < rows; r++) {
       grid[r] = [];
-      for (var c = 0; c < COLS; c++) {
+      for (var c = 0; c < cols; c++) {
         grid[r][c] = 0;
       }
     }
@@ -87,8 +92,11 @@
     wrap.className = 'vossen-grid-wrap';
     wrap.setAttribute('tabindex', '0');
     wrap.setAttribute('aria-label', 'Speelveld: stuur de vos met pijltjestoetsen naar het hol');
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
+    wrap.style.setProperty('--vossen-cols', String(cols));
+    wrap.style.setProperty('--vossen-rows', String(rows));
+    wrap.style.setProperty('--vossen-aspect', String(cols) + ' / ' + String(rows));
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
         const cell = document.createElement('div');
         cell.className = 'vossen-cell' + (grid[r][c] === 1 ? ' vossen-wall' : '');
         if (r === goal.r && c === goal.c) {
@@ -119,18 +127,21 @@
     window.RegenboogCore.updateHUDScore(CLASS_ID, liveScore);
     window.RegenboogCore.updateHUDRound(CLASS_ID, currentRound);
 
-    area.appendChild(wrap);
+    var layout = document.createElement('div');
+    layout.className = 'vossen-layout';
+    layout.appendChild(wrap);
     var hint = document.createElement('p');
     hint.className = 'game-score vossen-hint';
     hint.textContent = 'Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Zetten: ' + moves + ' – Gebruik pijltjestoetsen om het hol te bereiken.';
-    area.appendChild(hint);
+    layout.appendChild(hint);
+    area.appendChild(layout);
     wrap.focus();
   }
 
   function move(dr, dc) {
     const nr = fox.r + dr;
     const nc = fox.c + dc;
-    if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS || grid[nr][nc] === 1) return;
+    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || grid[nr][nc] === 1) return;
     fox.r = nr;
     fox.c = nc;
     moves++;
@@ -196,13 +207,45 @@
 
   function run() {
     var wallChance = currentRound === 1 ? 0.28 : currentRound === 2 ? 0.35 : 0.42;
+    var size = GRID_SIZES[Math.max(0, Math.min(TOTAL_ROUNDS - 1, currentRound - 1))];
+    rows = size.rows;
+    cols = size.cols;
     moves = 0;
     fox = { r: 0, c: 0 };
-    goal = { r: ROWS - 1, c: COLS - 1 };
+    goal = { r: rows - 1, c: cols - 1 };
     createMaze(wallChance);
     render();
   }
 
-  run();
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Vossen - Hol Zoeken</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">' +
+      '    Help de vos de weg naar het hol te vinden in een doolhof.' +
+      '  </p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0e8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Gebruik de pijltjestoetsen om de vos te bewegen</p>' +
+      '    <p style="margin:0.5rem 0;">- Vermijd muren en bereik het hol zo snel mogelijk</p>' +
+      '    <p style="margin:0.5rem 0;">- 3 rondes: ronde 3 heeft een grotere grid</p>' +
+      '    <p style="margin:0.5rem 0;">- Minder zetten = hogere score</p>' +
+      '  </div>' +
+      '  <div>' +
+      '    <button type="button" id="vossen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #8b4513, #6b3410); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button>' +
+      '  </div>' +
+      '</div>';
+
+    var startBtn = document.getElementById('vossen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', function () {
+        currentRound = 1;
+        totalScore = 0;
+        run();
+      });
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

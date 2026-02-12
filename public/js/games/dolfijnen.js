@@ -92,32 +92,7 @@
     hoops = [];
     fishes = [];
     lastSpawnTime = 0;
-    
-    area.innerHTML = `
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <h3>Ronde ${currentRound + 1}/${TOTAL_ROUNDS}</h3>
-        <p>Beweeg je cursor op/neer om de dolfijn te besturen. Zwem door hoepels, eet visjes en vermijd obstakels!</p>
-        <div style="margin: 1rem 0;">
-          <div style="display: inline-block; margin: 0 1rem;">
-            <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #00FF00; border-radius: 50%; margin-right: 0.5rem; vertical-align: middle;"></div>
-            Hoepel = +10 punten
-          </div>
-          <div style="display: inline-block; margin: 0 1rem;">
-            <span style="font-size: 2rem;">🐟</span> Vis = +5 punten
-          </div>
-          <div style="display: inline-block; margin: 0 1rem;">
-            <span style="font-size: 2rem;">🪨</span> Obstakel = -20 punten
-          </div>
-        </div>
-        <button id="dolfijnen-start" style="padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5)); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
-          Start Spel
-        </button>
-      </div>
-      <div id="dolfijnen-hud-container" style="display: none; margin-bottom: 0.5rem;"></div>
-      <canvas id="dolfijnen-canvas" style="border: 2px solid var(--border); border-radius: 12px; background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%); display: none; cursor: none;"></canvas>
-    `;
-    
-    document.getElementById('dolfijnen-start').addEventListener('click', startRound);
+    startRound();
   }
   
   // Expose startRound to window for onclick handler
@@ -160,8 +135,8 @@
     if (hudContainer) {
       hudContainer.innerHTML = window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, false, true);
       hudContainer.style.display = 'block';
-    } else {
-      // Als container niet bestaat, voeg HUD toe voor canvas
+    } else if (!document.getElementById(CLASS_ID + '-hud')) {
+      // Alleen toevoegen als er nog geen HUD staat (voorkomt dubbele score/ronde).
       const hudHtml = window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, false, true);
       if (canvas && canvas.parentNode) {
         const tempDiv = document.createElement('div');
@@ -566,6 +541,31 @@
   // Initialize dolphin image loading
   loadDolphinImage();
   
-  init();
+  function startFresh() {
+    currentRound = 0;
+    totalScore = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Dolfijnen - Oceaan Sprint</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Zwemt met de dolfijn en verzamel de juiste items.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#e6f7ff; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Beweeg de dolfijn met de besturing</p>' +
+      '    <p style="margin:0.5rem 0;">- Pak goede objecten en vermijd slechte</p>' +
+      '    <p style="margin:0.5rem 0;">- Speel 3 rondes met hogere snelheid</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="dolfijnen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #0ea5e9, #0369a1); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('dolfijnen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

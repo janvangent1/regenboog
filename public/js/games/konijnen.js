@@ -11,6 +11,31 @@
   let timerId;
   let running = false;
 
+  function playSound(frequency, duration, type, volume) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      function run() {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      }
+      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+      else run();
+    } catch (e) {}
+  }
+
+  function playCollectSound() { playSound(740, 0.08, 'triangle', 0.06); }
+  function playRoundDoneSound() { playSound(560, 0.14, 'sine', 0.06); }
+
 
   const CARROT_SIZE = 88;
   const CARROT_PADDING = 12;
@@ -30,6 +55,7 @@
     carrot.addEventListener('click', function () {
       score++;
       window.RegenboogCore.updateHUDScore(CLASS_ID, score);
+      playCollectSound();
       carrot.remove();
       spawnCarrot();
     });
@@ -60,6 +86,7 @@
         area.querySelectorAll('.carrot-btn').forEach((b) => b.remove());
         totalScore += score;
         if (currentRound + 1 >= TOTAL_ROUNDS) {
+          playRoundDoneSound();
           area.innerHTML = '<p class="game-score">Alle ' + TOTAL_ROUNDS + ' rondes klaar! Totaal ' + totalScore + ' wortels.</p>';
           window.Leaderboard.showSubmitForm(CLASS_ID, totalScore, function () {
             window.Leaderboard.render(leaderboardEl, CLASS_ID);
@@ -67,6 +94,7 @@
           return;
         }
         currentRound++;
+        playRoundDoneSound();
         area.innerHTML =
           '<p class="game-score">Ronde klaar! ' + score + ' wortels. Totaal: ' + totalScore + '</p>' +
           '<button type="button" id="konijnen-next">Volgende ronde</button>';
@@ -83,6 +111,26 @@
     currentRound = 0;
     start();
   }
-  startFresh();
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Konijnen - Wortel Vangst</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Klik zo snel mogelijk op de wortels en haal een hoge score.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0e8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik op elke wortel die verschijnt</p>' +
+      '    <p style="margin:0.5rem 0;">- Werk zo snel mogelijk voor meer punten</p>' +
+      '    <p style="margin:0.5rem 0;">- Speel 3 rondes met oplopende moeilijkheid</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="konijnen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #6fbf73, #4d9f55); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('konijnen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

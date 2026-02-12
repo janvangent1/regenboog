@@ -111,6 +111,79 @@
   color: var(--rainbow-5);
 }
 
+/* Gestandaardiseerde intro-blokken voor alle spellen */
+.core-intro {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.core-intro-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #2f3e4f;
+}
+
+.core-intro-subtitle {
+  margin: 0.6rem auto 0;
+  max-width: 680px;
+  font-size: 1.05rem;
+  color: #4a5568;
+}
+
+.core-intro-card {
+  margin: 1rem auto 0;
+  max-width: 680px;
+  padding: 1rem 1.1rem;
+  border-radius: 12px;
+  border: 2px solid #d5dee8;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  text-align: left;
+}
+
+.core-intro-card p {
+  margin: 0.45rem 0;
+  color: #374151;
+}
+
+.core-intro-card ul,
+.core-intro-card ol {
+  list-style: none;
+  margin: 0.45rem 0;
+  padding-left: 0;
+}
+
+.core-intro-card li {
+  margin: 0.45rem 0;
+  color: #374151;
+}
+
+.core-intro-step {
+  font-weight: 500;
+}
+
+.core-intro-actions {
+  margin-top: 0.95rem;
+}
+
+.core-intro-start {
+  padding: 0.95rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5));
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.core-intro-start:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
 .leaderboard-box {
   margin-top: 1.25rem;
   padding: 1.25rem;
@@ -381,18 +454,26 @@
 }
 
 /* Vossen – Hol Zoeken: responsive grid + toetsenbord */
+.vossen-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .vossen-grid-wrap {
   display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+  grid-template-columns: repeat(var(--vossen-cols, 8), 1fr);
+  grid-template-rows: repeat(var(--vossen-rows, 6), 1fr);
   width: 100%;
   max-width: min(420px, 95vw);
-  aspect-ratio: 8 / 6;
+  aspect-ratio: var(--vossen-aspect, 8 / 6);
   border: 2px solid #8b4513;
   border-radius: 8px;
   overflow: hidden;
   background: #f5deb3;
   outline: none;
+  margin: 0 auto;
 }
 
 .vossen-grid-wrap:focus {
@@ -438,6 +519,7 @@
 .vossen-hint {
   margin-top: 0.75rem;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 /* Draken – Vuur Bollen: draak schiet op doelen */
@@ -564,6 +646,14 @@
 }
 
 /* Beren – Honing Verzamelen: doolhofgrid met beer en honing */
+.beren-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .beren-instruction {
   font-size: 1rem;
   font-weight: 600;
@@ -650,6 +740,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: center;
   margin: 0.5rem 0;
 }
 
@@ -685,8 +776,9 @@
 }
 
 .beren-run {
+  display: block;
   padding: 10px 24px;
-  margin-top: 0.5rem;
+  margin: 0.5rem auto 0;
   font-size: 1rem;
   font-weight: 700;
   border-radius: 10px;
@@ -703,7 +795,10 @@
 }
 
 .beren-again {
+  display: block;
   margin-top: 1rem;
+  margin-left: auto;
+  margin-right: auto;
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: 10px;
@@ -715,6 +810,14 @@
 }
 
 /* Leeuwen – Jacht Planning: doolhofgrid met leeuw en prooi */
+.leeuwen-layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .leeuwen-instruction {
   font-size: 1rem;
   font-weight: 600;
@@ -801,6 +904,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: center;
   margin: 0.5rem 0;
 }
 
@@ -836,8 +940,9 @@
 }
 
 .leeuwen-run {
+  display: block;
   padding: 10px 24px;
-  margin-top: 0.5rem;
+  margin: 0.5rem auto 0;
   font-size: 1rem;
   font-weight: 700;
   border-radius: 10px;
@@ -854,7 +959,10 @@
 }
 
 .leeuwen-again {
+  display: block;
   margin-top: 1rem;
+  margin-left: auto;
+  margin-right: auto;
   padding: 10px 20px;
   font-size: 1rem;
   border-radius: 10px;
@@ -947,178 +1055,331 @@
   line-height: 1;
 }
 
-/* Panda's – Bamboe Labyrint: doolhofgrid met panda en bamboe */
-.pandas-instruction {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: var(--text);
-}
-
-.pandas-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(6, 1fr);
+/* Panda's – Ruimteverdediging: panda schiet bamboe op vallend puin */
+.pandas-layout {
   width: 100%;
-  max-width: min(300px, 90vw);
-  aspect-ratio: 1;
-  gap: 3px;
-  margin: 1rem 0;
-  padding: 6px;
-  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 50%, #81c784 100%);
-  border-radius: 12px;
-  border: 2px solid #2e7d32;
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);
-}
-
-.pandas-cell {
-  min-height: 0;
-  min-width: 0;
-  border-radius: 6px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  background: #e8f5e9;
-  border: 1px solid #a5d6a7;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  border-radius: 14px;
+  border: 2px solid #1a2f4d;
+  background: linear-gradient(180deg, #edf5ff 0%, #d9e9ff 100%);
 }
 
-.pandas-cell.pandas-start {
-  background: linear-gradient(180deg, #fff8e1 0%, #fff3e0 100%);
-  border-color: #5d4037;
-}
-
-.pandas-cell.pandas-bamboo {
-  background: linear-gradient(180deg, #c8e6c9 0%, #a5d6a7 100%);
-  border-color: #2e7d32;
-}
-
-.pandas-cell.pandas-wall {
-  background: #4e342e;
-  border-color: #3e2723;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.pandas-panda {
-  width: 70%;
-  height: 70%;
-  object-fit: contain;
-}
-
-.pandas-panda-emoji {
-  font-size: min(8vw, 1.8rem);
-  line-height: 1;
-}
-
-.pandas-bamboo-icon {
-  font-size: min(8vw, 1.8rem);
-  line-height: 1;
-}
-
-.pandas-sequence {
-  margin: 0.5rem 0;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.pandas-buttons {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin: 0.5rem 0;
-}
-
-.pandas-dir-btn,
-.pandas-clear-btn {
-  padding: 6px 12px;
-  font-size: 0.9rem;
-  border-radius: 8px;
-  border: 2px solid #2e7d32;
-  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
-  color: #1b5e20;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.pandas-dir-btn:hover,
-.pandas-clear-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
-}
-
-.pandas-clear-btn {
-  border-color: #5d4037;
-  background: linear-gradient(180deg, #efebe9 0%, #d7ccc8 100%);
-  color: #4e342e;
-}
-
-.pandas-run {
-  padding: 10px 24px;
-  margin-top: 0.5rem;
+.pandas-instruction {
+  margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  border-radius: 10px;
-  border: 2px solid #2e7d32;
-  background: linear-gradient(180deg, #2e7d32 0%, #1b5e20 100%);
-  color: white;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
+  color: #23395d;
 }
 
-.pandas-run:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+.pandas-progress {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #355f2f;
 }
 
-.pandas-again {
-  margin-top: 1rem;
-  padding: 10px 20px;
-  font-size: 1rem;
-  border-radius: 10px;
-  border: 2px solid #5d4037;
-  background: linear-gradient(180deg, #a5d6a7 0%, #81c784 100%);
-  color: #1b5e20;
+.pandas-legend {
+  width: 100%;
+  max-width: min(420px, 92vw);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.1rem;
+}
+
+.pandas-legend-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #1f2f46;
+  margin-right: 4px;
+}
+
+.pandas-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #cad7ea;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 0.78rem;
   font-weight: 600;
+  color: #2a3f5f;
+}
+
+.pandas-canvas {
+  width: 100%;
+  max-width: min(420px, 92vw);
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 2px solid #10253f;
+  background: #132844;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
+}
+
+.pandas-controls {
+  width: 100%;
+  max-width: min(420px, 92vw);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.pandas-control-btn {
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 2px solid #223a5c;
+  background: linear-gradient(180deg, #ffffff 0%, #eef3fb 100%);
+  color: #1f2f46;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.14s, box-shadow 0.14s;
+}
+
+.pandas-control-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(34, 58, 92, 0.25);
+}
+
+.pandas-shoot-btn {
+  border-color: #3d7c3c;
+  background: linear-gradient(180deg, #f3ffe8 0%, #dff3c8 100%);
+  color: #245b24;
+}
+
+.pandas-message {
+  margin: 0.2rem 0 0;
+  min-height: 1.4rem;
+  font-size: 0.92rem;
+  color: #2f3f56;
+  font-weight: 600;
+}
+
+.pandas-next {
+  margin-top: 0.2rem;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 2px solid #2b5f2a;
+  background: linear-gradient(180deg, #e6ffdf 0%, #c7efb9 100%);
+  color: #214a1f;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pandas-finish {
+  text-align: center;
+  margin-top: 1rem;
 }
 
 /* Zebra's – Patroon Logica (5e leerjaar, 10-11 jaar) */
-.zebras-instruction {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--text);
-}
-
-.zebras-sequence {
-  font-size: 1.2rem;
-  margin: 0.75rem 0;
-  color: var(--text);
-}
-
-.zebras-buttons {
+.zebras-layout {
+  width: 100%;
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 1rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border-radius: 16px;
+  border: 2px solid #222;
+  background:
+    linear-gradient(0deg, rgba(255, 255, 255, 0.93), rgba(255, 255, 255, 0.93)),
+    repeating-linear-gradient(
+      120deg,
+      #f2f2f2 0 14px,
+      #ffffff 14px 28px
+    );
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 
-.zebras-btn {
-  padding: 12px 20px;
-  font-size: 1.2rem;
+.zebras-theme-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.2rem;
+}
+
+.zebras-theme-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 2px solid #1f1f1f;
+  background: linear-gradient(180deg, #ffffff 0%, #ececec 100%);
+}
+
+.zebras-theme-icon {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.zebras-theme-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #202020;
+  letter-spacing: 0.02em;
+}
+
+.zebras-instruction {
+  font-size: 1.02rem;
   font-weight: 700;
-  border-radius: 10px;
+  margin: 0;
+  color: var(--text);
+  max-width: 660px;
+}
+
+.zebras-sequence-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 0.2rem 0 0.6rem;
+}
+
+.zebras-seq-chip {
+  min-width: 52px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 2px solid #2f2f2f;
+  background: linear-gradient(180deg, #ffffff 0%, #f2f2f2 100%);
+  color: #222;
+  font-size: 1.1rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.zebras-seq-missing {
+  border-style: dashed;
+  border-color: #555;
+  background: linear-gradient(180deg, #f7f7f7 0%, #ececec 100%);
+}
+
+.zebras-options {
+  width: 100%;
+  max-width: 520px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.zebras-option {
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 12px;
   border: 2px solid #333;
   background: linear-gradient(180deg, #fff 0%, #f0f0f0 100%);
   color: #222;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.zebras-btn:hover {
+.zebras-option:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.zebras-option-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2f2f2f;
+  color: #fff;
+  font-size: 0.82rem;
+}
+
+.zebras-option-correct {
+  border-color: #2a9d8f;
+  background: linear-gradient(180deg, #dff7f3 0%, #c9eee7 100%);
+}
+
+.zebras-option-wrong {
+  border-color: #d64545;
+  background: linear-gradient(180deg, #ffe9e9 0%, #ffd6d6 100%);
+}
+
+.zebras-option-disabled,
+.zebras-option:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.zebras-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 0.3rem;
+}
+
+.zebras-hint-btn,
+.zebras-next-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 2px solid #333;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zebras-hint-btn {
+  background: linear-gradient(180deg, #fff8e1 0%, #ffe9a8 100%);
+  color: #5f4b00;
+  border-color: #b58d00;
+}
+
+.zebras-next-btn {
+  background: linear-gradient(180deg, #dff7f3 0%, #c2ece4 100%);
+  color: #145c53;
+  border-color: #2a9d8f;
+}
+
+.zebras-feedback {
+  margin: 0.2rem 0 0;
+  min-height: 1.4rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.zebras-feedback-success {
+  color: #1f7a42;
+}
+
+.zebras-feedback-error {
+  color: #b02a2a;
+}
+
+.zebras-feedback-hint {
+  color: #7a5d00;
+}
+
+.zebras-end-note {
+  text-align: center;
+  color: var(--text-soft);
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 520px) {
+  .zebras-options {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Giraffen – Dierentetris (1 ronde) */
@@ -1348,136 +1609,86 @@
   }
 }
 
-/* Zwaluwen – Vang de vliegjes: reactiespel */
-.zwaluwen-instruction {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--text);
-}
-
-.zwaluwen-arena {
-  position: relative;
+/* Zwaluwen – Pac-vlucht: doolhof met bolletjes en roofvogels */
+.zwaluwen-layout {
   width: 100%;
-  min-height: 320px;
-  max-width: 420px;
-  margin: 0 auto;
-  padding: 1rem;
-  background: linear-gradient(180deg, #87ceeb 0%, #b0e0e6 40%, #e0f4ff 100%);
-  border-radius: 16px;
-  border: 2px solid #5a9fb8;
-  overflow: hidden;
-  box-shadow: inset 0 0 60px rgba(255,255,255,0.3);
-}
-
-.zwaluwen-bird {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 56px;
-  height: 56px;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.zwaluwen-sprite {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
-}
-
-.zwaluwen-emoji-fallback {
-  font-size: 2rem;
-  line-height: 1;
-  display: block;
-}
-
-.zwaluwen-bugs {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-
-.zwaluwen-bugs > * {
-  pointer-events: auto;
-}
-
-.zwaluwen-bug {
-  position: absolute;
-  width: 44px;
-  height: 44px;
-  margin-left: -22px;
-  margin-top: -22px;
-  padding: 0;
-  border: none;
-  border-radius: 50%;
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-  background: rgba(255,255,255,0.7);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transition: transform 0.15s, opacity 0.2s;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  animation: zwaluwen-bug-appear 0.2s ease-out;
-}
-
-@keyframes zwaluwen-bug-appear {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.zwaluwen-bug:hover {
-  transform: scale(1.15);
-  background: rgba(255,255,255,0.95);
-}
-
-.zwaluwen-bug.zwaluwen-caught {
-  animation: zwaluwen-caught 0.15s ease-out forwards;
-  pointer-events: none;
-}
-
-@keyframes zwaluwen-caught {
-  to { transform: scale(0); opacity: 0; }
-}
-
-.zwaluwen-bug.zwaluwen-missed {
-  opacity: 0.4;
-  animation: zwaluwen-missed 0.3s ease-out forwards;
-}
-
-@keyframes zwaluwen-missed {
-  to { transform: scale(1.2); opacity: 0; }
-}
-
-.zwaluwen-hud {
-  position: absolute;
-  bottom: 12px;
-  left: 0;
-  right: 0;
   text-align: center;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #2c5282;
-  text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+  gap: 0.55rem;
 }
 
-.zwaluwen-again {
-  margin-top: 1rem;
-  padding: 10px 24px;
+.zwaluwen-instruction {
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 0;
+  color: #24374f;
+  max-width: 720px;
+}
+
+.zwaluwen-progress {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3a5f87;
+}
+
+.zwaluwen-canvas {
+  width: 100%;
+  max-width: min(520px, 95vw);
+  border: 2px solid #1f3959;
+  border-radius: 12px;
+  background: #dff3ff;
+}
+
+.zwaluwen-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: min(360px, 80vw);
+}
+
+.zwaluwen-dir-btn {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 2px solid #5a9fb8;
+  background: linear-gradient(180deg, #f0f7ff 0%, #d7e8f8 100%);
+  color: #1f3d5b;
   font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+
+.zwaluwen-dir-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(31, 61, 91, 0.22);
+}
+
+.zwaluwen-message {
+  margin: 0.1rem 0 0;
+  min-height: 1.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #3d4f62;
+}
+
+.zwaluwen-next-btn {
+  margin-top: 0.8rem;
+  padding: 10px 20px;
   border-radius: 10px;
   border: 2px solid #5a9fb8;
   background: linear-gradient(180deg, #87ceeb 0%, #6bb6d6 100%);
   color: #1a365d;
   font-weight: 700;
   cursor: pointer;
+}
+
+.zwaluwen-end-note {
+  margin-top: 0.4rem;
+  color: var(--text-soft);
 }
 
 /* Kangoeroes – Spring naar het getal: pad met stenen en springende kangoeroe */

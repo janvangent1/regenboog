@@ -10,6 +10,31 @@
   let mistakes = 0;
   let timerInterval = null;
 
+  function playSound(frequency, duration, type, volume) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      function run() {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      }
+      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+      else run();
+    } catch (e) {}
+  }
+
+  function playCorrectSound() { playSound(660, 0.12, 'sine', 0.055); }
+  function playWrongSound() { playSound(210, 0.16, 'sawtooth', 0.065); }
+
   // Verschillende soorten voedsel
   const FOOD_TYPES = {
     plant: { emoji: '🌿', name: 'waterplanten' },
@@ -208,6 +233,7 @@
         const n = parseInt(btn.dataset.n, 10);
         
         if (n === count) {
+          playCorrectSound();
           stopTimer();
           updateTimerAndScore(); // Final update
           correct++;
@@ -250,6 +276,7 @@
           }
         } else {
           // Fout antwoord
+          playWrongSound();
           mistakes++;
           updateTimerAndScore(); // Update score na fout (timer blijft lopen)
           // Wacht even zodat speler de score update ziet, dan stop timer en toon resultaat
@@ -276,6 +303,35 @@
     });
   }
 
-  newRound();
+  function startFresh() {
+    stopTimer();
+    round = 0;
+    correct = 0;
+    totalScore = 0;
+    mistakes = 0;
+    startTime = 0;
+    newRound();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Nijlpaarden - Tel de Dieren</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Kijk goed en kies hoeveel nijlpaarden je ziet.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#eef3f8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Tel de nijlpaarden op het scherm</p>' +
+      '    <p style="margin:0.5rem 0;">- Kies het juiste aantal</p>' +
+      '    <p style="margin:0.5rem 0;">- Sneller en minder fouten geeft meer punten</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="nijlpaarden-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #4a5568, #2d3748); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('nijlpaarden-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

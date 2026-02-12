@@ -445,6 +445,25 @@
   window.addEventListener('beforeunload', stopTimers);
   document.addEventListener('keydown', handleKeyDown);
 
-  startGame();
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Giraffen - Blokken Toren</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Stapel dierenvormen en maak volle rijen voor punten.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#fff4e6; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Beweeg met pijltjes links/rechts</p>' +
+      '    <p style="margin:0.5rem 0;">- Draai met pijl omhoog</p>' +
+      '    <p style="margin:0.5rem 0;">- Maak meerdere volle rijen tegelijk voor bonuspunten</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="giraffen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #dd6b20, #b45309); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('giraffen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startGame);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

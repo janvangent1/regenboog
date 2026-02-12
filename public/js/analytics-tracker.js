@@ -4,6 +4,7 @@
  */
 (function() {
   'use strict';
+  let heartbeatInterval = null;
 
   // Cookie helper functions
   function setCookie(name, value, days) {
@@ -97,6 +98,51 @@
       // Silently fail - analytics should not break the site
       console.debug('Analytics tracking failed:', err);
     });
+
+    startHeartbeat(visitorId, page);
+  }
+
+  function sendHeartbeat() {
+    const visitorId = getVisitorId();
+    const page = sessionStorage.getItem('regenboog_visit_page') || getCurrentPage();
+    if (!visitorId || !page) return;
+
+    fetch('/api/track-visit-heartbeat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        visitor_id: visitorId,
+        page: page
+      }),
+      keepalive: true
+    }).catch(err => {
+      console.debug('Analytics heartbeat failed:', err);
+    });
+  }
+
+  function startHeartbeat(visitorId, page) {
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+    }
+    // Send first ping quickly, then every 30s
+    fetch('/api/track-visit-heartbeat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        visitor_id: visitorId,
+        page: page
+      }),
+      keepalive: true
+    }).catch(err => {
+      console.debug('Analytics heartbeat start failed:', err);
+    });
+
+    heartbeatInterval = setInterval(sendHeartbeat, 30000);
   }
 
   // Track visit end
@@ -131,6 +177,10 @@
     // Clean up session storage
     sessionStorage.removeItem('regenboog_visit_start');
     sessionStorage.removeItem('regenboog_visit_page');
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      heartbeatInterval = null;
+    }
   }
 
   // Initialize tracking

@@ -287,6 +287,36 @@
     showQuestion();
   }
 
-  newRound();
+  function startFresh() {
+    stopTimer();
+    round = 0;
+    questionInRound = 0;
+    correct = 0;
+    totalScore = 0;
+    mistakes = 0;
+    startTime = 0;
+    newRound();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Kangoeroes - Spring Sommen</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Kies het juiste antwoord en spring over de stenen.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0e8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Los elke som op door op een steen te klikken</p>' +
+      '    <p style="margin:0.5rem 0;">- Foute antwoorden geven strafpunten</p>' +
+      '    <p style="margin:0.5rem 0;">- Speel 3 rondes met telkens 5 vragen</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="kangoeroes-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #8b5e34, #6f4518); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('kangoeroes-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

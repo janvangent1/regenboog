@@ -16,6 +16,32 @@
   let currentRound = 1;
   let totalMoves = 0;
 
+  function playSound(frequency, duration, type, volume) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      function run() {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume || 0.045, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      }
+      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+      else run();
+    } catch (e) {}
+  }
+
+  function playFlipSound() { playSound(420, 0.05, 'triangle', 0.035); }
+  function playMatchSound() { playSound(680, 0.12, 'sine', 0.055); }
+  function playMismatchSound() { playSound(210, 0.14, 'sawtooth', 0.06); }
+
   /* Cheese illustrations as inline SVG (different types for matching) */
   const cheeseSvgs = [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true"><path fill="#f4c430" stroke="#d4a017" stroke-width="1.5" d="M8 32 L32 8 L56 32 L32 56 Z"/><path fill="#e6b422" d="M32 14 L50 32 L32 50 L14 32 Z"/><circle cx="24" cy="26" r="3" fill="#d4a017" opacity="0.6"/><circle cx="40" cy="38" r="2.5" fill="#d4a017" opacity="0.6"/></svg>',
@@ -46,6 +72,7 @@
     if (block || flipped.length >= 2) return;
     const card = cards[idx];
     if (card.matched || card.el.classList.contains('flipped')) return;
+    playFlipSound();
     card.el.classList.add('flipped');
     card.el.innerHTML = card.svg;
     flipped.push({ idx, svg: card.svg });
@@ -55,6 +82,7 @@
       if (movesEl) movesEl.textContent = 'Zetten: ' + moves;
       block = true;
       if (flipped[0].svg === flipped[1].svg) {
+        playMatchSound();
         cards[flipped[0].idx].matched = true;
         cards[flipped[1].idx].matched = true;
         pairsFound += 1;
@@ -70,6 +98,7 @@
           }
         }
       } else {
+        playMismatchSound();
         setTimeout(function () {
           cards[flipped[0].idx].el.classList.remove('flipped');
           cards[flipped[0].idx].el.innerHTML = '?';
@@ -140,6 +169,31 @@
     area.appendChild(grid);
   }
 
-  init();
+  function startFresh() {
+    currentRound = 1;
+    totalMoves = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Muizen - Kaasmemory</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Vind de juiste paren en onthoud waar de kaas zit.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#fff9e6; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Draai telkens 2 kaarten om</p>' +
+      '    <p style="margin:0.5rem 0;">- Vind alle paren om door te gaan</p>' +
+      '    <p style="margin:0.5rem 0;">- Minder zetten geeft een hogere eindscore</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="muizen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #d69e2e, #b7791f); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('muizen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

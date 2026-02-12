@@ -12,6 +12,31 @@
   let timerId;
   let running = false;
 
+  function playSound(frequency, duration, type, volume) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      function run() {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      }
+      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+      else run();
+    } catch (e) {}
+  }
+
+  function playCorrectSound() { playSound(660, 0.1, 'sine', 0.06); }
+  function playWrongSound() { playSound(220, 0.16, 'sawtooth', 0.07); }
+
   function spawnFish() {
     if (!running || Date.now() >= endTime) return;
     var speed = FALL_SPEEDS[currentRound] || 4;
@@ -39,6 +64,7 @@
     fish.addEventListener('click', function () {
       score++;
       window.RegenboogCore.updateHUDScore(CLASS_ID, score);
+      playCorrectSound();
       clearInterval(fall);
       fish.remove();
     });
@@ -72,6 +98,7 @@
     badItem.addEventListener('click', function () {
       score = Math.max(0, score - 1);
       window.RegenboogCore.updateHUDScore(CLASS_ID, score);
+      playWrongSound();
       badItem.style.animation = 'shake 0.3s';
       setTimeout(function() {
         clearInterval(fall);
@@ -154,6 +181,7 @@
         area.style.cursor = '';
         totalScore += score;
         if (currentRound + 1 >= TOTAL_ROUNDS) {
+          playCorrectSound();
           area.innerHTML = '<p class="game-score">Alle ' + TOTAL_ROUNDS + ' rondes klaar! Totaal ' + totalScore + ' vissen.</p>';
           window.Leaderboard.showSubmitForm(CLASS_ID, totalScore, function () {
             window.Leaderboard.render(leaderboardEl, CLASS_ID);
@@ -161,6 +189,7 @@
           return;
         }
         currentRound++;
+        playCorrectSound();
         area.innerHTML =
           '<p class="game-score">Ronde klaar! ' + score + ' vissen. Totaal: ' + totalScore + '</p>' +
           '<button type="button" id="pinguins-next">Volgende ronde</button>';
@@ -194,6 +223,25 @@
     currentRound = 0;
     start();
   }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Pinguins - Vang de Vissen</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Beweeg met je muis en klik de vallende vissen.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#eef6ff; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik op vissen om punten te verdienen</p>' +
+      '    <p style="margin:0.5rem 0;">- Vermijd schoenen, die kosten punten</p>' +
+      '    <p style="margin:0.5rem 0;">- Elke ronde vallen objecten sneller</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="pinguins-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #4a90e2, #2d6fb6); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('pinguins-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
   
   // Cleanup on page unload
   window.addEventListener('beforeunload', function() {
@@ -203,6 +251,6 @@
     }
   });
   
-  startFresh();
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

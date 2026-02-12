@@ -35,6 +35,10 @@
     return 0.55;
   }
 
+  function getMinHoneyDistance() {
+    return 4;
+  }
+
   var dirToArrow = { omhoog: '\u2191', omlaag: '\u2193', links: '\u2190', rechts: '\u2192' };
   function pathToArrows(path) {
     return path.map(function (d) { return dirToArrow[d] || d; }).join(' ');
@@ -225,7 +229,32 @@
     gridCols = gs.cols;
     var minSteps = getMinSteps(currentRound);
     var wallChance = getWallChance(currentRound);
-    var res = genPath(minSteps, gridRows, gridCols);
+    var minHoneyDistance = getMinHoneyDistance();
+    var res = null;
+    var buildTry = 0;
+    while (buildTry < 60) {
+      buildTry++;
+      var candidate = genPath(minSteps, gridRows, gridCols);
+      var distanceFromStart = Math.abs(candidate.r) + Math.abs(candidate.c);
+      if (distanceFromStart >= minHoneyDistance) {
+        res = candidate;
+        break;
+      }
+    }
+    if (!res) {
+      // Fallback: forceer een veilige afstand in de laatste kolom/rij.
+      res = genPath(minSteps, gridRows, gridCols);
+      if (gridCols > 4) {
+        res.r = Math.min(gridRows - 1, 1);
+        res.c = gridCols - 1;
+      } else {
+        res.r = gridRows - 1;
+        res.c = Math.min(gridCols - 1, 3);
+      }
+      if (res.pathCells && res.pathCells.length > 0) {
+        res.pathCells[res.pathCells.length - 1] = { r: res.r, c: res.c };
+      }
+    }
     targetPath = res.path;
     honey = { r: res.r, c: res.c };
     playerPath = [];
@@ -266,11 +295,13 @@
     var gridStyle = 'position: relative; display: grid; grid-template-columns: repeat(' + gridCols + ', 1fr); grid-template-rows: repeat(' + gridRows + ', 1fr); width: 100%; max-width: min(320px, 90vw); aspect-ratio: ' + gridCols + '/' + gridRows + '; gap: 4px; margin: 1rem 0; padding: 8px; background: linear-gradient(180deg, #e8dcc4 0%, #d4c4a0 100%); border-radius: 12px; border: 2px solid #8b7355; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);';
     area.innerHTML =
       window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, true, true) +
+      '<div class="beren-layout">' +
       '<p class="beren-instruction">Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Programmeer de beer: kies de juiste volgorde om bij de honing te komen. Start linksboven!</p>' +
       '<div class="beren-grid" style="' + gridStyle + '">' + gridHtml + '</div>' +
       '<p id="beren-sequence" class="beren-sequence">Jouw volgorde: <span id="beren-sequence-arrows" class="beren-sequence-arrows">—</span></p>' +
       '<div id="beren-buttons" class="beren-buttons"></div>' +
-      '<button type="button" id="beren-run" class="beren-run">Start</button>';
+      '<button type="button" id="beren-run" class="beren-run">Start</button>' +
+      '</div>';
 
     window.RegenboogCore.updateHUDRound(CLASS_ID, currentRound);
     updateLiveScore();
@@ -400,6 +431,35 @@
     });
   }
 
-  run();
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Beer naar de honing</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">' +
+      '    Help de beer stap voor stap bij de honing te komen.' +
+      '  </p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0e8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik pijltjes om een route te programmeren</p>' +
+      '    <p style="margin:0.5rem 0;">- Klik Start om de route uit te voeren</p>' +
+      '    <p style="margin:0.5rem 0;">- Vermijd muren en bereik de honing</p>' +
+      '    <p style="margin:0.5rem 0;">- 3 rondes: grotere grid en meer uitdaging</p>' +
+      '  </div>' +
+      '  <div>' +
+      '    <button type="button" id="beren-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #2a9d8f, #238276); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button>' +
+      '  </div>' +
+      '</div>';
+
+    var startBtn = document.getElementById('beren-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', function () {
+        currentRound = 1;
+        totalScore = 0;
+        run();
+      });
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

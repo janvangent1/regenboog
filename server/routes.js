@@ -1,4 +1,4 @@
-const { getLeaderboard, submitScore, getAllLeaderboards, getPlayStatistics, deleteScoresByGame, getAllScores, trackVisit, endVisit, getAnalytics, getClassRankings } = require('./database');
+const { getLeaderboard, submitScore, getAllLeaderboards, getPlayStatistics, deleteScoresByGame, getAllScores, trackVisit, endVisit, pingVisit, getAnalytics, getActiveVisitors, getClassRankings } = require('./database');
 
 function registerRoutes(app) {
   // Import vlinders words module inside function to prevent blocking other routes
@@ -76,6 +76,19 @@ function registerRoutes(app) {
       .catch((err) => {
         console.error('Error ending visit:', err);
         res.status(500).json({ error: 'Kon bezoek niet beëindigen' });
+      });
+  });
+
+  app.post('/api/track-visit-heartbeat', (req, res) => {
+    const { visitor_id, page } = req.body;
+    if (!visitor_id || !page) {
+      return res.status(400).json({ error: 'visitor_id en page zijn verplicht' });
+    }
+    pingVisit(visitor_id, page)
+      .then((result) => res.json(result))
+      .catch((err) => {
+        console.error('Error heartbeat visit:', err);
+        res.status(500).json({ error: 'Kon bezoek status niet updaten' });
       });
   });
 
@@ -179,6 +192,15 @@ function registerRoutes(app) {
       .catch((err) => {
         console.error(err);
         res.status(500).json({ error: 'Kon analytics niet laden' });
+      });
+  });
+
+  app.get('/api/admin/active-visitors', checkAdminPassword, (req, res) => {
+    getActiveVisitors()
+      .then((active) => res.json(active))
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ error: 'Kon actieve bezoekers niet laden' });
       });
   });
 }

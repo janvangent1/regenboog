@@ -196,6 +196,11 @@
             <div class="label">Bezoeken</div>
           </div>
           <div class="stat-card">
+            <h4>Actieve Bezoekers Nu</h4>
+            <div class="value" id="stat-active-visitors">-</div>
+            <div class="label">Nu op de site</div>
+          </div>
+          <div class="stat-card">
             <h4>Gemiddelde Bezoekduur</h4>
             <div class="value" id="stat-avg-duration">-</div>
             <div class="label">Seconden</div>
@@ -267,6 +272,7 @@
       let isAuthenticated = false;
       let charts = {};
       let currentDays = 7;
+      let activeVisitorsInterval = null;
 
       const passwordScreen = document.getElementById('password-screen');
       const adminContent = document.getElementById('admin-content');
@@ -281,6 +287,7 @@
           passwordScreen.style.display = 'none';
           adminContent.style.display = 'block';
           loadAnalytics();
+          startActiveVisitorsPolling();
         }
       }
 
@@ -293,6 +300,7 @@
           passwordScreen.style.display = 'none';
           adminContent.style.display = 'block';
           loadAnalytics();
+          startActiveVisitorsPolling();
         } else {
           passwordError.textContent = 'Ongeldig wachtwoord';
           passwordError.style.display = 'block';
@@ -357,10 +365,40 @@
           (stats.uniqueVisitors || 0).toLocaleString('nl-NL');
         document.getElementById('stat-total-visits').textContent = 
           (stats.totalVisits || 0).toLocaleString('nl-NL');
+        document.getElementById('stat-active-visitors').textContent =
+          (data.activeVisitors?.currentVisitors || 0).toLocaleString('nl-NL');
         document.getElementById('stat-avg-duration').textContent = 
           formatDuration(durations.average || 0);
         document.getElementById('stat-return-rate').textContent = 
           (returnVisitors.returnRate || 0) + '%';
+      }
+
+      function refreshActiveVisitors() {
+        fetch('/api/admin/active-visitors', { headers: getAuthHeaders() })
+          .then(r => {
+            if (!r.ok) {
+              return r.text().then(text => {
+                throw new Error('HTTP ' + r.status + ': ' + text);
+              });
+            }
+            return r.json();
+          })
+          .then(data => {
+            document.getElementById('stat-active-visitors').textContent =
+              (data.currentVisitors || 0).toLocaleString('nl-NL');
+          })
+          .catch(err => {
+            console.debug('Active visitors refresh failed:', err);
+          });
+      }
+
+      function startActiveVisitorsPolling() {
+        if (activeVisitorsInterval) {
+          clearInterval(activeVisitorsInterval);
+          activeVisitorsInterval = null;
+        }
+        refreshActiveVisitors();
+        activeVisitorsInterval = setInterval(refreshActiveVisitors, 15000);
       }
 
       function updateCharts(data) {

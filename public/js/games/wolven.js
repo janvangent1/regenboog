@@ -136,27 +136,7 @@
     prey = null;
     lastMoveTime = 0;
     
-    area.innerHTML = `
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <h3>Wolven Roedel Jacht</h3>
-        <p>Leid je wolvenroedel! Je hebt <strong>3 minuten</strong> om je roedel zo lang mogelijk te maken!</p>
-        <div style="margin: 1rem 0; padding: 1rem; background: #f0f0f0; border-radius: 8px;">
-          <p style="margin: 0.5rem 0;"><strong>Hoe te spelen:</strong></p>
-          <p style="margin: 0.5rem 0;">⬆️⬇️⬅️➡️ <strong>Pijltjestoetsen</strong> - Beweeg de roedel</p>
-          <p style="margin: 0.5rem 0;">🍖 <strong>Eet prooien</strong> - Varken (🐗), Hert (🦌), Konijn (🐰), Vogel (🐦)</p>
-          <p style="margin: 0.5rem 0;">📈 <strong>Je roedel groeit</strong> elke keer dat je een prooi eet!</p>
-          <p style="margin: 0.5rem 0;">⏱️ <strong>Score</strong> = lengte van je roedel × 10 punten</p>
-          <p style="margin: 0.5rem 0;">⚠️ <strong>Pas op!</strong> Bots je tegen een muur, verlies je 3 wolven. Bots je tegen jezelf, is het game over!</p>
-        </div>
-        <button id="wolven-start" style="padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, #555, #333); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
-          Start Spel
-        </button>
-      </div>
-      <div id="wolven-hud-container" style="display: none; margin-bottom: 0.5rem;"></div>
-      <canvas id="wolven-canvas" style="border: 2px solid var(--border); border-radius: 12px; background: #2d5016; display: none;"></canvas>
-    `;
-    
-    document.getElementById('wolven-start').addEventListener('click', startRound);
+    startRound();
   }
   
   function startRound() {
@@ -535,7 +515,31 @@
     });
   }
   
-  // Initialize
-  init();
+  function startFresh() {
+    currentRound = 0;
+    totalScore = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Wolven - Roedel Jacht</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Stuur de roedel, verzamel prooi en groei zo lang mogelijk.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#eef2f7; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Beweeg met pijltjestoetsen</p>' +
+      '    <p style="margin:0.5rem 0;">- Verzamel prooi om te groeien</p>' +
+      '    <p style="margin:0.5rem 0;">- Bots niet tegen muren of je eigen roedel</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="wolven-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #4a5568, #2d3748); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('wolven-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

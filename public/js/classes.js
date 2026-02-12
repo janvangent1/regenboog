@@ -23,6 +23,6 @@ window.REGENBOOG_CLASSES = [
   { id: 'olifanten', name: 'Olifanten', grade: '4e-leerjaar', game: 'Waterpoel route geheugen' },
   { id: 'giraffen', name: 'Giraffen', grade: '5e-leerjaar', game: 'Giraffe naar het blad' },
   { id: 'zebras', name: "Zebra's", grade: '5e-leerjaar', game: 'Getallenpatronen' },
-  { id: 'pandas', name: "Panda's", grade: '6e-leerjaar', game: 'Bamboe en panda\'s' },
-  { id: 'zwaluwen', name: 'Zwaluwen', grade: '6e-leerjaar', game: 'Vliegjes vangen' },
+  { id: 'pandas', name: "Panda's", grade: '6e-leerjaar', game: 'Panda space verdediging' },
+  { id: 'zwaluwen', name: 'Zwaluwen', grade: '6e-leerjaar', game: 'Luchtdoolhof' },
 ];

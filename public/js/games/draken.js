@@ -219,8 +219,31 @@
     });
   }
 
-  score = 0;
-  round = 0;
-  startRound();
+  function startFresh() {
+    score = 0;
+    round = 0;
+    startRound();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Draken - Vuurdoelen</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Help de draak de juiste doelen te raken.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#fff1f0; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik op rode doelen om punten te scoren</p>' +
+      '    <p style="margin:0.5rem 0;">- Vermijd groene doelen (strafpunten)</p>' +
+      '    <p style="margin:0.5rem 0;">- Doelen bewegen sneller per ronde</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="draken-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #c53030, #9b2c2c); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('draken-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

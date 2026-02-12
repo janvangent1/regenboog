@@ -39,12 +39,19 @@ function initDatabase() {
         user_agent TEXT,
         referrer TEXT,
         visit_start DATETIME NOT NULL,
+        last_seen DATETIME,
         visit_end DATETIME,
         duration INTEGER,
         ip_address TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    // Add last_seen column if it doesn't exist (for existing databases)
+    db.run(`ALTER TABLE visits ADD COLUMN last_seen DATETIME`, (err) => {
+      if (err && !err.message.includes('duplicate column')) {
+        console.error('Error adding last_seen column:', err);
+      }
+    });
     
     // Create indexes for better query performance
     db.run(`CREATE INDEX IF NOT EXISTS idx_visits_visitor_id ON visits(visitor_id)`, (err) => {
@@ -54,6 +61,9 @@ function initDatabase() {
       if (err && !err.message.includes('duplicate')) console.error('Error creating index:', err);
     });
     db.run(`CREATE INDEX IF NOT EXISTS idx_visits_page ON visits(page)`, (err) => {
+      if (err && !err.message.includes('duplicate')) console.error('Error creating index:', err);
+    });
+    db.run(`CREATE INDEX IF NOT EXISTS idx_visits_last_seen ON visits(last_seen)`, (err) => {
       if (err && !err.message.includes('duplicate')) console.error('Error creating index:', err);
     });
   });
@@ -173,8 +183,8 @@ function trackVisit(visitorId, page, userAgent, referrer, ipAddress) {
     const db = getDb();
     const now = new Date().toISOString();
     db.run(
-      'INSERT INTO visits (visitor_id, page, user_agent, referrer, visit_start, ip_address) VALUES (?, ?, ?, ?, ?, ?)',
-      [visitorId, page, userAgent || null, referrer || null, now, ipAddress || null],
+      'INSERT INTO visits (visitor_id, page, user_agent, referrer, visit_start, last_seen, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [visitorId, page, userAgent || null, referrer || null, now, now, ipAddress || null],
       function (err) {
         db.close();
         if (err) reject(err);
@@ -191,18 +201,63 @@ function endVisit(visitorId, page, duration) {
     // SQLite doesn't support ORDER BY/LIMIT in UPDATE, so we use a subquery
     db.run(
       `UPDATE visits 
-       SET visit_end = ?, duration = ? 
+       SET visit_end = ?, duration = ?, last_seen = ? 
        WHERE id = (
          SELECT id FROM visits 
          WHERE visitor_id = ? AND page = ? AND visit_end IS NULL 
          ORDER BY visit_start DESC 
          LIMIT 1
        )`,
-      [now, duration, visitorId, page],
+      [now, duration, now, visitorId, page],
       function (err) {
         db.close();
         if (err) reject(err);
         else resolve({ updated: this.changes });
+      }
+    );
+  });
+}
+
+function pingVisit(visitorId, page) {
+  return new Promise((resolve, reject) => {
+    const db = getDb();
+    const now = new Date().toISOString();
+    db.run(
+      `UPDATE visits
+       SET last_seen = ?
+       WHERE id = (
+         SELECT id FROM visits
+         WHERE visitor_id = ? AND page = ? AND visit_end IS NULL
+         ORDER BY visit_start DESC
+         LIMIT 1
+       )`,
+      [now, visitorId, page],
+      function (err) {
+        db.close();
+        if (err) reject(err);
+        else resolve({ updated: this.changes, lastSeen: now });
+      }
+    );
+  });
+}
+
+function getActiveVisitors(activeWindowSeconds = 90) {
+  return new Promise((resolve, reject) => {
+    const db = getDb();
+    const cutoff = new Date(Date.now() - (activeWindowSeconds * 1000)).toISOString();
+    db.get(
+      `SELECT COUNT(DISTINCT visitor_id) as active_visitors
+       FROM visits
+       WHERE visit_end IS NULL
+         AND COALESCE(last_seen, visit_start) >= ?`,
+      [cutoff],
+      (err, row) => {
+        db.close();
+        if (err) reject(err);
+        else resolve({
+          currentVisitors: row.active_visitors || 0,
+          activeWindowSeconds: activeWindowSeconds
+        });
       }
     );
   });
@@ -221,9 +276,10 @@ function getAnalytics(startDate, endDate) {
       getPeakHours(start, end),
       getReturnVisitors(start, end),
       getDeviceStats(start, end),
-      getVisitorsOverTime(start, end)
+      getVisitorsOverTime(start, end),
+      getActiveVisitors()
     ])
-      .then(([visitorStats, pageViews, durations, peakHours, returnVisitors, deviceStats, visitorsOverTime]) => {
+      .then(([visitorStats, pageViews, durations, peakHours, returnVisitors, deviceStats, visitorsOverTime, activeVisitors]) => {
         resolve({
           visitorStats,
           pageViews,
@@ -231,7 +287,8 @@ function getAnalytics(startDate, endDate) {
           peakHours,
           returnVisitors,
           deviceStats,
-          visitorsOverTime
+          visitorsOverTime,
+          activeVisitors
         });
       })
       .catch(reject);
@@ -579,7 +636,9 @@ module.exports = {
   getAllScores,
   trackVisit,
   endVisit,
+  pingVisit,
   getAnalytics,
+  getActiveVisitors,
   getVisitorStats,
   getPageViews,
   getVisitDurations,

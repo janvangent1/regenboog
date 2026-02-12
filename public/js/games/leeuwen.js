@@ -35,6 +35,12 @@
     return 0.58;
   }
 
+  function getMinPreyDistance(round) {
+    if (round === 1) return 3;
+    if (round === 2) return 4;
+    return 5;
+  }
+
   var dirToArrow = { omhoog: '\u2191', omlaag: '\u2193', links: '\u2190', rechts: '\u2192' };
   function pathToArrows(path) {
     return path.map(function (d) { return dirToArrow[d] || d; }).join(' ');
@@ -141,6 +147,36 @@
     return false;
   }
 
+  function isPreyReachable(rows, cols, walls, target) {
+    var blocked = {};
+    for (var i = 0; i < walls.length; i++) {
+      blocked[walls[i].r + ',' + walls[i].c] = true;
+    }
+    var queue = [{ r: 0, c: 0 }];
+    var visited = { '0,0': true };
+    var directions = [
+      { dr: -1, dc: 0 },
+      { dr: 1, dc: 0 },
+      { dr: 0, dc: -1 },
+      { dr: 0, dc: 1 }
+    ];
+
+    while (queue.length > 0) {
+      var cell = queue.shift();
+      if (cell.r === target.r && cell.c === target.c) return true;
+      for (var d = 0; d < directions.length; d++) {
+        var nr = cell.r + directions[d].dr;
+        var nc = cell.c + directions[d].dc;
+        var key = nr + ',' + nc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+        if (visited[key] || blocked[key]) continue;
+        visited[key] = true;
+        queue.push({ r: nr, c: nc });
+      }
+    }
+    return false;
+  }
+
   function moveLionToCell(r, c, onDone) {
     if (!lionEl) {
       if (onDone) onDone();
@@ -230,24 +266,64 @@
     gridCols = gs.cols;
     var minSteps = getMinSteps(currentRound);
     var wallChance = getWallChance(currentRound);
-    var res = genPath(minSteps, gridRows, gridCols);
-    targetPath = res.path;
-    prey = { r: res.r, c: res.c };
-    playerPath = [];
-    var pathCells = res.pathCells || [{ r: 0, c: 0 }];
-    for (var i = 0; i < pathCells.length; i++) {
-      pathCells[i] = { r: pathCells[i].r, c: pathCells[i].c };
-    }
-    walls = [];
-    for (var r = 0; r < gridRows; r++) {
-      for (var c = 0; c < gridCols; c++) {
-        if (r === 0 && c === 0) continue;
-        if (r === prey.r && c === prey.c) continue;
-        if (!onPath(pathCells, r, c) && Math.random() < wallChance) {
-          walls.push({ r: r, c: c });
+    var minPreyDistance = getMinPreyDistance(currentRound);
+    var maxMapTries = 60;
+    var mapTry = 0;
+    var built = null;
+    while (mapTry < maxMapTries) {
+      mapTry++;
+      var res = genPath(minSteps, gridRows, gridCols);
+      var pathCells = res.pathCells || [{ r: 0, c: 0 }];
+      var preyCandidate = { r: res.r, c: res.c };
+      var manhattan = Math.abs(preyCandidate.r) + Math.abs(preyCandidate.c);
+      if (manhattan < minPreyDistance) continue;
+
+      var candidateWalls = [];
+      for (var r = 0; r < gridRows; r++) {
+        for (var c = 0; c < gridCols; c++) {
+          if (r === 0 && c === 0) continue;
+          if (r === preyCandidate.r && c === preyCandidate.c) continue;
+          if (!onPath(pathCells, r, c) && Math.random() < wallChance) {
+            candidateWalls.push({ r: r, c: c });
+          }
         }
       }
+      if (!isPreyReachable(gridRows, gridCols, candidateWalls, preyCandidate)) continue;
+      built = {
+        path: res.path,
+        prey: preyCandidate,
+        pathCells: pathCells,
+        walls: candidateWalls
+      };
+      break;
     }
+
+    // Fallback: use a valid generated map even if strict distance was not found.
+    if (!built) {
+      var fallback = genPath(minSteps, gridRows, gridCols);
+      var fallbackPathCells = fallback.pathCells || [{ r: 0, c: 0 }];
+      var fallbackWalls = [];
+      for (var fr = 0; fr < gridRows; fr++) {
+        for (var fc = 0; fc < gridCols; fc++) {
+          if (fr === 0 && fc === 0) continue;
+          if (fr === fallback.r && fc === fallback.c) continue;
+          if (!onPath(fallbackPathCells, fr, fc) && Math.random() < wallChance) {
+            fallbackWalls.push({ r: fr, c: fc });
+          }
+        }
+      }
+      built = {
+        path: fallback.path,
+        prey: { r: fallback.r, c: fallback.c },
+        pathCells: fallbackPathCells,
+        walls: fallbackWalls
+      };
+    }
+
+    targetPath = built.path;
+    prey = built.prey;
+    playerPath = [];
+    walls = built.walls;
 
     var gridHtml = '';
     for (var row = 0; row < gridRows; row++) {
@@ -268,14 +344,16 @@
       }
     }
 
-    var gridStyle = 'position: relative; display: grid; grid-template-columns: repeat(' + gridCols + ', 1fr); grid-template-rows: repeat(' + gridRows + ', 1fr); width: 100%; max-width: min(360px, 92vw); aspect-ratio: ' + gridCols + '/' + gridRows + '; gap: 4px; margin: 1rem 0; padding: 8px; background: linear-gradient(180deg, #e8dcb4 0%, #d4c494 100%); border-radius: 12px; border: 2px solid #b8860b; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);';
+    var gridStyle = 'position: relative; display: grid; grid-template-columns: repeat(' + gridCols + ', 1fr); grid-template-rows: repeat(' + gridRows + ', 1fr); width: 100%; max-width: min(360px, 92vw); aspect-ratio: ' + gridCols + '/' + gridRows + '; gap: 4px; margin: 1rem auto; padding: 8px; background: linear-gradient(180deg, #e8dcb4 0%, #d4c494 100%); border-radius: 12px; border: 2px solid #b8860b; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08);';
     area.innerHTML =
       window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, true, true) +
+      '<div class="leeuwen-layout">' +
       '<p class="leeuwen-instruction">Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Plan de jacht: kies de juiste volgorde om de prooi te bereiken. Leeuw start linksboven!</p>' +
       '<div class="leeuwen-grid" style="' + gridStyle + '">' + gridHtml + '</div>' +
       '<p id="leeuwen-sequence" class="leeuwen-sequence">Jouw volgorde: <span id="leeuwen-sequence-arrows" class="leeuwen-sequence-arrows">—</span></p>' +
       '<div id="leeuwen-buttons" class="leeuwen-buttons"></div>' +
-      '<button type="button" id="leeuwen-run" class="leeuwen-run">Start jacht</button>';
+      '<button type="button" id="leeuwen-run" class="leeuwen-run">Start jacht</button>' +
+      '</div>';
 
     window.RegenboogCore.updateHUDRound(CLASS_ID, currentRound);
     updateLiveScore();
@@ -405,6 +483,29 @@
     });
   }
 
-  run();
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Leeuwen - Jachtplanning</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Programmeer de route van de leeuw naar de prooi.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0e8; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik pijltjes om een stappenreeks te maken</p>' +
+      '    <p style="margin:0.5rem 0;">- Klik Start om de route uit te voeren</p>' +
+      '    <p style="margin:0.5rem 0;">- Bereik de prooi in 3 rondes</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="leeuwen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #d97706, #b45309); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('leeuwen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', function () {
+        currentRound = 1;
+        totalScore = 0;
+        run();
+      });
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

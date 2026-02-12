@@ -17,6 +17,31 @@
   let dropZones = [];
   let timerInterval = null;
 
+  function playSound(frequency, duration, type, volume) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      function run() {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = type || 'sine';
+        osc.frequency.value = frequency;
+        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + duration);
+      }
+      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+      else run();
+    } catch (e) {}
+  }
+
+  function playCorrectSound() { playSound(640, 0.1, 'sine', 0.055); }
+  function playWrongSound() { playSound(220, 0.15, 'sawtooth', 0.06); }
+
   function shuffleArray(array) {
     const shuffled = array.slice();
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -133,7 +158,10 @@
     var instruction = currentRound >= 1 
       ? 'Ronde ' + (currentRound + 1) + '/' + TOTAL_ROUNDS + '. Sleep elk voorwerp naar de eend met dezelfde kleur. De eenden verschuiven!'
       : 'Ronde ' + (currentRound + 1) + '/' + TOTAL_ROUNDS + '. Sleep elk voorwerp naar de eend met dezelfde kleur.';
-    area.innerHTML = '<p>' + instruction + '</p>';
+    area.innerHTML =
+      '<div id="eenden-layout" style="width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;">' +
+      '<p style="max-width:700px;margin:0 auto;">' + instruction + '</p>' +
+      '</div>';
     
     // Gebruik consistente HUD layout (timer verborgen)
     const hudHtml = window.RegenboogCore.createHUD(CLASS_ID, currentRound + 1, TOTAL_ROUNDS, false, true);
@@ -145,6 +173,7 @@
     const dropZone = document.createElement('div');
     dropZone.style.display = 'flex';
     dropZone.style.flexWrap = 'wrap';
+    dropZone.style.justifyContent = 'center';
     dropZone.style.gap = '12px';
     dropZone.style.marginTop = '12px';
     dropZone.id = 'eenden-drop-zone'; // ID toevoegen voor debugging
@@ -175,6 +204,7 @@
         const id = e.dataTransfer.getData('text');
         const item = items.find((x) => x.id === id);
         if (item && item.color === c) {
+          playCorrectSound();
           item.el.remove();
           score++;
           document.getElementById('eenden-score').textContent = 'Goed: ' + score + ' / ' + total;
@@ -205,6 +235,7 @@
           }
         } else {
           // Fout antwoord - straf
+          playWrongSound();
           mistakes++;
           updateTimerAndScore(); // Update score na fout
           zone.style.animation = 'shake 0.3s';
@@ -216,7 +247,8 @@
       dropZone.appendChild(zone);
       dropZones.push(zone);
     });
-    area.appendChild(dropZone);
+    const layoutEl = document.getElementById('eenden-layout');
+    (layoutEl || area).appendChild(dropZone);
     
     // In ronde 2 en 3: laat eenden elke 3-4 seconden verschuiven
     if (currentRound >= 1) {
@@ -226,10 +258,10 @@
     scoreEl.id = 'eenden-score';
     scoreEl.className = 'game-score';
     scoreEl.textContent = 'Goed: 0 / 0';
-    area.appendChild(scoreEl);
     const itemBox = document.createElement('div');
     itemBox.style.display = 'flex';
     itemBox.style.flexWrap = 'wrap';
+    itemBox.style.justifyContent = 'center';
     itemBox.style.gap = '8px';
     itemBox.style.marginTop = '12px';
     items = [];
@@ -263,9 +295,35 @@
       itemBox.appendChild(el);
       items.push({ id: itemData.id, color: itemData.color, el });
     });
-    area.appendChild(itemBox);
+    (layoutEl || area).appendChild(scoreEl);
+    (layoutEl || area).appendChild(itemBox);
   }
 
-  init();
+  function startFresh() {
+    currentRound = 0;
+    totalScore = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Eenden - Sorteer op Kleur</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Sleep de eenden naar de juiste kleurzone.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#eef9ff; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Sleep elke eend naar de juiste kleur</p>' +
+      '    <p style="margin:0.5rem 0;">- Fouten geven strafpunten</p>' +
+      '    <p style="margin:0.5rem 0;">- In latere rondes bewegen de doelen</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="eenden-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #3182ce, #2b6cb0); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('eenden-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

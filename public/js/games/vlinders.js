@@ -317,7 +317,7 @@
     // Place new letter
     const isCorrect = letter === wordLetters[slotIndex];
     const color = isCorrect ? '#2a9d8f' : '#e63946';
-    
+
     slot.innerHTML = `<div class="vlinders-placed-letter" style="
       font-size: 2.5rem;
       font-weight: 700;
@@ -326,33 +326,40 @@
       line-height: 1;
       animation: vlinders-correct 0.3s ease-out;
     ">${letter}</div>`;
-    slot.dataset.hasLetter = 'true';
-    slot.dataset.letterId = letterId;
-    
-    // Make dragged letter gray and disabled
-    grayOutLetter(letterEl);
-    
-    // Add to placedLetters
-    placedLetters.push({ letter, slotIndex, letterId, isHint: false });
-    
-    // Update progress
-    const progressEl = document.getElementById('vlinders-progress');
-    const placedCountEl = document.getElementById('vlinders-placed-count');
-    if (progressEl && placedCountEl) {
-      progressEl.style.display = 'block';
-      placedCountEl.textContent = placedLetters.length;
-    }
-    
+
     if (isCorrect) {
+      slot.dataset.hasLetter = 'true';
+      slot.dataset.letterId = letterId;
+
+      // Alleen correcte letters blijven geplaatst.
+      grayOutLetter(letterEl);
+      placedLetters.push({ letter, slotIndex, letterId, isHint: false });
+
+      // Update progress
+      const progressEl = document.getElementById('vlinders-progress');
+      const placedCountEl = document.getElementById('vlinders-placed-count');
+      if (progressEl && placedCountEl) {
+        progressEl.style.display = 'block';
+        placedCountEl.textContent = placedLetters.length;
+      }
+
       playPlaceSound();
+
+      // Check if word is complete
+      if (checkWordComplete()) {
+        completeWord();
+      }
     } else {
+      // Foute letters blijven niet staan: toon kort feedback en reset dan het vakje.
       mistakes++;
       playWrongSound();
-    }
-    
-    // Check if word is complete
-    if (checkWordComplete()) {
-      completeWord();
+      delete slot.dataset.hasLetter;
+      delete slot.dataset.letterId;
+      setTimeout(function () {
+        if (slot.dataset.hasLetter !== 'true') {
+          slot.innerHTML = '';
+        }
+      }, 260);
     }
   }
 
@@ -698,12 +705,34 @@
     document.head.appendChild(style);
   }
 
-  // Initialize
-  currentRound = 1;
-  currentWordIndex = 0;
-  totalScore = 0;
-  roundScore = 0;
-  wordsInRound = [];
-  loadWordsForRound();
+  function startFresh() {
+    currentRound = 1;
+    currentWordIndex = 0;
+    totalScore = 0;
+    roundScore = 0;
+    wordsInRound = [];
+    loadWordsForRound();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Vlinders - Dierennamen Maken</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Sleep letters naar de juiste plek om dierennamen te vormen.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#fff0f6; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Sleep letters naar de lege vakjes</p>' +
+      '    <p style="margin:0.5rem 0;">- Maak alle woorden in de ronde</p>' +
+      '    <p style="margin:0.5rem 0;">- Gebruik hints enkel als het nodig is</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="vlinders-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #d53f8c, #b83280); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('vlinders-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

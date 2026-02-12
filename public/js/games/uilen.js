@@ -267,6 +267,31 @@
     }
   }
 
-  init();
+  function startFresh() {
+    currentRound = 1;
+    totalScore = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Uilen - Nachtmemory</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Zoek de gelijke kaarten in zo weinig mogelijk zetten.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#f5f0fa; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Klik kaarten om ze om te draaien</p>' +
+      '    <p style="margin:0.5rem 0;">- Zoek alle paren per ronde</p>' +
+      '    <p style="margin:0.5rem 0;">- Elk volgend level heeft meer kaarten</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="uilen-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #6b46c1, #553c9a); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('uilen-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
   window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();

@@ -115,41 +115,7 @@
     scorePopups = [];
     
     loadImages();
-    
-    area.innerHTML = `
-      <div style="text-align: center; margin-bottom: 1rem;">
-        <h3>Ronde ${currentRound + 1}/${TOTAL_ROUNDS}</h3>
-        <p>Beweeg je cursor links/rechts om het lieveheersbeestje te besturen. Verzamel bloemen 🌸 en vermijd vlinders, uilen en muizen!</p>
-        <div style="margin: 1rem 0;">
-          <div style="display: inline-block; margin: 0 1rem;">
-            <span style="font-size: 1.5rem;">🌸</span> Bloem = +10 punten
-          </div>
-          <div style="display: inline-block; margin: 0 1rem;">
-            <img src="/assets/images/classes/vlinders.png" style="width: 30px; height: 30px; vertical-align: middle;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="font-size: 1.5rem; display: none;">🦋</span> Vlinder = -5 punten
-          </div>
-          <div style="display: inline-block; margin: 0 1rem;">
-            <img src="/assets/images/classes/uilen.png" style="width: 30px; height: 30px; vertical-align: middle;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="font-size: 1.5rem; display: none;">🦉</span> Uil = -5 punten
-          </div>
-          <div style="display: inline-block; margin: 0 1rem;">
-            <img src="/assets/images/classes/muizen.png" style="width: 30px; height: 30px; vertical-align: middle;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';"><span style="font-size: 1.5rem; display: none;">🐭</span> Muis = -5 punten
-          </div>
-        </div>
-      </div>
-      <div id="lieveheersbeestjes-hud-container" style="display: none; margin-bottom: 0.5rem;"></div>
-      <button id="lieveheersbeestjes-start" style="padding: 1rem 2rem; font-size: 1.2rem; background: linear-gradient(135deg, var(--rainbow-4), var(--rainbow-5)); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 600;">
-        Start Spel
-      </button>
-    `;
-    
-    const startBtn = document.getElementById('lieveheersbeestjes-start');
-    if (startBtn) {
-      startBtn.addEventListener('click', function() {
-        this.style.display = 'none';
-        startRound();
-      });
-    }
-    
-    window.Leaderboard.render(leaderboardEl, CLASS_ID);
+    startRound();
   }
   
   function startRound() {
@@ -572,5 +538,31 @@
   // Expose startRound globally for button onclick
   window.lieveheersbeestjesStartRound = startRound;
   
-  init();
+  function startFresh() {
+    currentRound = 0;
+    totalScore = 0;
+    init();
+  }
+
+  function showIntro() {
+    area.innerHTML =
+      '<div style="text-align:center; margin-bottom:1rem;">' +
+      '  <h3>Lieveheersbeestjes - Tuinverdediging</h3>' +
+      '  <p style="font-size:1.05rem; color:#555; margin-bottom:0.6rem;">Bescherm de tuin en vang de juiste doelen.</p>' +
+      '  <div style="margin:1rem 0; padding:1rem; background:#fff5f5; border-radius:8px; display:inline-block; text-align:left;">' +
+      '    <p style="margin:0.5rem 0;"><strong>Hoe te spelen:</strong></p>' +
+      '    <p style="margin:0.5rem 0;">- Beweeg en reageer snel op objecten</p>' +
+      '    <p style="margin:0.5rem 0;">- Verzamel punten en vermijd fouten</p>' +
+      '    <p style="margin:0.5rem 0;">- Elke ronde wordt uitdagender</p>' +
+      '  </div>' +
+      '  <div><button type="button" id="lieveheersbeestjes-start" style="padding:1rem 2rem; font-size:1.1rem; background:linear-gradient(135deg, #e53e3e, #c53030); color:white; border:none; border-radius:12px; cursor:pointer; font-weight:700;">Start spel</button></div>' +
+      '</div>';
+    var startBtn = document.getElementById('lieveheersbeestjes-start');
+    if (startBtn) {
+      startBtn.addEventListener('click', startFresh);
+    }
+  }
+
+  showIntro();
+  window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();
