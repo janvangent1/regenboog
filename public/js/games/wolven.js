@@ -206,8 +206,12 @@
     // Setup keyboard controls
     document.addEventListener('keydown', handleKeyPress);
 
-    // Pijlknoppen voor touch/tablet (zelfde logica als toetsenbord: geen omkering)
+    // Op mobiel: padenbalk naar body zodat fixed onderaan altijd zichtbaar is
     var arrowPad = document.getElementById('wolven-arrow-pad');
+    if (arrowPad && window.matchMedia('(max-width: 768px)').matches) {
+      arrowPad.parentNode.removeChild(arrowPad);
+      document.body.appendChild(arrowPad);
+    }
     if (arrowPad) {
       arrowPad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -483,6 +487,8 @@
     const finalScore = calculateLiveScore();
     totalScore += finalScore;
     
+    var pad = document.getElementById('wolven-arrow-pad');
+    if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
     area.innerHTML = `
       <div style="text-align: center; padding: 2rem;">
         <h2 class="game-score" style="font-size: 1.8rem; color: #e63946;">Game Over!</h2>
@@ -522,6 +528,8 @@
     setTimeout(() => playSound(700, 0.15, 'sine'), 100);
     setTimeout(() => playSound(800, 0.2, 'sine'), 200);
     
+    var pad = document.getElementById('wolven-arrow-pad');
+    if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
     area.innerHTML = `
       <div style="text-align: center; padding: 2rem;">
         <h2 class="game-score" style="font-size: 1.8rem; color: #555;">Tijd is om! Spel voorbij!</h2>
@@ -543,6 +551,8 @@
   }
 
   function showIntro() {
+    var pad = document.getElementById('wolven-arrow-pad');
+    if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
     area.innerHTML =
       '<div style="text-align:center; margin-bottom:1rem;">' +
       '  <h3>Wolven - Roedel Jacht</h3>' +
