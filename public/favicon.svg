@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Kwartcirkel vult hele afbeelding: radius 32, middelpunt (32,32); rechte rand onder en rechts -->
+  <path fill="#e85d5d" d="M0 32 A32 32 0 0 1 32 0 L32 4 A28 28 0 0 0 4 32 Z"/>
+  <path fill="#f0a050" d="M4 32 A28 28 0 0 1 32 4 L32 8 A24 24 0 0 0 8 32 Z"/>
+  <path fill="#f5d65d" d="M8 32 A24 24 0 0 1 32 8 L32 12 A20 20 0 0 0 12 32 Z"/>
+  <path fill="#5cb85c" d="M12 32 A20 20 0 0 1 32 12 L32 16 A16 16 0 0 0 16 32 Z"/>
+  <path fill="#5ba3d9" d="M16 32 A16 16 0 0 1 32 16 L32 20 A12 12 0 0 0 20 32 Z"/>
+  <path fill="#8b6fb8" d="M20 32 A12 12 0 0 1 32 20 L32 24 A8 8 0 0 0 24 32 Z"/>
+  <path fill="#8b6fb8" d="M24 32 L32 32 L32 24 Z"/>
+</svg>
