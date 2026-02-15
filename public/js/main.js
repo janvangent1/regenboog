@@ -30,11 +30,12 @@
         var iconHtml = '<span class="class-card-icon" aria-hidden="true">' +
           '<img src="' + imgSrc + '" alt="" class="class-card-logo" loading="lazy">' +
           '</span>';
+        var gameSubtitle = (c.game && c.game !== c.name) ? '<span class="class-game">' + c.game + '</span>' : '';
         return (
-          '<a class="class-card" href="/games/' + c.id + '.html" title="' + c.name + ' – ' + c.game + '">' +
+          '<a class="class-card" href="/games/' + c.id + '.html" title="' + c.name + (c.game && c.game !== c.name ? ' – ' + c.game : '') + '">' +
             iconHtml +
             '<span class="class-name">' + c.name + '</span>' +
-            '<span class="class-game">' + c.game + '</span>' +
+            gameSubtitle +
           '</a>'
         );
       })
