@@ -1654,21 +1654,9 @@
   grid-template-rows: auto auto;
 }
 
-/* Op gsm: pijlknoppen vast onderaan zodat ze altijd zichtbaar zijn (geen scroll nodig) */
+/* Op gsm: pijlknoppen in de flow houden (zoals Giraffen), zodat ze zichtbaar zijn na scrollen */
 @media (max-width: 768px) {
-  #game-area {
-    padding-bottom: 100px;
-  }
   .arrow-pad {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 50;
-    margin: 0 auto;
-    padding: 10px 16px;
-    background: rgba(255, 255, 255, 0.97);
-    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.15);
     max-width: 260px;
   }
   .arrow-pad-vertical {

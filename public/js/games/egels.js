@@ -193,12 +193,8 @@
     // Setup keyboard controls
     document.addEventListener('keydown', handleKeyPress);
 
-    // Op mobiel: padenbalk naar body zodat fixed onderaan altijd zichtbaar is
+    // Pijlknoppen voor touch/tablet (zelfde throttle als toetsenbord)
     var arrowPad = document.getElementById('egels-arrow-pad');
-    if (arrowPad && window.matchMedia('(max-width: 768px)').matches) {
-      arrowPad.parentNode.removeChild(arrowPad);
-      document.body.appendChild(arrowPad);
-    }
     if (arrowPad) {
       arrowPad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -676,8 +672,6 @@
     
     if (currentRound >= TOTAL_ROUNDS) {
       // Game complete
-      var pad = document.getElementById('egels-arrow-pad');
-      if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
       area.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
           <h2 class="game-score" style="font-size: 1.8rem; color: #2a9d8f;">Geweldig! Alle rondes voltooid!</h2>
@@ -690,8 +684,6 @@
       });
     } else {
       // Next round
-      var pad = document.getElementById('egels-arrow-pad');
-      if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
       area.innerHTML = `
         <div style="text-align: center; padding: 2rem;">
           <h2 class="game-score" style="font-size: 1.5rem; color: #2a9d8f;">Ronde ${currentRound} voltooid!</h2>
@@ -714,8 +706,6 @@
   }
 
   function showIntro() {
-    var pad = document.getElementById('egels-arrow-pad');
-    if (pad && pad.parentNode === document.body) pad.parentNode.removeChild(pad);
     area.innerHTML =
       '<div style="text-align:center; margin-bottom:1rem;">' +
       '  <h3>Egels - Weg Oversteken</h3>' +

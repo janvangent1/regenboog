@@ -87,13 +87,7 @@
     }
   }
 
-  function removeMobilePad() {
-    var el = document.getElementById('vossen-arrow-pad');
-    if (el && el.parentNode) el.parentNode.removeChild(el);
-  }
-
   function render() {
-    removeMobilePad();
     const wrap = document.createElement('div');
     wrap.className = 'vossen-grid-wrap';
     wrap.setAttribute('tabindex', '0');
@@ -143,7 +137,6 @@
     var pad = document.createElement('div');
     pad.className = 'arrow-pad';
     pad.innerHTML = '<button type="button" class="arrow-pad-btn arrow-pad-btn-up" data-dr="-1" data-dc="0" aria-label="Omhoog">↑</button><button type="button" class="arrow-pad-btn arrow-pad-btn-left" data-dr="0" data-dc="-1" aria-label="Links">←</button><button type="button" class="arrow-pad-btn arrow-pad-btn-down" data-dr="1" data-dc="0" aria-label="Omlaag">↓</button><button type="button" class="arrow-pad-btn arrow-pad-btn-right" data-dr="0" data-dc="1" aria-label="Rechts">→</button>';
-    pad.id = 'vossen-arrow-pad';
     pad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var dr = parseInt(btn.getAttribute('data-dr'), 10);
@@ -151,12 +144,7 @@
         move(dr, dc);
       });
     });
-    var isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (isMobile) {
-      document.body.appendChild(pad);
-    } else {
-      layout.appendChild(pad);
-    }
+    layout.appendChild(pad);
     area.appendChild(layout);
     wrap.focus();
   }
@@ -176,14 +164,12 @@
       const roundScore = Math.max(10, 200 - moves * 3);
       totalScore += roundScore;
       if (currentRound >= TOTAL_ROUNDS) {
-        removeMobilePad();
         area.innerHTML = '<p class="game-score">Alle ' + TOTAL_ROUNDS + ' rondes! Score: ' + totalScore + '</p>';
         window.Leaderboard.showSubmitForm(CLASS_ID, totalScore, function () {
           window.Leaderboard.render(leaderboardEl, CLASS_ID);
         });
       } else {
         currentRound++;
-        removeMobilePad();
         area.innerHTML =
           '<p class="game-score">Ronde voltooid! Score: ' + roundScore + '. Totaal: ' + totalScore + '</p>' +
           '<button type="button" id="vossen-next">Volgende ronde</button>';
@@ -221,24 +207,6 @@
     } catch (e) {}
   }
 
-  window.addEventListener('resize', function () {
-    var pad = document.getElementById('vossen-arrow-pad');
-    var inLayout = area.querySelector('.vossen-layout .arrow-pad');
-    if (!pad && !inLayout) return;
-    var isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (pad && pad.parentNode === document.body && !isMobile) {
-      pad.parentNode.removeChild(pad);
-      var layout = area.querySelector('.vossen-layout');
-      if (layout) layout.appendChild(pad);
-    } else if (isMobile && area.querySelector('.vossen-grid-wrap')) {
-      var padInLayout = area.querySelector('.vossen-layout .arrow-pad');
-      if (padInLayout && padInLayout.parentNode !== document.body) {
-        padInLayout.parentNode.removeChild(padInLayout);
-        padInLayout.id = 'vossen-arrow-pad';
-        document.body.appendChild(padInLayout);
-      }
-    }
-  });
   document.addEventListener('keydown', function (e) {
     ensureAudioUnlock();
     handleKey(e);
