@@ -1654,10 +1654,27 @@
   grid-template-rows: auto auto;
 }
 
-/* Op gsm: pijlknoppen in de flow houden (zoals Giraffen), zodat ze zichtbaar zijn na scrollen */
+/* Op gsm: pijlknoppen altijd zichtbaar – vast onderaan (egels, wolven, vossen hebben groot speelveld) */
 @media (max-width: 768px) {
   .arrow-pad {
     max-width: 260px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    z-index: 100;
+    background: var(--card);
+    padding: 0.5rem 0.5rem max(0.5rem, env(safe-area-inset-bottom));
+    margin: 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px 12px 0 0;
+    border: 2px solid var(--border);
+    border-bottom: none;
+  }
+  /* Ruimte onderaan zodat content niet onder de vaste knoppen verdwijnt */
+  .game-area:has(.arrow-pad) {
+    padding-bottom: 120px;
   }
   .arrow-pad-vertical {
     max-width: 80px;
