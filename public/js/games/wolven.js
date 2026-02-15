@@ -161,6 +161,12 @@
     const hudHtml = window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, true, true);
     area.innerHTML = hudHtml + `
       <canvas id="wolven-canvas" style="border: 2px solid var(--border); border-radius: 12px; background: #2d5016;"></canvas>
+      <div class="arrow-pad" id="wolven-arrow-pad">
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-up" data-dx="0" data-dy="-1" aria-label="Omhoog">↑</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-left" data-dx="-1" data-dy="0" aria-label="Links">←</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-down" data-dx="0" data-dy="1" aria-label="Omlaag">↓</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-right" data-dx="1" data-dy="0" aria-label="Rechts">→</button>
+      </div>
     `;
     
     // Verberg ronde informatie (1/1)
@@ -199,6 +205,21 @@
     
     // Setup keyboard controls
     document.addEventListener('keydown', handleKeyPress);
+
+    // Pijlknoppen voor touch/tablet (zelfde logica als toetsenbord: geen omkering)
+    var arrowPad = document.getElementById('wolven-arrow-pad');
+    if (arrowPad) {
+      arrowPad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (!gameRunning) return;
+          var dx = parseInt(btn.getAttribute('data-dx'), 10);
+          var dy = parseInt(btn.getAttribute('data-dy'), 10);
+          var cur = direction;
+          if (dx !== 0 && (cur.x === 0 || (cur.x === 0 && cur.y === 0))) nextDirection = { x: dx, y: 0 };
+          if (dy !== 0 && (cur.y === 0 || (cur.x === 0 && cur.y === 0))) nextDirection = { x: 0, y: dy };
+        });
+      });
+    }
     
     // Initialize HUD
     window.RegenboogCore.updateHUDRound(CLASS_ID, 1);

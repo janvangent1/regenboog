@@ -132,8 +132,19 @@
     layout.appendChild(wrap);
     var hint = document.createElement('p');
     hint.className = 'game-score vossen-hint';
-    hint.textContent = 'Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Zetten: ' + moves + ' – Gebruik pijltjestoetsen om het hol te bereiken.';
+    hint.textContent = 'Ronde ' + currentRound + '/' + TOTAL_ROUNDS + '. Zetten: ' + moves + ' – Pijltjes of knoppen om het hol te bereiken.';
     layout.appendChild(hint);
+    var pad = document.createElement('div');
+    pad.className = 'arrow-pad';
+    pad.innerHTML = '<button type="button" class="arrow-pad-btn arrow-pad-btn-up" data-dr="-1" data-dc="0" aria-label="Omhoog">↑</button><button type="button" class="arrow-pad-btn arrow-pad-btn-left" data-dr="0" data-dc="-1" aria-label="Links">←</button><button type="button" class="arrow-pad-btn arrow-pad-btn-down" data-dr="1" data-dc="0" aria-label="Omlaag">↓</button><button type="button" class="arrow-pad-btn arrow-pad-btn-right" data-dr="0" data-dc="1" aria-label="Rechts">→</button>';
+    pad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var dr = parseInt(btn.getAttribute('data-dr'), 10);
+        var dc = parseInt(btn.getAttribute('data-dc'), 10);
+        move(dr, dc);
+      });
+    });
+    layout.appendChild(pad);
     area.appendChild(layout);
     wrap.focus();
   }

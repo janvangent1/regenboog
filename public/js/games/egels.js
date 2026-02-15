@@ -24,8 +24,10 @@
   let hitCooldown = 0; // Cooldown om meerdere hits snel achter elkaar te voorkomen
   let isHit = false; // Voor visuele feedback
   let topGrassY = 0; // Y positie van de top grass (voor oversteek detectie)
+  let lastMoveTime = 0; // Throttle: max snelheid beweging (geen bliksemsnel bij snel tikken)
   
   // Game constants
+  const MOVE_THROTTLE_MS = 180; // Min. ms tussen twee bewegingen (realistischer tempo)
   const HEDGEHOG_WIDTH = 50;
   const HEDGEHOG_HEIGHT = 50;
   const LANE_HEIGHT = 80;
@@ -151,6 +153,12 @@
     const hudHtml = window.RegenboogCore.createHUD(CLASS_ID, currentRound, TOTAL_ROUNDS, false, true);
     area.innerHTML = hudHtml + `
       <canvas id="egels-canvas" style="border: 2px solid var(--border); border-radius: 12px; background: #87CEEB;"></canvas>
+      <div class="arrow-pad" id="egels-arrow-pad">
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-up" data-dx="0" data-dy="-1" aria-label="Omhoog">↑</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-left" data-dx="-50" data-dy="0" aria-label="Links">←</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-down" data-dx="0" data-dy="1" aria-label="Omlaag">↓</button>
+        <button type="button" class="arrow-pad-btn arrow-pad-btn-right" data-dx="50" data-dy="0" aria-label="Rechts">→</button>
+      </div>
     `;
     
     canvas = document.getElementById('egels-canvas');
@@ -184,6 +192,30 @@
     
     // Setup keyboard controls
     document.addEventListener('keydown', handleKeyPress);
+
+    // Pijlknoppen voor touch/tablet (zelfde throttle als toetsenbord)
+    var arrowPad = document.getElementById('egels-arrow-pad');
+    if (arrowPad) {
+      arrowPad.querySelectorAll('.arrow-pad-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          if (!gameRunning) return;
+          var dx = parseInt(btn.getAttribute('data-dx'), 10);
+          var dy = parseInt(btn.getAttribute('data-dy'), 10);
+          if (dy === -1) {
+            moveHedgehog(0, -LANE_HEIGHT);
+            playMoveSound();
+          } else if (dy === 1) {
+            if (hedgehogY < canvas.height - HEDGEHOG_HEIGHT - 20) {
+              moveHedgehog(0, LANE_HEIGHT);
+              playMoveSound();
+            }
+          } else if (dx !== 0) {
+            moveHedgehog(dx, 0);
+            playMoveSound();
+          }
+        });
+      });
+    }
     
     // Initialize HUD
     window.RegenboogCore.updateHUDRound(CLASS_ID, currentRound);
@@ -221,6 +253,9 @@
   }
   
   function moveHedgehog(dx, dy) {
+    const now = Date.now();
+    if (now - lastMoveTime < MOVE_THROTTLE_MS) return;
+    
     const newX = hedgehogX + dx;
     const newY = hedgehogY + dy;
     
@@ -234,6 +269,7 @@
     
     hedgehogX = newX;
     hedgehogY = newY;
+    lastMoveTime = now;
     
     // Check collision with vehicles (geen game over meer, alleen penalty)
     if (checkCollision() && hitCooldown <= 0) {

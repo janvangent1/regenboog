@@ -159,9 +159,9 @@
       loadDolphinImage();
     }
     
-    // Mouse/touch tracking
+    // Mouse/touch tracking (passive: false zodat preventDefault scroll blokkeert op tablet/gsm)
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove);
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     // Start game loop
     gameLoop();

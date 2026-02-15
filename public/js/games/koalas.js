@@ -352,7 +352,11 @@
       `<div style="text-align:center; margin-bottom:0.5rem; color:#445; font-weight:600;">
         Koala Pong - Ronde ${currentRound}/${TOTAL_ROUNDS}
       </div>
-      <canvas id="koalas-canvas" style="display:block; margin:0 auto; border:2px solid var(--border); border-radius:12px; background:#d7f2c8;"></canvas>`;
+      <canvas id="koalas-canvas" style="display:block; margin:0 auto; border:2px solid var(--border); border-radius:12px; background:#d7f2c8;"></canvas>
+      <div class="arrow-pad arrow-pad-vertical" id="koalas-paddle-pad" style="max-width:80px;">
+        <button type="button" class="arrow-pad-btn" id="koalas-btn-up" aria-label="Omhoog">↑</button>
+        <button type="button" class="arrow-pad-btn" id="koalas-btn-down" aria-label="Omlaag">↓</button>
+      </div>`;
 
     canvas = document.getElementById('koalas-canvas');
     ctx = canvas.getContext('2d');
@@ -379,6 +383,19 @@
     updateHud();
     stopRoundLoop();
     rafId = requestAnimationFrame(frame);
+
+    var btnUp = document.getElementById('koalas-btn-up');
+    var btnDown = document.getElementById('koalas-btn-down');
+    if (btnUp) {
+      btnUp.addEventListener('pointerdown', function () { input.up = true; });
+      btnUp.addEventListener('pointerup', function () { input.up = false; });
+      btnUp.addEventListener('pointerleave', function () { input.up = false; });
+    }
+    if (btnDown) {
+      btnDown.addEventListener('pointerdown', function () { input.down = true; });
+      btnDown.addEventListener('pointerup', function () { input.down = false; });
+      btnDown.addEventListener('pointerleave', function () { input.down = false; });
+    }
   }
 
   function onKeyDown(e) {

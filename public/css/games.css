@@ -1609,6 +1609,51 @@
   }
 }
 
+/* Gedeelde pijlknoppen – toetsenbordlayout (zoals Giraffen) voor touch/tablet */
+.arrow-pad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 0.75rem;
+  align-items: stretch;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.arrow-pad-btn {
+  padding: 10px 8px;
+  border-radius: 8px;
+  border: 2px solid var(--border, #ccc);
+  background: linear-gradient(180deg, #fff8e8 0%, #f5e6c8 100%);
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-height: 44px;
+  width: 100%;
+}
+
+.arrow-pad-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.arrow-pad-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.arrow-pad-btn-up { grid-column: 2; }
+.arrow-pad-btn-left { grid-column: 1; grid-row: 2; }
+.arrow-pad-btn-down { grid-column: 2; grid-row: 2; }
+.arrow-pad-btn-right { grid-column: 3; grid-row: 2; }
+
+.arrow-pad-vertical {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+}
+
 /* Zwaluwen – Pac-vlucht: doolhof met bolletjes en roofvogels */
 .zwaluwen-layout {
   width: 100%;
@@ -1644,11 +1689,17 @@
 
 .zwaluwen-controls {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto;
   gap: 8px;
   width: 100%;
-  max-width: min(360px, 80vw);
+  max-width: min(200px, 80vw);
 }
+
+.zwaluwen-dir-btn-up { grid-column: 2; }
+.zwaluwen-dir-btn-left { grid-column: 1; grid-row: 2; }
+.zwaluwen-dir-btn-down { grid-column: 2; grid-row: 2; }
+.zwaluwen-dir-btn-right { grid-column: 3; grid-row: 2; }
 
 .zwaluwen-dir-btn {
   padding: 8px 10px;
@@ -1838,6 +1889,12 @@
 
 .eenden-fade-in {
   animation: duck-fade-in 0.3s ease-in forwards;
+}
+
+.eenden-selected {
+  outline: 3px solid #333;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #fff;
 }
 
 /* Uilen – memory game animations */

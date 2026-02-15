@@ -524,9 +524,9 @@
         '  <div class="core-intro-actions dammen-mode-actions">' +
         '    <p class="dammen-choose-mode">Kies hoe je wilt spelen:</p>' +
         '    <div class="dammen-mode-buttons">' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="1v1">1 vs 1 – twee spelers op één computer</button>' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="1vAI">1 vs computer</button>' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="multiplayer">Multiplayer – online tegen iemand anders</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="1v1">1 tegen 1 (op dezelfde computer)</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="1vAI">1 tegen computer</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="multiplayer">1 tegen 1 (over internet)</button>' +
         '    </div>' +
         '  </div>' +
         '</div>';

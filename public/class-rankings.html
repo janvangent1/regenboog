@@ -189,6 +189,133 @@
       display: inline-block;
       margin-right: 0.5rem;
     }
+
+    /* Responsive: tablet */
+    @media (max-width: 900px) {
+      .rankings-container {
+        padding: 0.75rem;
+      }
+      .rankings-section {
+        padding: 1rem;
+      }
+      .rankings-section h2 {
+        font-size: 1.3rem;
+      }
+      .rankings-header,
+      .rankings-row {
+        grid-template-columns: 60px 1fr 90px;
+        gap: 0.75rem;
+        padding: 0.75rem;
+      }
+      .rankings-header {
+        font-size: 0.9rem;
+      }
+      .rank-number {
+        font-size: 1.25rem;
+      }
+      .rank-1 .rank-number { font-size: 1.6rem; }
+      .rank-2 .rank-number,
+      .rank-3 .rank-number { font-size: 1.4rem; }
+      .class-col {
+        font-size: 1rem;
+      }
+      .points-col {
+        font-size: 1.1rem;
+      }
+      .game-details {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      }
+    }
+
+    /* Responsive: mobile */
+    @media (max-width: 600px) {
+      .rankings-container {
+        padding: 0.5rem;
+      }
+      .rankings-section {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .rankings-section h2 {
+        font-size: 1.15rem;
+      }
+      .rankings-section h3 {
+        font-size: 1rem;
+      }
+      .rankings-section p {
+        font-size: 0.9rem;
+      }
+      .rankings-header,
+      .rankings-row {
+        grid-template-columns: 44px 1fr 56px;
+        gap: 0.5rem;
+        padding: 0.6rem 0.5rem;
+      }
+      .rankings-header {
+        font-size: 0.8rem;
+      }
+      .rank-col {
+        font-size: 0.85rem;
+      }
+      .rank-number {
+        font-size: 1.1rem;
+      }
+      .rank-1 .rank-number { font-size: 1.4rem; }
+      .rank-2 .rank-number,
+      .rank-3 .rank-number { font-size: 1.2rem; }
+      .class-col {
+        font-size: 0.9rem;
+        font-weight: 600;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .points-col {
+        font-size: 1rem;
+      }
+      .game-details {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .game-card {
+        padding: 0.75rem;
+      }
+      .game-card h4 {
+        font-size: 0.95rem;
+      }
+      .back-link {
+        font-size: 1rem;
+      }
+      .position-number {
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Voorkom horizontaal scrollen */
+    body {
+      overflow-x: hidden;
+    }
+    .rankings-container {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    /* Header compacter op mobiel (alleen op deze pagina) */
+    @media (max-width: 600px) {
+      .header {
+        padding: 1.25rem 0.5rem;
+        min-height: 100px;
+      }
+      .header h1 {
+        font-size: 1.15rem;
+      }
+      .tagline {
+        font-size: 0.9rem;
+      }
+    }
   </style>
 </head>
 <body>

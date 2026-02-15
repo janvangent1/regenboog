@@ -158,9 +158,9 @@
     mouseX = ladybugX;
     const LADYBUG_Y_POS = canvas.height - LADYBUG_HEIGHT - 20; // 20px van onderen
     
-    // Mouse/touch tracking
+    // Mouse/touch tracking (passive: false zodat preventDefault scroll blokkeert op tablet/gsm)
     canvas.addEventListener('mousemove', handleMouseMove);
-    canvas.addEventListener('touchmove', handleTouchMove);
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
     
     // Start game loop
     gameLoop();

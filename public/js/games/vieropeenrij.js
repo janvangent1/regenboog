@@ -88,7 +88,9 @@
         if (!p) continue;
         for (var i = 0; i < dirs.length; i++) {
           var dr = dirs[i][0], dc = dirs[i][1];
-          var n = countLine(b, r, c, dr, dc, p) + countLine(b, r - dr, c - dc, -dr, -dc, p) - 1;
+          var n1 = countLine(b, r, c, dr, dc, p);
+          var n2 = countLine(b, r - dr, c - dc, -dr, -dc, p);
+          var n = n1 + (n2 > 0 ? n2 - 1 : 0);
           if (n >= 4) return p;
         }
       }
@@ -108,14 +110,18 @@
     for (var r = 0; r < ROWS; r++) {
       for (var c = 0; c < COLS; c++) {
         for (var d = 0; d < dirs.length; d++) {
-          var n = countLine(b, r, c, dirs[d][0], dirs[d][1], forPlayer) + countLine(b, r - dirs[d][0], c - dirs[d][1], -dirs[d][0], -dirs[d][1], forPlayer) - 1;
+          var na = countLine(b, r, c, dirs[d][0], dirs[d][1], forPlayer);
+          var nb = countLine(b, r - dirs[d][0], c - dirs[d][1], -dirs[d][0], -dirs[d][1], forPlayer);
+          var n = na + (nb > 0 ? nb - 1 : 0);
           if (n >= 4) return 1000;
           if (n === 3) score += 10;
           if (n === 2) score += 2;
         }
         for (var d2 = 0; d2 < dirs.length; d2++) {
           var other = forPlayer === P1 ? P2 : P1;
-          var n2 = countLine(b, r, c, dirs[d2][0], dirs[d2][1], other) + countLine(b, r - dirs[d2][0], c - dirs[d2][1], -dirs[d2][0], -dirs[d2][1], other) - 1;
+          var na2 = countLine(b, r, c, dirs[d2][0], dirs[d2][1], other);
+          var nb2 = countLine(b, r - dirs[d2][0], c - dirs[d2][1], -dirs[d2][0], -dirs[d2][1], other);
+          var n2 = na2 + (nb2 > 0 ? nb2 - 1 : 0);
           if (n2 >= 4) return -1000;
           if (n2 === 3) score -= 8;
         }
@@ -258,9 +264,9 @@
         '  <div class="core-intro-actions dammen-mode-actions">' +
         '    <p class="dammen-choose-mode">Kies hoe je wilt spelen:</p>' +
         '    <div class="dammen-mode-buttons">' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="1v1">1 vs 1</button>' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="1vAI">1 vs computer</button>' +
-        '      <button type="button" class="dammen-mode-btn" data-mode="multiplayer">Multiplayer</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="1v1">1 tegen 1 (op dezelfde computer)</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="1vAI">1 tegen computer</button>' +
+        '      <button type="button" class="dammen-mode-btn" data-mode="multiplayer">1 tegen 1 (over internet)</button>' +
         '    </div>' +
         '  </div>' +
         '</div>';

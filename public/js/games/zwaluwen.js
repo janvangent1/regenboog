@@ -802,10 +802,10 @@
       '<p id="zwaluwen-progress" class="zwaluwen-progress"></p>' +
       '<canvas id="zwaluwen-canvas" class="zwaluwen-canvas" width="' + width + '" height="' + height + '"></canvas>' +
       '<div class="zwaluwen-controls">' +
-      '<button type="button" class="zwaluwen-dir-btn" id="zw-dir-up">▲</button>' +
-      '<button type="button" class="zwaluwen-dir-btn" id="zw-dir-left">◀</button>' +
-      '<button type="button" class="zwaluwen-dir-btn" id="zw-dir-down">▼</button>' +
-      '<button type="button" class="zwaluwen-dir-btn" id="zw-dir-right">▶</button>' +
+      '<button type="button" class="zwaluwen-dir-btn zwaluwen-dir-btn-up" id="zw-dir-up" aria-label="Omhoog">▲</button>' +
+      '<button type="button" class="zwaluwen-dir-btn zwaluwen-dir-btn-left" id="zw-dir-left" aria-label="Links">◀</button>' +
+      '<button type="button" class="zwaluwen-dir-btn zwaluwen-dir-btn-down" id="zw-dir-down" aria-label="Omlaag">▼</button>' +
+      '<button type="button" class="zwaluwen-dir-btn zwaluwen-dir-btn-right" id="zw-dir-right" aria-label="Rechts">▶</button>' +
       '</div>' +
       '<p id="zwaluwen-message" class="zwaluwen-message">' + message + '</p>' +
       '</div>';

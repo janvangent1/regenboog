@@ -47,7 +47,9 @@ function checkWinner(board) {
       const p = board[r][c];
       if (!p) continue;
       for (const [dr, dc] of dirs) {
-        const n = countLine(board, r, c, dr, dc, p) + countLine(board, r - dr, c - dc, -dr, -dc, p) - 1;
+        const n1 = countLine(board, r, c, dr, dc, p);
+        const n2 = countLine(board, r - dr, c - dc, -dr, -dc, p);
+        const n = n1 + (n2 > 0 ? n2 - 1 : 0);
         if (n >= 4) return p;
       }
     }

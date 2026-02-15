@@ -32,6 +32,15 @@ app.get('/games/:game', (req, res) => {
 
 attachSockets(server);
 
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`Fout: Poort ${PORT} is al in gebruik. Stop het andere proces of kies een andere poort (bijv. PORT=3001).`);
+  } else {
+    console.error('Serverfout:', err);
+  }
+  process.exit(1);
+});
+
 server.listen(PORT, () => {
   console.log(`Regenboog Spellen draait op http://localhost:${PORT}`);
 });

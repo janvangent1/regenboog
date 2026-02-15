@@ -16,6 +16,7 @@
   let shuffleInterval = null;
   let dropZones = [];
   let timerInterval = null;
+  let selectedItemId = null; // Touch: tap eend dan tap zone om te droppen
 
   function playSound(frequency, duration, type, volume) {
     try {
@@ -198,52 +199,86 @@
       zone.ondragleave = function () {
         zone.style.background = '';
       };
+      function tryDropToZone(id) {
+        const item = items.find((x) => x.id === id);
+        if (!item || item.color !== c) return false;
+        playCorrectSound();
+        item.el.remove();
+        score++;
+        document.getElementById('eenden-score').textContent = 'Goed: ' + score + ' / ' + total;
+        updateTimerAndScore();
+        if (score === total) {
+          stopTimer();
+          const elapsed = (Date.now() - startTime) / 1000;
+          var roundScore = Math.max(10, Math.floor(500 - elapsed * 5 - mistakes * 20));
+          totalScore += roundScore;
+          if (currentRound + 1 >= TOTAL_ROUNDS) {
+            area.innerHTML = '<p class="game-score">Alle ' + TOTAL_ROUNDS + ' rondes goed! Score: ' + totalScore + '</p>';
+            window.Leaderboard.showSubmitForm(CLASS_ID, totalScore, function () {
+              window.Leaderboard.render(leaderboardEl, CLASS_ID);
+            });
+          } else {
+            currentRound++;
+            area.innerHTML =
+              '<p class="game-score">Ronde klaar! Score: ' + roundScore + '. Totaal: ' + totalScore + '</p>' +
+              '<button type="button" id="eenden-next">Volgende ronde</button>';
+            document.getElementById('eenden-next').addEventListener('click', init);
+          }
+          if (shuffleInterval) {
+            clearInterval(shuffleInterval);
+            shuffleInterval = null;
+          }
+        }
+        return true;
+      }
       zone.ondrop = function (e) {
         e.preventDefault();
         zone.style.background = '';
         const id = e.dataTransfer.getData('text');
         const item = items.find((x) => x.id === id);
         if (item && item.color === c) {
-          playCorrectSound();
-          item.el.remove();
-          score++;
-          document.getElementById('eenden-score').textContent = 'Goed: ' + score + ' / ' + total;
-          updateTimerAndScore(); // Update score na goede actie
-          if (score === total) {
-            stopTimer();
-            const elapsed = (Date.now() - startTime) / 1000; // seconden
-            // Score: basis van 500, minus tijd (max 60 sec), minus fouten * 20
-            // Hoe sneller en zonder fouten = hogere score
-            var roundScore = Math.max(10, Math.floor(500 - elapsed * 5 - mistakes * 20));
-            totalScore += roundScore;
-            if (currentRound + 1 >= TOTAL_ROUNDS) {
-              area.innerHTML = '<p class="game-score">Alle ' + TOTAL_ROUNDS + ' rondes goed! Score: ' + totalScore + '</p>';
-              window.Leaderboard.showSubmitForm(CLASS_ID, totalScore, function () {
-                window.Leaderboard.render(leaderboardEl, CLASS_ID);
-              });
-            } else {
-              currentRound++;
-              area.innerHTML =
-                '<p class="game-score">Ronde klaar! Score: ' + roundScore + '. Totaal: ' + totalScore + '</p>' +
-                '<button type="button" id="eenden-next">Volgende ronde</button>';
-              document.getElementById('eenden-next').addEventListener('click', init);
-            }
-            if (shuffleInterval) {
-              clearInterval(shuffleInterval);
-              shuffleInterval = null;
-            }
-          }
-        } else {
-          // Fout antwoord - straf
+          tryDropToZone(id);
+        } else if (item) {
           playWrongSound();
           mistakes++;
-          updateTimerAndScore(); // Update score na fout
+          updateTimerAndScore();
           zone.style.animation = 'shake 0.3s';
-          setTimeout(function() {
-            zone.style.animation = '';
-          }, 300);
+          setTimeout(function() { zone.style.animation = ''; }, 300);
         }
       };
+      zone.addEventListener('click', function () {
+        if (selectedItemId) {
+          if (tryDropToZone(selectedItemId)) {
+            selectedItemId = null;
+            items.forEach(function (x) { if (x.el) x.el.classList.remove('eenden-selected'); });
+          } else {
+            playWrongSound();
+            mistakes++;
+            updateTimerAndScore();
+            zone.style.animation = 'shake 0.3s';
+            setTimeout(function() { zone.style.animation = ''; }, 300);
+            selectedItemId = null;
+            items.forEach(function (x) { if (x.el) x.el.classList.remove('eenden-selected'); });
+          }
+        }
+      });
+      zone.addEventListener('touchend', function (e) {
+        if (selectedItemId && (e.target === zone || zone.contains(e.target))) {
+          e.preventDefault();
+          if (tryDropToZone(selectedItemId)) {
+            selectedItemId = null;
+            items.forEach(function (x) { if (x.el) x.el.classList.remove('eenden-selected'); });
+          } else {
+            playWrongSound();
+            mistakes++;
+            updateTimerAndScore();
+            zone.style.animation = 'shake 0.3s';
+            setTimeout(function() { zone.style.animation = ''; }, 300);
+            selectedItemId = null;
+            items.forEach(function (x) { if (x.el) x.el.classList.remove('eenden-selected'); });
+          }
+        }
+      }, { passive: false });
       dropZone.appendChild(zone);
       dropZones.push(zone);
     });
@@ -287,11 +322,22 @@
       el.style.cssText =
         'width:50px;height:50px;border-radius:50%;background:' +
         colorHex[itemData.color] +
-        ';cursor:grab;';
+        ';cursor:grab;touch-action:manipulation;';
       el.id = itemData.id;
       el.ondragstart = function (e) {
         e.dataTransfer.setData('text', itemData.id);
       };
+      function selectItem(ev) {
+        if (ev && ev.type === 'touchend') ev.preventDefault();
+        selectedItemId = itemData.id;
+        items.forEach(function (x) {
+          if (x.el) x.el.classList.toggle('eenden-selected', x.id === itemData.id);
+        });
+      }
+      el.addEventListener('click', selectItem);
+      el.addEventListener('touchend', function (e) {
+        selectItem(e);
+      }, { passive: false });
       itemBox.appendChild(el);
       items.push({ id: itemData.id, color: itemData.color, el });
     });
