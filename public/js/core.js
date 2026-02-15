@@ -127,6 +127,24 @@ window.RegenboogCore = {
       'Eet prooien om de roedel te laten groeien.',
       'Bots niet tegen jezelf of muren; dat kost je voortgang of eindigt het spel.'
     ],
+    dammen: [
+      'Nederlands dammen: 10×10 bord, elk 20 schijven in de eerste vier rijen.',
+      'Schijven bewegen diagonaal naar voren; ze mogen ook achteruit slaan. Slaan is verplicht.',
+      'Bij slagkeuze moet je altijd de slag maken waarmee je de meeste schijven slaat (meerslag).',
+      'Bereik de overkant om een dam te worden; een dam mag over de hele diagonaal bewegen en slaan.'
+    ],
+    schaken: [
+      'Elk stuk beweegt volgens zijn eigen regels (pion, paard, loper, toren, koningin, koning).',
+      'De koning mag niet in schaak staan; je kunt geen zet doen die je eigen koning in gevaar brengt.',
+      'Schaakmat: als de koning van de tegenstander schaak staat en geen vlucht heeft, win je.',
+      'Sla stukken van de tegenstander en bescherm je koning.'
+    ],
+    vieropeenrij: [
+      'Kies een kolom en laat je steen vallen; die komt onderop in die kolom terecht.',
+      'Probeer vier stenen op een rij te maken: horizontaal, verticaal of diagonaal.',
+      'Blokkeer je tegenstander en zoek zelf vier op een rij.',
+      'Win door als eerste vier op een rij te hebben.'
+    ],
     zebras: [
       'Kies het juiste volgende getal in het patroon.',
       'Gebruik hints alleen als het nodig is.',

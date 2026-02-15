@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dammen - De Regenboog</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/games.css">
+</head>
+<body>
+  <header class="header" role="banner">
+    <div class="logo-wrap">
+      <a href="/" class="header-link">
+        <h1>Basisschool De Regenboog</h1>
+        <p class="tagline">Kies je klas en speel!</p>
+      </a>
+    </div>
+  </header>
+  <div class="game-container">
+    <header class="game-header">
+      <h1>Dammen</h1>
+      <nav class="game-nav">
+        <a href="/">Terug naar menu</a>
+      </nav>
+    </header>
+    <div class="game-area" id="game-area"></div>
+    <div class="leaderboard-box">
+      <h3>Ranglijst (1 vs computer)</h3>
+      <div id="leaderboard"></div>
+    </div>
+  </div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/classes.js"></script>
+  <script src="/js/core.js"></script>
+  <script src="/js/leaderboard.js"></script>
+  <script src="/js/games/dammen.js"></script>
+  <script src="/js/analytics-tracker.js"></script>
+</body>
+</html>

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
 Load test voor Regenboog Raspberry Pi server – met GUI.
-Stel URL, aantal gelijktijdige gebruikers en timeout in en start de test.
+Simuleert realistisch bezoek: homepage, spel openen, tracking, leaderboard, score opslaan.
 """
 
+import json
+import random
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import urllib.request
@@ -18,22 +20,45 @@ DEFAULT_CONCURRENT = 10
 DEFAULT_TIMEOUT = 15
 MIN_CONCURRENT = 1
 MAX_CONCURRENT = 500
-PATHS = ["/", "/games/zebras.html", "/api/leaderboard/zebras"]
+
+# Spellen (class_name voor leaderboard/score); zonder game-template
+GAMES = [
+    "beren", "dolfijnen", "draken", "eenden", "egels", "giraffen", "kangoeroes",
+    "koalas", "konijnen", "leeuwen", "lieveheersbeestjes", "muizen", "nijlpaarden",
+    "olifanten", "pandas", "pinguins", "uilen", "vlinders", "vossen", "wolven",
+    "zebras", "zwaluwen",
+]
+
+USER_AGENT = "RegenboogLoadTest/1.0 (simulated browser)"
 
 
-def fetch_one(base_url: str, path: str, timeout_sec: int) -> dict:
-    """Eén HTTP GET; retourneert dict met ok, status_code, ms, path, error."""
+def _request(
+    base_url: str,
+    path: str,
+    timeout_sec: int,
+    method: str = "GET",
+    body: dict | None = None,
+) -> dict:
+    """Eén HTTP request (GET of POST met JSON); retourneert ok, status_code, ms, path, error."""
     url = base_url.rstrip("/") + path
     start = time.perf_counter()
     try:
-        req = urllib.request.Request(url, method="GET")
+        if method == "GET":
+            req = urllib.request.Request(url, method="GET")
+            req.add_header("User-Agent", USER_AGENT)
+        else:
+            data = json.dumps(body or {}).encode("utf-8")
+            req = urllib.request.Request(url, data=data, method=method)
+            req.add_header("Content-Type", "application/json")
+            req.add_header("User-Agent", USER_AGENT)
         with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
-            body = resp.read()
+            resp.read()
         ms = int((time.perf_counter() - start) * 1000)
         status = resp.status
         ok = 200 <= status < 400
         return {"ok": ok, "status_code": status, "ms": ms, "path": path}
     except urllib.error.HTTPError as e:
+        e.read()
         ms = int((time.perf_counter() - start) * 1000)
         return {"ok": False, "status_code": e.code, "ms": ms, "path": path, "error": str(e)}
     except urllib.error.URLError as e:
@@ -47,14 +72,72 @@ def fetch_one(base_url: str, path: str, timeout_sec: int) -> dict:
         return {"ok": False, "status_code": None, "ms": ms, "path": path, "error": str(e)}
 
 
-def simulate_one_player(base_url: str, paths: list, timeout_sec: int, player_id: int) -> dict:
-    """Simuleer één speler: vraag elk pad na elkaar aan."""
+def simulate_one_player(
+    base_url: str,
+    timeout_sec: int,
+    player_id: int,
+) -> dict:
+    """
+    Simuleer één bezoeker: homepage → spel → leaderboard → score.
+    Tracking-endpoints (track-visit, heartbeat, track-visit-end) worden
+    meegestuurd voor realisme maar zijn optioneel (404/oudere server = geen fout).
+    """
     results = []
-    for path in paths:
-        r = fetch_one(base_url, path, timeout_sec)
+    base_url = base_url.rstrip("/")
+    visitor_id = f"loadtest-{player_id}-{random.randint(10000, 99999)}"
+    game = random.choice(GAMES)
+    page_game = f"/games/{game}.html"
+
+    def step(method: str, path: str, body: dict | None = None, required: bool = True) -> bool:
+        r = _request(base_url, path, timeout_sec, method=method, body=body)
+        r["required"] = required
         results.append(r)
-        if not r.get("ok", True):
-            break
+        return r.get("ok", False)
+
+    # 1. Homepage (verplicht)
+    if not step("GET", "/"):
+        return {"player_id": player_id, "results": results}
+    step("POST", "/api/track-visit", {
+        "visitor_id": visitor_id,
+        "page": "/",
+        "user_agent": USER_AGENT,
+        "referrer": "",
+    }, required=False)
+
+    # 2. Spelpagina (verplicht)
+    if not step("GET", page_game):
+        return {"player_id": player_id, "results": results}
+    step("POST", "/api/track-visit", {
+        "visitor_id": visitor_id,
+        "page": page_game,
+        "user_agent": USER_AGENT,
+        "referrer": "/",
+    }, required=False)
+
+    if game == "vlinders":
+        step("GET", "/api/vlinders/word/1", required=False)
+
+    step("POST", "/api/track-visit-heartbeat", {"visitor_id": visitor_id, "page": page_game}, required=False)
+
+    # 3. Leaderboard (verplicht)
+    if not step("GET", f"/api/leaderboard/{game}"):
+        return {"player_id": player_id, "results": results}
+
+    # 4. Score opslaan (verplicht)
+    if not step("POST", "/api/score", {
+        "class_name": game,
+        "player_name": f"Loadtest {player_id}",
+        "student_class": "Zebra's",
+        "score": random.randint(80, 450),
+    }):
+        return {"player_id": player_id, "results": results}
+
+    step("POST", "/api/track-visit-end", {
+        "visitor_id": visitor_id,
+        "page": page_game,
+        "duration": random.randint(20, 90),
+    }, required=False)
+
     return {"player_id": player_id, "results": results}
 
 
@@ -62,7 +145,6 @@ def run_load_test(
     base_url: str,
     concurrent: int,
     timeout_sec: int,
-    paths: list,
     cancel_flag: threading.Event,
 ) -> dict:
     """Voer load test uit; cancel_flag om (later) te kunnen stoppen."""
@@ -72,7 +154,7 @@ def run_load_test(
 
     with ThreadPoolExecutor(max_workers=concurrent) as ex:
         futures = {
-            ex.submit(simulate_one_player, base_url, paths, timeout_sec, i + 1): i + 1
+            ex.submit(simulate_one_player, base_url, timeout_sec, i + 1): i + 1
             for i in range(concurrent)
         }
         for fut in as_completed(futures):
@@ -90,8 +172,8 @@ def run_load_test(
 
     for item in outcomes:
         results = item.get("results", [])
-        all_ok = all(r.get("ok", False) for r in results)
-        if all_ok and results:
+        required_ok = all(r.get("ok", False) for r in results if r.get("required", True))
+        if required_ok and results:
             success_count += 1
             times.append(sum(r.get("ms", 0) for r in results))
         else:
@@ -121,7 +203,7 @@ class LoadTestApp:
         self.root = tk.Tk()
         self.root.title("Regenboog – Load test Pi")
         self.root.minsize(480, 420)
-        self.root.geometry("620 520")
+        self.root.geometry("620x520")
 
         self.cancel_flag = threading.Event()
         self.test_thread = None
@@ -217,12 +299,12 @@ class LoadTestApp:
         self._clear_log()
         self._log(f"Load test – URL: {url}")
         self._log(f"Gelijktijdige gebruikers: {concurrent}  |  Timeout: {timeout} s")
-        self._log("Paden: " + ", ".join(PATHS))
+        self._log("Simulatie: realistisch bezoek (homepage → spel → tracking → leaderboard → score opslaan).")
         self._log("")
         self._log("Bezig...")
 
         def run():
-            result = run_load_test(url, concurrent, timeout, PATHS, self.cancel_flag)
+            result = run_load_test(url, concurrent, timeout, self.cancel_flag)
             self.root.after(0, lambda: self._on_test_done(result))
 
         self.test_thread = threading.Thread(target=run, daemon=True)
@@ -255,8 +337,10 @@ class LoadTestApp:
         if r["fail_count"] > 0:
             for o in r["outcomes"]:
                 res = o.get("results", [])
-                if not all(x.get("ok", False) for x in res):
-                    bad = next((x for x in res if not x.get("ok", True)), {})
+                required_ok = all(x.get("ok", False) for x in res if x.get("required", True))
+                if not required_ok:
+                    failed = [x for x in res if not x.get("ok", True)]
+                    bad = next((x for x in failed if x.get("required", True)), failed[0] if failed else {})
                     err = bad.get("error") or bad.get("status_code")
                     self._log(f"Voorbeeld fout:   {err} bij {bad.get('path', '?')}")
                     break

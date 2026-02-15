@@ -25,4 +25,7 @@ window.REGENBOOG_CLASSES = [
   { id: 'zebras', name: "Zebra's", grade: '5e-leerjaar', game: 'Getallenpatronen' },
   { id: 'pandas', name: "Panda's", grade: '6e-leerjaar', game: 'Panda space verdediging' },
   { id: 'zwaluwen', name: 'Zwaluwen', grade: '6e-leerjaar', game: 'Luchtdoolhof' },
+  { id: 'dammen', name: 'Dammen', grade: 'extra-spellen', game: 'Dammen' },
+  { id: 'schaken', name: 'Schaken', grade: 'extra-spellen', game: 'Schaken' },
+  { id: 'vieropeenrij', name: '4 op een rij', grade: 'extra-spellen', game: '4 op een rij' },
 ];

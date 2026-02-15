@@ -15,6 +15,7 @@
     '4e-leerjaar': 'classes-4e-leerjaar',
     '5e-leerjaar': 'classes-5e-leerjaar',
     '6e-leerjaar': 'classes-6e-leerjaar',
+    'extra-spellen': 'classes-extra-spellen',
   };
 
   Object.keys(containerIds).forEach((grade) => {
@@ -23,7 +24,9 @@
     if (!el) return;
     el.innerHTML = list
       .map(function (c) {
-        var imgSrc = '/assets/images/classes/' + c.id + '.png';
+        var imgSrc = (c.id === 'dammen' || c.id === 'schaken' || c.id === 'vieropeenrij')
+          ? '/assets/images/classes/' + c.id + '.svg'
+          : '/assets/images/classes/' + c.id + '.png';
         var iconHtml = '<span class="class-card-icon" aria-hidden="true">' +
           '<img src="' + imgSrc + '" alt="" class="class-card-logo" loading="lazy">' +
           '</span>';

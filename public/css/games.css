@@ -1877,3 +1877,711 @@
   background: #fff;
   border-color: #6a4c93;
 }
+
+/* Dammen – 1 vs 1 of 1 vs computer */
+.dammen-instruction {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.dammen-stand {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  opacity: 0.9;
+  text-align: center;
+}
+
+.dammen-mode-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dammen-mode-btn {
+  padding: 14px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 2px solid #2e7d32;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #1b5e20;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: left;
+}
+
+.dammen-mode-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.35);
+}
+
+.dammen-mode-actions {
+  margin-top: 0.95rem;
+  text-align: center;
+}
+
+.dammen-choose-mode {
+  margin: 0 0 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #2f3e4f;
+  text-align: center;
+}
+
+.dammen-difficulty-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 280px;
+  margin-bottom: 1rem;
+}
+
+.dammen-difficulty-btn {
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 2px solid #5d4037;
+  background: linear-gradient(180deg, #fff8e8 0%, #e8dcc4 100%);
+  color: #3e2723;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-align: left;
+}
+
+.dammen-difficulty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(93, 64, 55, 0.25);
+}
+
+.dammen-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  grid-template-rows: repeat(10, 1fr);
+  width: min(90vw, 420px);
+  aspect-ratio: 1;
+  margin: 0 auto 1rem;
+  border: 3px solid #5d4037;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.dammen-cell {
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(93, 64, 55, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  cursor: default;
+  position: relative;
+}
+
+.dammen-cell:disabled {
+  cursor: default;
+}
+
+.dammen-cell.dammen-light {
+  background: #e8dcc8;
+}
+
+.dammen-cell.dammen-dark {
+  background: #8b7355;
+  cursor: pointer;
+}
+
+.dammen-cell.dammen-dark:hover:not(.dammen-selected) {
+  background: #9c8466;
+}
+
+.dammen-cell.dammen-selected {
+  background: #7cb342;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.dammen-cell.dammen-valid {
+  background: #a5d6a7;
+  box-shadow: inset 0 0 0 2px #2e7d32;
+}
+
+.dammen-cell.dammen-move-from {
+  background: #fff9c4;
+  box-shadow: inset 0 0 0 3px #f9a825;
+  animation: dammen-pulse 0.6s ease-in-out 2;
+}
+
+.dammen-cell.dammen-move-to {
+  background: #c8e6c9;
+  box-shadow: inset 0 0 0 3px #2e7d32;
+  animation: dammen-pulse 0.6s ease-in-out 2;
+}
+
+.dammen-cell.dammen-move-capture {
+  background: #ffcdd2;
+  box-shadow: inset 0 0 0 3px #c62828;
+  animation: dammen-pulse 0.6s ease-in-out 2;
+}
+
+@keyframes dammen-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+.dammen-piece {
+  width: 75%;
+  height: 75%;
+  border-radius: 50%;
+  display: block;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.dammen-p1 {
+  background: radial-gradient(circle at 30% 30%, #fff8e8, #e8d4a0);
+  border: 2px solid #b8860b;
+}
+
+.dammen-p2 {
+  background: radial-gradient(circle at 30% 30%, #5c4a3a, #3e2723);
+  border: 2px solid #1a0f0a;
+}
+
+.dammen-king::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 40%;
+  border: 2px solid rgba(0,0,0,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dammen-p2.dammen-king::after {
+  border-color: rgba(255,255,255,0.5);
+}
+
+.dammen-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 0.75rem;
+}
+
+.dammen-again,
+.dammen-back {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.dammen-again {
+  border: 2px solid #2e7d32;
+  background: linear-gradient(180deg, #66bb6a 0%, #43a047 100%);
+  color: #fff;
+}
+
+.dammen-again:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.4);
+}
+
+.dammen-back {
+  border: 2px solid #5d4037;
+  background: linear-gradient(180deg, #d7ccc8 0%, #bcaaa4 100%);
+  color: #3e2723;
+}
+
+.dammen-back:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.dammen-name-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 280px;
+  margin-bottom: 1rem;
+}
+
+.dammen-name-input {
+  padding: 10px 14px;
+  font-size: 1rem;
+  border: 2px solid #5d4037;
+  border-radius: 8px;
+}
+
+.dammen-lobby-list {
+  margin-bottom: 1rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.dammen-lobby-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dammen-lobby-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dammen-invite-btn {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  background: #e8f5e9;
+  color: #1b5e20;
+  cursor: pointer;
+}
+
+.dammen-invite-btn:hover {
+  background: #c8e6c9;
+}
+
+.dammen-lobby-empty {
+  color: var(--text-soft);
+  padding: 1rem;
+}
+
+.dammen-invite-overlay {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #fff8e1;
+  border: 2px solid #ffb74d;
+  border-radius: 12px;
+}
+
+.dammen-invite-overlay p {
+  margin: 0 0 10px;
+  font-weight: 700;
+}
+
+.dammen-accept-btn,
+.dammen-decline-btn {
+  padding: 8px 16px;
+  margin-right: 8px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dammen-accept-btn {
+  border: 2px solid #2e7d32;
+  background: #c8e6c9;
+  color: #1b5e20;
+}
+
+.dammen-decline-btn {
+  border: 2px solid #5d4037;
+  background: #efebe9;
+  color: #3e2723;
+}
+
+.dammen-play-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.dammen-board-wrap {
+  flex: 0 0 auto;
+}
+
+.dammen-chat-panel {
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: 320px;
+  min-width: 260px;
+  border: 2px solid #8b7355;
+  border-radius: 12px;
+  background: #f5f0e8;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 420px;
+}
+
+.dammen-chat-title {
+  padding: 8px 12px;
+  font-weight: 700;
+  background: #e8dcc8;
+  border-bottom: 1px solid #8b7355;
+}
+
+.dammen-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  min-height: 160px;
+  max-height: 240px;
+}
+
+.dammen-chat-msg {
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.dammen-chat-input-wrap {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  border-top: 1px solid #8b7355;
+}
+
+.dammen-chat-input {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 2px solid #8b7355;
+  border-radius: 8px;
+}
+
+.dammen-chat-send {
+  padding: 8px 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #2e7d32;
+  background: #c8e6c9;
+  color: #1b5e20;
+  cursor: pointer;
+}
+
+/* Dammen – centraal uitlijnen */
+.dammen-game .dammen-instruction,
+.dammen-game .dammen-choose-mode {
+  text-align: center;
+}
+.dammen-game .dammen-play-wrap {
+  justify-content: center;
+}
+.dammen-game .dammen-board-wrap {
+  margin-left: auto;
+  margin-right: auto;
+}
+.dammen-game .dammen-actions {
+  justify-content: center;
+}
+.dammen-game .dammen-difficulty-buttons {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.dammen-game .dammen-name-form {
+  margin-left: auto;
+  margin-right: auto;
+}
+.dammen-game .dammen-invite-overlay {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 320px;
+}
+.dammen-game .dammen-mp-back,
+.dammen-game #dammen-lobby-back {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.dammen-game .dammen-lobby-list {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 360px;
+}
+.dammen-game .dammen-back,
+.dammen-game .dammen-again {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+/* Schaken – centraal uitlijnen */
+.schaken-game .dammen-instruction,
+.schaken-game .dammen-choose-mode {
+  text-align: center;
+}
+.schaken-game .dammen-play-wrap {
+  justify-content: center;
+}
+.schaken-game .dammen-board-wrap {
+  margin-left: auto;
+  margin-right: auto;
+}
+.schaken-game .dammen-actions {
+  justify-content: center;
+}
+.schaken-game .dammen-difficulty-buttons {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.schaken-game .dammen-name-form {
+  margin-left: auto;
+  margin-right: auto;
+}
+.schaken-game .dammen-invite-overlay {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 320px;
+}
+.schaken-game .dammen-mp-back,
+.schaken-game #dammen-lobby-back {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.schaken-game .dammen-lobby-list {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 360px;
+}
+.schaken-game .dammen-back,
+.schaken-game .dammen-again {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+/* Schaken */
+.schaken-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(80vw, 400px);
+  aspect-ratio: 1;
+  border: 2px solid #5d4037;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.schaken-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: clamp(0.6rem, 4vw, 1.2rem);
+  font-weight: 700;
+}
+
+.schaken-cell.schaken-light {
+  background: #efebe9;
+}
+
+.schaken-cell.schaken-dark {
+  background: #8d6e63;
+}
+
+.schaken-cell.schaken-dark:hover:not(.schaken-selected) {
+  background: #a1887f;
+}
+
+.schaken-cell.schaken-selected {
+  background: #ffb74d;
+  box-shadow: inset 0 0 0 2px #e65100;
+}
+
+.schaken-cell.schaken-valid {
+  background: rgba(129, 199, 132, 0.6);
+}
+
+.schaken-piece {
+  pointer-events: none;
+  display: block;
+  width: 85%;
+  height: 85%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.schaken-piece.schaken-p1.schaken-K { background-image: url('/assets/images/schaken/king-w.svg'); }
+.schaken-piece.schaken-p1.schaken-Q { background-image: url('/assets/images/schaken/queen-w.svg'); }
+.schaken-piece.schaken-p1.schaken-R { background-image: url('/assets/images/schaken/rook-w.svg'); }
+.schaken-piece.schaken-p1.schaken-B { background-image: url('/assets/images/schaken/bishop-w.svg'); }
+.schaken-piece.schaken-p1.schaken-N { background-image: url('/assets/images/schaken/knight-w.svg'); }
+.schaken-piece.schaken-p1.schaken-P { background-image: url('/assets/images/schaken/pawn-w.svg'); }
+.schaken-piece.schaken-p2.schaken-K { background-image: url('/assets/images/schaken/king-b.svg'); }
+.schaken-piece.schaken-p2.schaken-Q { background-image: url('/assets/images/schaken/queen-b.svg'); }
+.schaken-piece.schaken-p2.schaken-R { background-image: url('/assets/images/schaken/rook-b.svg'); }
+.schaken-piece.schaken-p2.schaken-B { background-image: url('/assets/images/schaken/bishop-b.svg'); }
+.schaken-piece.schaken-p2.schaken-N { background-image: url('/assets/images/schaken/knight-b.svg'); }
+.schaken-piece.schaken-p2.schaken-P { background-image: url('/assets/images/schaken/pawn-b.svg'); }
+
+/* 4 op een rij – centraal uitlijnen */
+.vieropeenrij-game .dammen-instruction,
+.vieropeenrij-game .dammen-choose-mode {
+  text-align: center;
+}
+.vieropeenrij-game .dammen-play-wrap {
+  justify-content: center;
+}
+.vieropeenrij-game .dammen-board-wrap {
+  margin-left: auto;
+  margin-right: auto;
+}
+.vieropeenrij-game .dammen-actions {
+  justify-content: center;
+}
+.vieropeenrij-game .dammen-difficulty-buttons {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vieropeenrij-game .dammen-name-form {
+  margin-left: auto;
+  margin-right: auto;
+}
+.vieropeenrij-game .dammen-invite-overlay {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 320px;
+}
+.vieropeenrij-game .dammen-mp-back,
+.vieropeenrij-game #dammen-lobby-back {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.vieropeenrij-game .dammen-lobby-list {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 360px;
+}
+.vieropeenrij-game .vieropeenrij-columns {
+  justify-content: center;
+}
+.vieropeenrij-game .dammen-back,
+.vieropeenrij-game .dammen-again {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+/* 4 op een rij */
+.vieropeenrij-board {
+  display: flex;
+  flex-direction: row;
+  width: min(80vw, 350px);
+  aspect-ratio: 7/6;
+  border: 2px solid #5d4037;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #5d4037;
+  gap: 2px;
+  padding: 4px;
+}
+
+.vieropeenrij-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.vieropeenrij-col:hover:not(.vieropeenrij-col-disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.vieropeenrij-col-disabled {
+  cursor: default;
+}
+
+.vieropeenrij-col:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.vieropeenrij-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  background: #efebe9;
+  border-radius: 50%;
+  min-height: 0;
+  flex: 1;
+}
+
+.vieropeenrij-cell:hover {
+  background: #efebe9;
+}
+
+.vieropeenrij-cell.vieropeenrij-p1::after {
+  content: '';
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  background: #d32f2f;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.vieropeenrij-cell.vieropeenrij-p2::after {
+  content: '';
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  background: #1976d2;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.vieropeenrij-columns {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.vieropeenrij-col-btn {
+  padding: 8px 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #5d4037;
+  background: #efebe9;
+  color: #3e2723;
+  cursor: pointer;
+  min-width: 44px;
+}
+
+.vieropeenrij-col-btn:hover:not(:disabled) {
+  background: #d7ccc8;
+}
+
+.vieropeenrij-col-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

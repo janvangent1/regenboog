@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+  <defs>
+    <pattern id="dammen-dark" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#8b7355"/>
+    </pattern>
+    <pattern id="dammen-light" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#e8dcc8"/>
+    </pattern>
+  </defs>
+  <rect width="64" height="64" rx="6" fill="#5d4037"/>
+  <rect x="4" y="4" width="56" height="56" rx="4" fill="url(#dammen-light)"/>
+  <g fill="url(#dammen-dark)">
+    <rect x="8" y="8" width="8" height="8"/>
+    <rect x="24" y="8" width="8" height="8"/>
+    <rect x="40" y="8" width="8" height="8"/>
+    <rect x="16" y="16" width="8" height="8"/>
+    <rect x="32" y="16" width="8" height="8"/>
+    <rect x="48" y="16" width="8" height="8"/>
+    <rect x="8" y="24" width="8" height="8"/>
+    <rect x="24" y="24" width="8" height="8"/>
+    <rect x="40" y="24" width="8" height="8"/>
+    <rect x="16" y="32" width="8" height="8"/>
+    <rect x="32" y="32" width="8" height="8"/>
+    <rect x="48" y="32" width="8" height="8"/>
+    <rect x="8" y="40" width="8" height="8"/>
+    <rect x="24" y="40" width="8" height="8"/>
+    <rect x="40" y="40" width="8" height="8"/>
+    <rect x="16" y="48" width="8" height="8"/>
+    <rect x="32" y="48" width="8" height="8"/>
+    <rect x="48" y="48" width="8" height="8"/>
+  </g>
+  <circle cx="20" cy="20" r="3.2" fill="#e8d4a0" stroke="#b8860b" stroke-width="0.8"/>
+  <circle cx="36" cy="20" r="3.2" fill="#e8d4a0" stroke="#b8860b" stroke-width="0.8"/>
+  <circle cx="44" cy="28" r="3.2" fill="#3e2723" stroke="#1a0f0a" stroke-width="0.8"/>
+  <circle cx="28" cy="36" r="3.2" fill="#e8d4a0" stroke="#b8860b" stroke-width="0.8"/>
+  <circle cx="44" cy="44" r="3.2" fill="#3e2723" stroke="#1a0f0a" stroke-width="0.8"/>
+</svg>
