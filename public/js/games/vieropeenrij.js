@@ -422,15 +422,33 @@
       return;
     }
 
-    var turnText = gameOver
-      ? (winner === 0 ? 'Gelijkspel!' : (winner === P1 ? 'Rood wint!' : 'Blauw wint!'))
-      : thinking ? 'Computer denkt…'
-      : mode === '1vAI' && currentPlayer === P2 ? 'Computer is aan zet'
-      : mode === 'multiplayer'
-        ? (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet')
-        : (currentPlayer === P1 ? 'Rood aan zet' : 'Blauw aan zet');
-    if (gameOver && mode === 'multiplayer' && winner === mySide) turnText = 'Jij wint!';
-    if (gameOver && mode === 'multiplayer' && winner !== null && winner !== 0 && winner !== mySide) turnText = opponentName + ' wint!';
+    var turnText = '';
+    var winnerHtml = '';
+    
+    if (gameOver && winner !== null && winner !== 0 && (mode === '1v1' || mode === 'multiplayer')) {
+      // Toon winnaar scherm alleen voor 1v1 en multiplayer
+      if (window.RegenboogCore && window.RegenboogCore.showWinnerScreen) {
+        var winnerName1 = mode === 'multiplayer' ? (mySide === P1 ? 'Jij' : opponentName) : 'Rood';
+        var winnerName2 = mode === 'multiplayer' ? (mySide === P2 ? 'Jij' : opponentName) : 'Blauw';
+        winnerHtml = window.RegenboogCore.showWinnerScreen(winner, mode, {
+          player1Name: winnerName1,
+          player2Name: winnerName2,
+          mySide: mySide,
+          opponentName: opponentName
+        });
+      }
+      turnText = mode === 'multiplayer'
+        ? (winner === mySide ? 'Jij wint!' : opponentName + ' wint!')
+        : (winner === P1 ? 'Rood wint!' : 'Blauw wint!');
+    } else {
+      turnText = gameOver
+        ? (winner === 0 ? 'Gelijkspel!' : (winner === P1 ? 'Rood wint!' : 'Blauw wint!'))
+        : thinking ? 'Computer denkt…'
+        : mode === '1vAI' && currentPlayer === P2 ? 'Computer is aan zet'
+        : mode === 'multiplayer'
+          ? (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet')
+          : (currentPlayer === P1 ? 'Rood aan zet' : 'Blauw aan zet');
+    }
 
     var chatHtml = '';
     if (mode === 'multiplayer') {
@@ -440,6 +458,7 @@
 
     area.innerHTML =
       '<p class="dammen-instruction">' + turnText + '</p>' +
+      winnerHtml +
       '<div class="dammen-play-wrap"><div class="dammen-board-wrap">' + renderBoard() + '</div>' + chatHtml + '</div>' +
       '<div class="dammen-actions">' +
       (mode === 'multiplayer' ? '<button type="button" class="dammen-back" id="dammen-leave-room">Verlaat spel</button>' : '<button type="button" class="dammen-again" id="dammen-new">Nieuw spel</button><button type="button" class="dammen-back" id="dammen-back">Andere spelmodus</button>') +

@@ -2299,9 +2299,10 @@
 
 .dammen-play-wrap {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
   gap: 1rem;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 0.75rem;
 }
 
@@ -2314,6 +2315,7 @@
   width: 100%;
   max-width: 320px;
   min-width: 260px;
+  align-self: center;
   border: 2px solid #8b7355;
   border-radius: 12px;
   background: #f5f0e8;
@@ -2681,4 +2683,546 @@
 .vieropeenrij-col-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Zeeslag */
+.zeeslag-boards-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .zeeslag-boards-wrap {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+}
+
+/* Zeeslag – moeilijkheid en intro schermen centraal uitlijnen */
+.zeeslag-game .dammen-instruction,
+.zeeslag-game .dammen-choose-mode {
+  text-align: center;
+}
+.zeeslag-game .dammen-difficulty-buttons {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.zeeslag-game #dammen-diff-back {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.zeeslag-board {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  /* 1 rij label + 10 rijen cellen = 11 rijen totaal, zodat cellen strikt 10x10 zijn */
+  grid-template-rows: auto repeat(10, 1fr);
+  width: min(90vw, 320px);
+  aspect-ratio: 1;
+  border: 3px solid #1565c0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  background: #e3f2fd;
+}
+
+.zeeslag-board-label {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  text-align: center;
+  padding: 0.5rem;
+  background: #1565c0;
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.zeeslag-cell {
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(21, 101, 192, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
+  background: #e3f2fd;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.zeeslag-cell:hover:not(.zeeslag-hit):not(.zeeslag-miss) {
+  background: #bbdefb;
+}
+
+.zeeslag-cell.zeeslag-ship {
+  background: #90caf9;
+}
+
+.zeeslag-cell.zeeslag-hit {
+  background: #ef5350;
+  cursor: not-allowed;
+}
+
+.zeeslag-cell.zeeslag-hit::after {
+  content: '✕';
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.zeeslag-cell.zeeslag-miss {
+  background: #b0bec5;
+  cursor: not-allowed;
+}
+
+.zeeslag-cell.zeeslag-miss::after {
+  content: '○';
+  color: #546e7a;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.zeeslag-placement {
+  text-align: center;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid #1565c0;
+}
+
+.zeeslag-placement p {
+  margin: 0 0 0.75rem;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.zeeslag-ship-btn {
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #1565c0;
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  margin: 0 0.5rem;
+}
+
+.zeeslag-ship-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.35);
+}
+
+.zeeslag-ship-icon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.zeeslag-cell.zeeslag-ship {
+  position: relative;
+}
+
+.zeeslag-cell.zeeslag-ship-selected {
+  box-shadow: inset 0 0 0 3px #ff9800;
+  background: #fff3e0 !important;
+}
+
+/* Sectie: richtingkeuze + preview naast elkaar op grotere schermen */
+.zeeslag-placement-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+}
+
+.zeeslag-placement-section .zeeslag-placement {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.zeeslag-placement-section .zeeslag-placement p {
+  margin: 0 0 0.5rem 0;
+}
+
+.zeeslag-ship-preview {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.zeeslag-preview-title {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.zeeslag-preview-label {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.zeeslag-preview-grid {
+  display: grid;
+  gap: 2px;
+  margin: 0 auto;
+}
+
+.zeeslag-preview-grid.zeeslag-preview-h {
+  max-width: 100%;
+}
+
+.zeeslag-preview-grid.zeeslag-preview-v {
+  max-width: 96px;
+}
+
+.zeeslag-preview-cell {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  min-height: 30px;
+  background: #e0e0e0;
+  border: 1px solid #bdbdbd;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.zeeslag-preview-cell.zeeslag-preview-ship {
+  background: #8d6e63;
+  border: 2px solid #5d4037;
+}
+
+.zeeslag-preview-cell .zeeslag-ship-icon {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.zeeslag-placement-controls {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  border: 2px solid #1565c0;
+  text-align: center;
+}
+
+.zeeslag-control-btn {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #1565c0;
+  background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+  margin: 0.25rem;
+}
+
+.zeeslag-control-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(21, 101, 192, 0.35);
+}
+
+.zeeslag-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zeeslag-hint {
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+.zeeslag-sunk-message {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(180deg, #ff6f00 0%, #e65100 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+  animation: zeeslag-sunk-pulse 0.5s ease-in-out;
+}
+
+@keyframes zeeslag-sunk-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Reken-duel */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes winner-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.reken-duel-penalty {
+  animation: shake 0.5s;
+}
+
+.reken-duel-winner {
+  animation: winner-pulse 1s ease-in-out;
+}
+
+@keyframes winner-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.game-winner-screen {
+  animation: winner-pulse 1s ease-in-out;
+}
+
+.reken-duel-question {
+  text-align: center;
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(180deg, #fff8e1 0%, #ffe082 100%);
+  border-radius: 16px;
+  border: 3px solid #f57f17;
+  box-shadow: 0 4px 16px rgba(245, 127, 23, 0.2);
+}
+
+.reken-duel-question-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #e65100;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 600px) {
+  .reken-duel-question-text {
+    font-size: 2rem;
+  }
+}
+
+.reken-duel-answer-input-wrap {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.reken-duel-answer-input {
+  padding: 12px 18px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 3px solid #f57f17;
+  background: white;
+  color: #e65100;
+  text-align: center;
+  min-width: 120px;
+  max-width: 200px;
+  font-family: 'Courier New', monospace;
+}
+
+.reken-duel-answer-input:focus {
+  outline: none;
+  border-color: #ff6f00;
+  box-shadow: 0 0 0 3px rgba(255, 111, 0, 0.2);
+}
+
+.reken-duel-submit-btn {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  border: 3px solid #f57f17;
+  background: linear-gradient(180deg, #ff6f00 0%, #e65100 100%);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.reken-duel-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(230, 81, 0, 0.4);
+}
+
+.reken-duel-submit-btn:active {
+  transform: translateY(0);
+}
+
+.reken-duel-waiting {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #666;
+  background: #f5f5f5;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+}
+
+.reken-duel-game .dammen-difficulty-btn {
+  text-align: center;
+  padding: 16px 20px;
+}
+
+.reken-duel-game .dammen-difficulty-btn small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Reken-duel – centraal uitlijnen van alle schermen */
+.reken-duel-game .dammen-instruction,
+.reken-duel-game .dammen-choose-mode,
+.reken-duel-game .core-intro-title,
+.reken-duel-game .core-intro-subtitle {
+  text-align: center;
+}
+
+.reken-duel-game .core-intro {
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .core-intro-card {
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .core-intro-actions {
+  text-align: center;
+}
+
+.reken-duel-game .dammen-mode-buttons {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .dammen-name-form {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .dammen-difficulty-buttons {
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .dammen-lobby-list {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 360px;
+}
+
+.reken-duel-game .dammen-invite-overlay {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 320px;
+}
+
+.reken-duel-game .dammen-back,
+.reken-duel-game #dammen-lobby-back,
+.reken-duel-game #dammen-mp-back,
+.reken-duel-game #dammen-diff-back {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.reken-duel-game .dammen-actions {
+  justify-content: center;
+}
+
+.reken-duel-game .reken-duel-question {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 500px;
+}
+
+.reken-duel-game .reken-duel-center-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.reken-duel-game .reken-duel-countdown,
+.reken-duel-game .reken-duel-penalty {
+  display: block;
+  max-width: 400px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.reken-duel-game .game-winner-screen {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 500px;
+}
+
+.reken-duel-game .dammen-stand {
+  text-align: center;
+}
+
+.reken-duel-game .dammen-stand > div {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px;
+}
+
+.reken-duel-game .dammen-play-wrap {
+  justify-content: center;
 }

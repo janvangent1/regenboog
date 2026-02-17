@@ -57,11 +57,12 @@ window.Leaderboard = {
   },
 
   showSubmitForm(className, score, onDone) {
-    const gameArea = document.getElementById('game-area');
-    if (!gameArea) {
-      if (onDone) onDone();
-      return;
-    }
+    // Toon formulier in een vaste overlay (buiten #game-area) zodat game render() het niet overschrijft
+    const overlay = document.createElement('div');
+    overlay.className = 'score-submit-overlay';
+    overlay.setAttribute('style',
+      'position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 1rem; box-sizing: border-box;'
+    );
 
     // Haal dierennamen op uit REGENBOOG_CLASSES, of gebruik fallback lijst
     let classes = [{ value: '', label: '-- Selecteer klas --' }];
@@ -138,10 +139,10 @@ window.Leaderboard = {
       </div>
     `;
 
-    // Voeg formulier toe aan game area
     const formContainer = document.createElement('div');
     formContainer.innerHTML = formHtml;
-    gameArea.appendChild(formContainer);
+    overlay.appendChild(formContainer);
+    document.body.appendChild(overlay);
 
     const form = document.getElementById('score-form');
     const nameInput = document.getElementById('player-name');
@@ -150,9 +151,13 @@ window.Leaderboard = {
     const cancelBtn = document.getElementById('cancel-score');
 
     function cleanup() {
-      formContainer.remove();
+      overlay.remove();
       if (onDone) onDone();
     }
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) cleanup();
+    });
 
     const self = this;
     form.addEventListener('submit', function(e) {

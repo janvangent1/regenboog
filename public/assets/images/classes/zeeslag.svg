@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+  <defs>
+    <linearGradient id="water-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1565c0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d47a1;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Achtergrond -->
+  <rect width="64" height="64" rx="6" fill="url(#water-bg)"/>
+  
+  <!-- Grid lijnen (subtiel) -->
+  <g opacity="0.2">
+    <line x1="8" y1="8" x2="56" y2="8" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="8" y1="20" x2="56" y2="20" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="8" y1="32" x2="56" y2="32" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="8" y1="44" x2="56" y2="44" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="8" y1="56" x2="56" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="8" y1="8" x2="8" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="20" y1="8" x2="20" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="32" y1="8" x2="32" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="44" y1="8" x2="44" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+    <line x1="56" y1="8" x2="56" y2="56" stroke="#42a5f5" stroke-width="0.5"/>
+  </g>
+  
+  <!-- Groot schip (horizontaal) -->
+  <g transform="translate(10, 24)">
+    <rect x="0" y="0" width="24" height="8" rx="1.5" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+    <rect x="2" y="2" width="20" height="4" fill="#a1887f"/>
+    <!-- Boeg -->
+    <polygon points="0,4 0,0 -4,2 -4,6 0,4" fill="#6d4c41"/>
+    <!-- Mast/rook -->
+    <rect x="18" y="0" width="2" height="3" fill="#5d4037"/>
+    <circle cx="19" cy="1.5" r="1.5" fill="#90caf9" opacity="0.7"/>
+  </g>
+  
+  <!-- Klein schip (verticaal) -->
+  <g transform="translate(42, 12)">
+    <rect x="0" y="0" width="8" height="16" rx="1.5" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+    <rect x="2" y="2" width="4" height="12" fill="#a1887f"/>
+    <!-- Boeg (boven) -->
+    <polygon points="4,0 0,0 2,-3 6,-3 4,0" fill="#6d4c41"/>
+    <!-- Mast -->
+    <rect x="3" y="2" width="2" height="3" fill="#5d4037"/>
+    <circle cx="4" cy="3.5" r="1" fill="#90caf9" opacity="0.7"/>
+  </g>
+  
+  <!-- Hit marker (X) op grid cel -->
+  <g transform="translate(34, 36)">
+    <circle cx="0" cy="0" r="6" fill="#ef5350" opacity="0.9"/>
+    <line x1="-4" y1="-4" x2="4" y2="4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+    <line x1="4" y1="-4" x2="-4" y2="4" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Miss marker (cirkel) op andere cel -->
+  <circle cx="22" cy="48" r="4" fill="none" stroke="#b0bec5" stroke-width="1.5"/>
+</svg>

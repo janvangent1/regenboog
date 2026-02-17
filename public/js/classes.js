@@ -28,4 +28,6 @@ window.REGENBOOG_CLASSES = [
   { id: 'dammen', name: 'Dammen', grade: 'extra-spellen', game: 'Dammen' },
   { id: 'schaken', name: 'Schaken', grade: 'extra-spellen', game: 'Schaken' },
   { id: 'vieropeenrij', name: '4 op een rij', grade: 'extra-spellen', game: '4 op een rij' },
+  { id: 'zeeslag', name: 'Zeeslag', grade: 'extra-spellen', game: 'Zeeslag' },
+  { id: 'reken-duel', name: 'Reken-duel', grade: 'extra-spellen', game: 'Reken-duel' },
 ];

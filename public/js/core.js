@@ -573,9 +573,88 @@ window.RegenboogCore = {
     });
     this._introObserver = observer;
   },
+  /**
+   * Toon winnaar scherm met gouden beker
+   * @param {number} winner - P1 (1), P2 (2), of null voor gelijkspel
+   * @param {string} mode - '1v1', 'multiplayer', of '1vAI'
+   * @param {object} options - Opties: { player1Name, player2Name, mySide, opponentName, player1Score, player2Score, player1Time, player2Time }
+   * @returns {string} HTML voor winnaar scherm
+   */
+  showWinnerScreen(winner, mode, options = {}) {
+    const {
+      player1Name = 'Speler 1',
+      player2Name = 'Speler 2',
+      mySide = null,
+      opponentName = 'Tegenstander',
+      player1Score = null,
+      player2Score = null,
+      player1Time = null,
+      player2Time = null
+    } = options;
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    if (winner === null) {
+      // Gelijkspel
+      return '<div class="game-winner-screen" style="text-align: center; padding: 2rem; margin: 1rem 0; background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%); border-radius: 16px; border: 3px solid #9e9e9e; box-shadow: 0 8px 24px rgba(158, 158, 158, 0.3);">' +
+        '<div style="font-size: 4rem; margin-bottom: 0.5rem;">🤝</div>' +
+        '<h2 style="font-size: 2rem; color: #616161; margin: 0.5rem 0; font-weight: bold;">Gelijkspel!</h2>' +
+        '<p style="font-size: 1.2rem; color: #757575; margin: 0.5rem 0;">Beide spelers hebben gelijk gespeeld!</p>' +
+        '</div>';
+    }
+
+    let winnerName = '';
+    let winnerColor = '';
+    let winnerInfo = '';
+    
+    if (mode === 'multiplayer') {
+      if (winner === mySide) {
+        winnerName = 'Jij';
+        winnerColor = '#1976d2';
+      } else {
+        winnerName = opponentName || 'Tegenstander';
+        winnerColor = '#d32f2f';
+      }
+      if (player1Score !== null && player2Score !== null) {
+        var winnerScore = winner === 1 ? player1Score : player2Score;
+        winnerInfo = '<p style="font-size: 1.3rem; color: #e65100; margin: 0.5rem 0; font-weight: 600;">Score: ' + winnerScore + ' punten</p>';
+      }
+    } else if (mode === '1v1') {
+      winnerName = winner === 1 ? player1Name : player2Name;
+      winnerColor = winner === 1 ? '#1976d2' : '#388e3c';
+      if (player1Time !== null && player2Time !== null) {
+        var formatTime = function(ms) {
+          return (ms / 1000).toFixed(1) + 's';
+        };
+        var winnerTime = winner === 1 ? player1Time : player2Time;
+        var loserTime = winner === 1 ? player2Time : player1Time;
+        var loserName = winner === 1 ? player2Name : player1Name;
+        winnerInfo = '<div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.6); border-radius: 8px;">' +
+          '<p style="font-size: 1.1rem; color: #e65100; margin: 0.3rem 0;"><strong>' + escapeHtml(winnerName) + ':</strong> ' + formatTime(winnerTime) + '</p>' +
+          '<p style="font-size: 1rem; color: #666; margin: 0.3rem 0;">' + escapeHtml(loserName) + ': ' + formatTime(loserTime) + '</p>' +
+          '</div>';
+      }
+    } else {
+      // 1vAI of andere
+      winnerName = winner === 1 ? player1Name : (winner === 2 ? player2Name : 'Computer');
+      winnerColor = winner === 1 ? '#1976d2' : '#d32f2f';
+    }
+
+    return '<div class="game-winner-screen" style="text-align: center; padding: 2rem; margin: 1rem 0; background: linear-gradient(180deg, #fff8e1 0%, #ffe082 100%); border-radius: 16px; border: 3px solid #f57f17; box-shadow: 0 8px 24px rgba(245, 127, 23, 0.4); animation: winner-pulse 1s ease-in-out;">' +
+      '<div style="font-size: 4rem; margin-bottom: 0.5rem; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));">🏆</div>' +
+      '<h2 style="font-size: 2.5rem; color: ' + winnerColor + '; margin: 0.5rem 0; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">' + escapeHtml(winnerName) + ' wint!</h2>' +
+      winnerInfo +
+      '</div>';
+  },
 };
 
 // Activeer globale auto-next voor alle rondeknoppen in games.
 window.RegenboogCore.initAutoNextObserver();
+
 // Uniformeer intro-schermen met startknop.
 window.RegenboogCore.initIntroNormalizer();

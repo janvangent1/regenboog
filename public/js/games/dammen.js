@@ -751,17 +751,37 @@
       return;
     }
 
-    var turnText = gameOver
-      ? (winner === P1 ? 'Speler 1 (wit) wint!' : 'Speler 2 (donker) wint!')
-      : thinking
-        ? 'Computer denkt…'
-        : mode === '1vAI' && currentPlayer === P2
-          ? 'Computer is aan zet'
-          : mode === 'multiplayer'
-            ? (gameOver ? (winner === mySide ? 'Jij wint!' : opponentName + ' wint!') : (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet'))
-            : currentPlayer === P1
-              ? 'Speler 1 (wit) aan zet'
-              : 'Speler 2 (donker) aan zet';
+    var turnText = '';
+    var winnerHtml = '';
+    
+    if (gameOver && winner !== null && (mode === '1v1' || mode === 'multiplayer')) {
+      // Toon winnaar scherm alleen voor 1v1 en multiplayer (niet voor 1vAI)
+      if (window.RegenboogCore && window.RegenboogCore.showWinnerScreen) {
+        var winnerName1 = mode === 'multiplayer' ? (mySide === P1 ? 'Jij' : opponentName) : 'Speler 1 (wit)';
+        var winnerName2 = mode === 'multiplayer' ? (mySide === P2 ? 'Jij' : opponentName) : 'Speler 2 (donker)';
+        winnerHtml = window.RegenboogCore.showWinnerScreen(winner, mode, {
+          player1Name: winnerName1,
+          player2Name: winnerName2,
+          mySide: mySide,
+          opponentName: opponentName
+        });
+      }
+      turnText = mode === 'multiplayer'
+        ? (winner === mySide ? 'Jij wint!' : opponentName + ' wint!')
+        : (winner === P1 ? 'Speler 1 (wit) wint!' : 'Speler 2 (donker) wint!');
+    } else {
+      turnText = gameOver
+        ? (winner === P1 ? 'Speler 1 (wit) wint!' : 'Speler 2 (donker) wint!')
+        : thinking
+          ? 'Computer denkt…'
+          : mode === '1vAI' && currentPlayer === P2
+            ? 'Computer is aan zet'
+            : mode === 'multiplayer'
+              ? (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet')
+              : currentPlayer === P1
+                ? 'Speler 1 (wit) aan zet'
+                : 'Speler 2 (donker) aan zet';
+    }
 
     var counts = getPieceCounts(board);
     var standLine = 'Stand: Wit ' + (counts.p1.pieces + counts.p1.kings) + ' stuks' + (counts.p1.kings ? ' (' + counts.p1.kings + ' dam' + (counts.p1.kings !== 1 ? 'men' : '') + ')' : '') + ' – Zwart ' + (counts.p2.pieces + counts.p2.kings) + ' stuks' + (counts.p2.kings ? ' (' + counts.p2.kings + ' dam' + (counts.p2.kings !== 1 ? 'men' : '') + ')' : '') + '.';
@@ -783,6 +803,7 @@
 
     area.innerHTML =
       '<p class="dammen-instruction">' + turnText + '</p>' +
+      winnerHtml +
       '<p class="dammen-stand">' + standLine + '</p>' +
       '<div class="dammen-play-wrap">' +
       '<div class="dammen-board-wrap">' + renderBoard() + '</div>' +

@@ -562,15 +562,33 @@
       return;
     }
 
-    var turnText = gameOver
-      ? (winner === 0 ? 'Gelijkspel!' : (winner === P1 ? 'Wit wint!' : 'Zwart wint!'))
-      : thinking ? 'Computer denkt…'
-      : mode === '1vAI' && currentPlayer === P2 ? 'Computer is aan zet'
-      : mode === 'multiplayer'
-        ? (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet')
-        : (currentPlayer === P1 ? 'Wit aan zet' : 'Zwart aan zet');
-    if (gameOver && mode === 'multiplayer' && winner === mySide) turnText = 'Jij wint!';
-    if (gameOver && mode === 'multiplayer' && winner !== null && winner !== 0 && winner !== mySide) turnText = opponentName + ' wint!';
+    var turnText = '';
+    var winnerHtml = '';
+    
+    if (gameOver && winner !== null && winner !== 0 && (mode === '1v1' || mode === 'multiplayer')) {
+      // Toon winnaar scherm alleen voor 1v1 en multiplayer
+      if (window.RegenboogCore && window.RegenboogCore.showWinnerScreen) {
+        var winnerName1 = mode === 'multiplayer' ? (mySide === P1 ? 'Jij' : opponentName) : 'Wit';
+        var winnerName2 = mode === 'multiplayer' ? (mySide === P2 ? 'Jij' : opponentName) : 'Zwart';
+        winnerHtml = window.RegenboogCore.showWinnerScreen(winner, mode, {
+          player1Name: winnerName1,
+          player2Name: winnerName2,
+          mySide: mySide,
+          opponentName: opponentName
+        });
+      }
+      turnText = mode === 'multiplayer'
+        ? (winner === mySide ? 'Jij wint!' : opponentName + ' wint!')
+        : (winner === P1 ? 'Wit wint!' : 'Zwart wint!');
+    } else {
+      turnText = gameOver
+        ? (winner === 0 ? 'Gelijkspel!' : (winner === P1 ? 'Wit wint!' : 'Zwart wint!'))
+        : thinking ? 'Computer denkt…'
+        : mode === '1vAI' && currentPlayer === P2 ? 'Computer is aan zet'
+        : mode === 'multiplayer'
+          ? (currentPlayer === mySide ? 'Jij bent aan zet' : opponentName + ' is aan zet')
+          : (currentPlayer === P1 ? 'Wit aan zet' : 'Zwart aan zet');
+    }
 
     var counts = getPieceCounts(board);
     var standLine = 'Stand: Wit ' + counts.p1 + ' stuks – Zwart ' + counts.p2 + ' stuks.';
@@ -583,6 +601,7 @@
 
     area.innerHTML =
       '<p class="dammen-instruction">' + turnText + '</p>' +
+      winnerHtml +
       '<p class="dammen-stand">' + standLine + '</p>' +
       '<div class="dammen-play-wrap"><div class="dammen-board-wrap">' + renderBoard() + '</div>' + chatHtml + '</div>' +
       '<div class="dammen-actions">' +
