@@ -382,8 +382,9 @@
 
   function onCellClick(r, c, boardType) {
     if (gameOver) return;
-    if (mode === 'multiplayer' && currentPlayer !== mySide) return;
     if (mode === 'multiplayer' && !socket) return;
+    // Alleen beurt-check tijdens schieten, niet tijdens plaatsen (beide spelers plaatsen tegelijk)
+    if (mode === 'multiplayer' && !placementPhase && currentPlayer !== mySide) return;
 
     if (placementPhase) {
       if (boardType !== 'my') return;
