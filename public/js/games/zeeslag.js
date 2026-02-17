@@ -241,7 +241,10 @@
       var previousOpponentShots = new Set(opponentBoard.shots);
       var previousOpponentHits = new Set(opponentBoard.hits);
       var previousMyHits = new Set(myBoard.hits);
-      myBoard = deserializeBoard(data.myBoard) || myBoard;
+      // Tijdens plaatsingsfase eigen bord niet overschrijven (voorkomt dat accepter zijn bord kwijt raakt)
+      if (!placementPhase || data.placementPhase === false) {
+        myBoard = deserializeBoard(data.myBoard) || myBoard;
+      }
       opponentBoard = deserializeBoard(data.opponentBoard) || opponentBoard;
       currentPlayer = data.currentPlayer;
       placementPhase = data.placementPhase !== undefined ? data.placementPhase : placementPhase;
@@ -423,12 +426,14 @@
       }
       var required = getRequiredShips();
       if (currentShipIndex >= required.length) {
-        placementPhase = false;
         if (mode === 'multiplayer') {
           socket.emit('move', { type: 'placeDone', ships: myBoard.ships });
-        } else if (mode === '1vAI') {
-          // In 1vAI mode: speler begint altijd eerst
-          currentPlayer = P1;
+          // placementPhase blijft true tot de server gameState stuurt (beide spelers klaar)
+        } else {
+          placementPhase = false;
+          if (mode === '1vAI') {
+            currentPlayer = P1;
+          }
         }
       }
       selectedShip = null;
@@ -886,7 +891,8 @@
     }
 
     var boardsHtml = '';
-    if (placementPhase && (mode !== 'multiplayer' || !roomId || currentShipIndex < getRequiredShips().length)) {
+    // Pas beide borden tonen als plaatsingsfase echt voorbij is (server: beide spelers placeDone)
+    if (placementPhase) {
       boardsHtml = '<div class="zeeslag-boards-wrap">' + renderMyBoard() + '</div>';
     } else {
       boardsHtml = '<div class="zeeslag-boards-wrap">' + renderMyBoard() + renderOpponentBoard() + '</div>';
@@ -1048,22 +1054,7 @@
       }
     }
 
-    area.querySelectorAll('.zeeslag-cell').forEach(function (cell) {
-      cell.addEventListener('click', function () {
-        var r = parseInt(cell.getAttribute('data-r'), 10);
-        var c = parseInt(cell.getAttribute('data-c'), 10);
-        var boardType = cell.getAttribute('data-board');
-        var shipIndex = cell.getAttribute('data-ship-index');
-        if (placementPhase && boardType === 'my' && shipIndex !== null && !selectedShip) {
-          // Selecteer schip voor rotate/move
-          selectedShipIndex = parseInt(shipIndex, 10);
-          selectedShip = null;
-          render();
-          return;
-        }
-        onCellClick(r, c, boardType);
-      });
-    });
+    // Clicks op cellen worden afgehandeld via delegation (zie onder, één listener op area)
 
     if (mode === 'multiplayer') {
       var leaveBtn = document.getElementById('dammen-leave-room');
@@ -1112,6 +1103,27 @@
 
   myBoard = initBoard();
   opponentBoard = initBoard();
+
+  // Eén keer event delegation: klikken op cellen (ook op child zoals SVG) altijd afhandelen
+  if (!area._zeeslagDelegation) {
+    area._zeeslagDelegation = true;
+    area.addEventListener('click', function (e) {
+      var cell = e.target.closest && e.target.closest('.zeeslag-cell');
+      if (!cell) return;
+      var r = parseInt(cell.getAttribute('data-r'), 10);
+      var c = parseInt(cell.getAttribute('data-c'), 10);
+      var boardType = cell.getAttribute('data-board');
+      var shipIndex = cell.getAttribute('data-ship-index');
+      if (placementPhase && boardType === 'my' && shipIndex != null && shipIndex !== '' && !selectedShip) {
+        selectedShipIndex = parseInt(shipIndex, 10);
+        selectedShip = null;
+        render();
+        return;
+      }
+      onCellClick(r, c, boardType);
+    });
+  }
+
   render();
   if (window.Leaderboard && leaderboardEl) window.Leaderboard.render(leaderboardEl, CLASS_ID);
 })();
