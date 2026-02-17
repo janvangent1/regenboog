@@ -86,7 +86,9 @@ function attachGameNamespace(ioOrNamespace, game) {
       socketToRoom.set(fromId, roomId);
       socketToRoom.set(socket.id, roomId);
       socket.join(roomId);
-      io.sockets.sockets.get(fromId)?.join(roomId);
+      // Default namespace (dammen): io.sockets.sockets; custom namespace (schaken, vieropeenrij): io.sockets
+      const inviterSocket = io.sockets?.sockets?.get(fromId) ?? io.sockets?.get(fromId);
+      if (inviterSocket) inviterSocket.join(roomId);
 
       io.to(fromId).emit('gameStart', {
         roomId,
