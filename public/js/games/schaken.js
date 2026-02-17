@@ -40,6 +40,17 @@
 
   function setupSocketListeners() {
     if (!socket) return;
+    // Verwijder bestaande listeners om dubbele registratie te voorkomen
+    socket.off('setNameOk');
+    socket.off('lobby');
+    socket.off('invite');
+    socket.off('gameStart');
+    socket.off('gameState');
+    socket.off('chat');
+    socket.off('opponentLeft');
+    socket.off('youLeftRoom');
+    socket.off('inviteFailed');
+    socket.off('inviteDeclined');
     socket.on('setNameOk', function () { socket.emit('getLobby'); render(); });
     socket.on('lobby', function (list) { lobbyList = list || []; render(); });
     socket.on('invite', function (data) {

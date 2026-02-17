@@ -194,13 +194,33 @@
     isClearingLines = true;
     render();
     if (clearAnimTimer) clearTimeout(clearAnimTimer);
-    clearAnimTimer = setTimeout(function () {
-      clearAnimTimer = null;
-      isClearingLines = false;
-      clearingRows = [];
-      onDone();
+    // Verwijder rijen één voor één met delay
+    var rowsToRemove = rows.slice().sort(function (a, b) { return b - a; });
+    var currentIndex = 0;
+    function removeNextRow() {
+      if (currentIndex >= rowsToRemove.length) {
+        clearAnimTimer = null;
+        isClearingLines = false;
+        clearingRows = [];
+        onDone();
+        render();
+        return;
+      }
+      // Verwijder één rij
+      var rowToRemove = rowsToRemove[currentIndex];
+      board.splice(rowToRemove, 1);
+      var emptyRow = [];
+      for (var c = 0; c < COLS; c++) emptyRow.push(null);
+      board.unshift(emptyRow);
+      // Update clearingRows om alleen de volgende rijen te tonen (aangepast voor verschuiving)
+      clearingRows = rowsToRemove.slice(currentIndex + 1).map(function (r) { return r - 1; });
+      currentIndex++;
       render();
-    }, 240);
+      // Wacht 200ms voordat volgende rij wordt verwijderd
+      clearAnimTimer = setTimeout(removeNextRow, 200);
+    }
+    // Start met eerste rij na 240ms
+    clearAnimTimer = setTimeout(removeNextRow, 240);
   }
 
   function lockPiece() {
