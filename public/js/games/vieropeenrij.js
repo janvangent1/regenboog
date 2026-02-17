@@ -38,6 +38,43 @@
   let lobbyList = [];
   let pendingInviteFrom = null;
 
+  function setupSocketListeners() {
+    if (!socket) return;
+    socket.on('setNameOk', function () { socket.emit('getLobby'); render(); });
+    socket.on('lobby', function (list) { lobbyList = list || []; render(); });
+    socket.on('invite', function (data) {
+      pendingInviteFrom = { fromId: data.fromId, fromName: data.fromName || 'Speler' };
+      render();
+    });
+    socket.on('gameStart', function (data) {
+      roomId = data.roomId;
+      board = data.board || initBoard();
+      mySide = data.youAre;
+      opponentName = data.opponentName || 'Tegenstander';
+      chatMessages = data.chat || [];
+      currentPlayer = P1;
+      winner = null;
+      gameOver = false;
+      step = 'play';
+      render();
+    });
+    socket.on('gameState', function (data) {
+      board = data.board || board;
+      currentPlayer = data.currentPlayer;
+      winner = data.winner != null ? data.winner : null;
+      gameOver = winner !== null;
+      render();
+    });
+    socket.on('chat', function (msg) { chatMessages.push(msg); render(); });
+    socket.on('opponentLeft', function () {
+      roomId = null; step = 'mp-lobby'; opponentName = ''; mySide = null; chatMessages = [];
+      render();
+    });
+    socket.on('youLeftRoom', function () { roomId = null; step = 'mp-lobby'; render(); });
+    socket.on('inviteFailed', function () { pendingInviteFrom = null; render(); });
+    socket.on('inviteDeclined', function () { pendingInviteFrom = null; render(); });
+  }
+
   function initBoard() {
     var b = [];
     for (var r = 0; r < ROWS; r++) {
@@ -305,40 +342,8 @@
         if (socket) socket.disconnect();
         socket = (typeof io !== 'undefined' && io) ? io('/vieropeenrij') : null;
         if (!socket) { step = 'mp-name'; render(); return; }
+        setupSocketListeners();
         socket.emit('setName', myName);
-        socket.on('setNameOk', function () { socket.emit('getLobby'); render(); });
-        socket.on('lobby', function (list) { lobbyList = list || []; render(); });
-        socket.on('invite', function (data) {
-          pendingInviteFrom = { fromId: data.fromId, fromName: data.fromName || 'Speler' };
-          render();
-        });
-        socket.on('gameStart', function (data) {
-          roomId = data.roomId;
-          board = data.board || initBoard();
-          mySide = data.youAre;
-          opponentName = data.opponentName || 'Tegenstander';
-          chatMessages = data.chat || [];
-          currentPlayer = P1;
-          winner = null;
-          gameOver = false;
-          step = 'play';
-          render();
-        });
-        socket.on('gameState', function (data) {
-          board = data.board || board;
-          currentPlayer = data.currentPlayer;
-          winner = data.winner != null ? data.winner : null;
-          gameOver = winner !== null;
-          render();
-        });
-        socket.on('chat', function (msg) { chatMessages.push(msg); render(); });
-        socket.on('opponentLeft', function () {
-          roomId = null; step = 'mp-lobby'; opponentName = ''; mySide = null; chatMessages = [];
-          render();
-        });
-        socket.on('youLeftRoom', function () { roomId = null; step = 'mp-lobby'; render(); });
-        socket.on('inviteFailed', function () { pendingInviteFrom = null; render(); });
-        socket.on('inviteDeclined', function () { pendingInviteFrom = null; render(); });
         render();
       });
       document.getElementById('dammen-mp-back').addEventListener('click', function () {
