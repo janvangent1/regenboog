@@ -712,6 +712,12 @@
 
     if (mode === 'multiplayer' && step === 'mp-choose-diff') {
       var targetId = inviteTargetId;
+      if (!targetId) {
+        // Als targetId niet meer beschikbaar is, ga terug naar lobby
+        step = 'mp-lobby';
+        render();
+        return;
+      }
       area.innerHTML =
         '<p class="dammen-instruction">Kies moeilijkheidsgraad voor de uitnodiging.</p>' +
         '<div class="dammen-difficulty-buttons">' +
@@ -724,10 +730,17 @@
           var diff = btn.getAttribute('data-diff');
           if (socket && targetId) {
             socket.emit('invite', { targetId: targetId, difficulty: diff });
+            // Wacht even zodat de server de invite kan verwerken voordat we teruggaan naar lobby
+            setTimeout(function() {
+              inviteTargetId = null;
+              step = 'mp-lobby';
+              render();
+            }, 100);
+          } else {
+            inviteTargetId = null;
+            step = 'mp-lobby';
+            render();
           }
-          inviteTargetId = null;
-          step = 'mp-lobby';
-          render();
         });
       });
       document.getElementById('dammen-diff-back').addEventListener('click', function () { inviteTargetId = null; step = 'mp-lobby'; render(); });

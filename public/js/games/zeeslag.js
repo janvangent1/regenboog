@@ -417,11 +417,14 @@
       }
       myBoard.ships.push(shipCells);
       currentShipIndex++;
+      if (mode === 'multiplayer' && socket) {
+        socket.emit('move', { type: 'place', ship: shipCells });
+      }
       var required = getRequiredShips();
       if (currentShipIndex >= required.length) {
         placementPhase = false;
         if (mode === 'multiplayer') {
-          socket.emit('move', { type: 'placeDone' });
+          socket.emit('move', { type: 'placeDone', ships: myBoard.ships });
         } else if (mode === '1vAI') {
           // In 1vAI mode: speler begint altijd eerst
           currentPlayer = P1;

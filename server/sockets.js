@@ -297,8 +297,16 @@ function attachZeeslagNamespace(ioOrNamespace) {
         if (move.type === 'placeDone') {
           if (youAre === P1) {
             room.player1Ready = true;
+            if (move.ships && Array.isArray(move.ships)) {
+              room.player1Board = initBoard();
+              room.player1Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
+            }
           } else {
             room.player2Ready = true;
+            if (move.ships && Array.isArray(move.ships)) {
+              room.player2Board = initBoard();
+              room.player2Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
+            }
           }
           // Stuur update naar beide spelers
           io.to(room.player1.id).emit('gameState', {
@@ -475,12 +483,14 @@ function attachRekenDuelNamespace(ioOrNamespace) {
       if (!me || !targetId || targetId === socket.id) return;
       const target = users.get(targetId);
       if (!target) return;
+      // Opslaan met targetId als key (voor de ontvanger)
       pendingInvites.set(targetId, { inviterId: socket.id, inviterName: me.name, difficulty: difficulty });
       io.to(targetId).emit('invite', { fromId: socket.id, fromName: me.name, difficulty: difficulty });
     });
 
     socket.on('acceptInvite', (data) => {
       const fromId = typeof data === 'object' && data.fromId ? data.fromId : data;
+      // Zoek de invite voor deze socket (de ontvanger), socket.id is de targetId waar de invite voor was
       const pending = pendingInvites.get(socket.id);
       if (!pending || pending.inviterId !== fromId) return;
       const difficulty = typeof data === 'object' && data.difficulty ? data.difficulty : (pending.difficulty || 'normal');
