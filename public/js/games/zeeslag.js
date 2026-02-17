@@ -220,6 +220,7 @@
     socket.on('gameStart', function (data) {
       roomId = data.roomId;
       myBoard = deserializeBoard(data.myBoard);
+      if (!myBoard || !Array.isArray(myBoard.ships)) myBoard = initBoard();
       opponentBoard = initBoard();
       mySide = data.youAre;
       opponentName = data.opponentName || 'Tegenstander';
@@ -230,6 +231,8 @@
       placementPhase = true;
       currentShipIndex = 0;
       selectedShip = null;
+      selectedShipIndex = null;
+      placementHistory = [];
       lastSunkShipMessage = null;
       previousOpponentHits = new Set();
       step = 'play';
@@ -392,6 +395,7 @@
     if (placementPhase) {
       if (boardType !== 'my') return;
       if (!selectedShip) return;
+      if (!myBoard || !Array.isArray(myBoard.ships)) return;
       var shipCells = [];
       var length = selectedShip.length;
       if (selectedShip.horizontal) {
@@ -890,6 +894,10 @@
       chatHtml = '<div class="dammen-chat-panel"><div class="dammen-chat-title">Chat – ' + escapeHtml(opponentName) + '</div><div class="dammen-chat-messages" id="dammen-chat-msgs">' + chatList + '</div><div class="dammen-chat-input-wrap"><input type="text" class="dammen-chat-input" id="dammen-chat-input" placeholder="Bericht…" maxlength="500"><button type="button" class="dammen-chat-send" id="dammen-chat-send">Verstuur</button></div></div>';
     }
 
+    // Zorg dat myBoard altijd geldig is in spel (multiplayer kan net gameStart hebben gekregen)
+    if ((mode === 'multiplayer' && roomId) || mode === '1vAI') {
+      if (!myBoard || !Array.isArray(myBoard.ships)) myBoard = initBoard();
+    }
     var boardsHtml = '';
     // Pas beide borden tonen als plaatsingsfase echt voorbij is (server: beide spelers placeDone)
     if (placementPhase) {
@@ -1054,7 +1062,23 @@
       }
     }
 
-    // Clicks op cellen worden afgehandeld via delegation (zie onder, één listener op area)
+    // Klik-handlers op elke cel (zodat uitgenodigde speler zeker kan plaatsen na gameStart)
+    area.querySelectorAll('.zeeslag-cell').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        var r = parseInt(cell.getAttribute('data-r'), 10);
+        var c = parseInt(cell.getAttribute('data-c'), 10);
+        if (isNaN(r) || isNaN(c)) return;
+        var boardType = cell.getAttribute('data-board');
+        var shipIndex = cell.getAttribute('data-ship-index');
+        if (placementPhase && boardType === 'my' && shipIndex != null && shipIndex !== '' && !selectedShip) {
+          selectedShipIndex = parseInt(shipIndex, 10);
+          selectedShip = null;
+          render();
+          return;
+        }
+        onCellClick(r, c, boardType);
+      });
+    });
 
     if (mode === 'multiplayer') {
       var leaveBtn = document.getElementById('dammen-leave-room');
@@ -1103,26 +1127,6 @@
 
   myBoard = initBoard();
   opponentBoard = initBoard();
-
-  // Eén keer event delegation: klikken op cellen (ook op child zoals SVG) altijd afhandelen
-  if (!area._zeeslagDelegation) {
-    area._zeeslagDelegation = true;
-    area.addEventListener('click', function (e) {
-      var cell = e.target.closest && e.target.closest('.zeeslag-cell');
-      if (!cell) return;
-      var r = parseInt(cell.getAttribute('data-r'), 10);
-      var c = parseInt(cell.getAttribute('data-c'), 10);
-      var boardType = cell.getAttribute('data-board');
-      var shipIndex = cell.getAttribute('data-ship-index');
-      if (placementPhase && boardType === 'my' && shipIndex != null && shipIndex !== '' && !selectedShip) {
-        selectedShipIndex = parseInt(shipIndex, 10);
-        selectedShip = null;
-        render();
-        return;
-      }
-      onCellClick(r, c, boardType);
-    });
-  }
 
   render();
   if (window.Leaderboard && leaderboardEl) window.Leaderboard.render(leaderboardEl, CLASS_ID);
