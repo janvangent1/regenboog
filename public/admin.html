@@ -193,60 +193,109 @@
   <script src="/js/classes.js"></script>
   <script>
     (function () {
-      const ADMIN_PASSWORD = 'jeroom';
-      let isAuthenticated = false;
-
       const passwordScreen = document.getElementById('password-screen');
       const adminContent = document.getElementById('admin-content');
       const passwordForm = document.getElementById('password-form');
       const passwordInput = document.getElementById('password-input');
       const passwordError = document.getElementById('password-error');
 
+      function getStoredPassword() {
+        return sessionStorage.getItem('admin_password') || '';
+      }
+
+      function getAuthHeaders() {
+        return {
+          'Content-Type': 'application/json',
+          'X-Admin-Password': getStoredPassword()
+        };
+      }
+
+      function showLoginForm(errorMsg) {
+        adminContent.style.display = 'none';
+        passwordScreen.style.display = 'block';
+        passwordInput.value = '';
+        if (errorMsg) {
+          passwordError.textContent = errorMsg;
+          passwordError.style.display = 'block';
+        } else {
+          passwordError.style.display = 'none';
+        }
+        passwordInput.focus();
+      }
+
+      function adminFetch(url, options) {
+        return fetch(url, Object.assign({ headers: getAuthHeaders() }, options))
+          .then(function (r) {
+            if (r.status === 401) {
+              sessionStorage.removeItem('admin_password');
+              showLoginForm('Ongeldig wachtwoord. Probeer opnieuw.');
+              throw new Error('401');
+            }
+            if (!r.ok) {
+              return r.text().then(function (text) {
+                throw new Error('HTTP ' + r.status + ': ' + text);
+              });
+            }
+            return r.json();
+          });
+      }
+
       function checkPassword() {
-        const stored = sessionStorage.getItem('admin_authenticated');
-        if (stored === 'true') {
-          isAuthenticated = true;
-          passwordScreen.style.display = 'none';
-          adminContent.style.display = 'block';
-          loadAdminData();
+        const stored = sessionStorage.getItem('admin_password');
+        if (stored) {
+          // Verify stored password is still valid before showing content
+          fetch('/api/admin/stats', { headers: { 'Content-Type': 'application/json', 'X-Admin-Password': stored } })
+            .then(function (r) {
+              if (r.ok) {
+                passwordScreen.style.display = 'none';
+                adminContent.style.display = 'block';
+                loadAdminData();
+              } else {
+                sessionStorage.removeItem('admin_password');
+              }
+            })
+            .catch(function () {});
         }
       }
 
       passwordForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const pwd = passwordInput.value;
-        if (pwd === ADMIN_PASSWORD) {
-          isAuthenticated = true;
-          sessionStorage.setItem('admin_authenticated', 'true');
-          passwordScreen.style.display = 'none';
-          adminContent.style.display = 'block';
-          loadAdminData();
-        } else {
-          passwordError.textContent = 'Ongeldig wachtwoord';
-          passwordError.style.display = 'block';
-          passwordInput.value = '';
-        }
+        const pwd = passwordInput.value.trim();
+        if (!pwd) return;
+        const submitBtn = passwordForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Controleren...';
+        fetch('/api/admin/stats', {
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Password': pwd }
+        })
+          .then(function (r) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Inloggen';
+            if (r.ok) {
+              sessionStorage.setItem('admin_password', pwd);
+              passwordError.style.display = 'none';
+              passwordScreen.style.display = 'none';
+              adminContent.style.display = 'block';
+              loadAdminData();
+            } else {
+              passwordError.textContent = 'Ongeldig wachtwoord. Probeer opnieuw.';
+              passwordError.style.display = 'block';
+              passwordInput.value = '';
+              passwordInput.focus();
+            }
+          })
+          .catch(function () {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Inloggen';
+            passwordError.textContent = 'Kan geen verbinding maken met de server.';
+            passwordError.style.display = 'block';
+          });
       });
-
-      function getAuthHeaders() {
-        return {
-          'Content-Type': 'application/json',
-          'X-Admin-Password': ADMIN_PASSWORD
-        };
-      }
 
       function loadStats() {
         const container = document.getElementById('stats-container');
         Promise.all([
-          fetch('/api/admin/stats', { headers: getAuthHeaders() }).then(r => {
-            if (!r.ok) {
-              return r.text().then(text => {
-                throw new Error('HTTP ' + r.status + ': ' + text);
-              });
-            }
-            return r.json();
-          }),
-          // Haal alle spellen op uit classes.js (via window.REGENBOOG_CLASSES)
+          adminFetch('/api/admin/stats'),
           Promise.resolve(window.REGENBOOG_CLASSES || [])
         ])
           .then(([stats, allGames]) => {
@@ -312,15 +361,7 @@
 
       function loadLeaderboards() {
         const container = document.getElementById('leaderboards-container');
-        fetch('/api/admin/leaderboards', { headers: getAuthHeaders() })
-          .then(r => {
-            if (!r.ok) {
-              return r.text().then(text => {
-                throw new Error('HTTP ' + r.status + ': ' + text);
-              });
-            }
-            return r.json();
-          })
+        adminFetch('/api/admin/leaderboards')
           .then(data => {
             if (!data.leaderboards || Object.keys(data.leaderboards).length === 0) {
               container.innerHTML = '<p>Nog geen ranglijsten beschikbaar.</p>';
@@ -365,11 +406,7 @@
         if (!confirm('Weet je zeker dat je alle scores voor "' + game + '" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.')) {
           return;
         }
-        fetch('/api/admin/scores/' + encodeURIComponent(game), {
-          method: 'DELETE',
-          headers: getAuthHeaders()
-        })
-          .then(r => r.json())
+        adminFetch('/api/admin/scores/' + encodeURIComponent(game), { method: 'DELETE' })
           .then(result => {
             alert('Verwijderd: ' + result.deleted + ' scores');
             loadAdminData();
@@ -383,18 +420,7 @@
         if (!confirm('Weet je zeker dat je alle statistieken en scores voor "' + game + '" wilt wissen? Dit kan niet ongedaan worden gemaakt.')) {
           return;
         }
-        fetch('/api/admin/scores/' + encodeURIComponent(game), {
-          method: 'DELETE',
-          headers: getAuthHeaders()
-        })
-          .then(r => {
-            if (!r.ok) {
-              return r.text().then(text => {
-                throw new Error('HTTP ' + r.status + ': ' + text);
-              });
-            }
-            return r.json();
-          })
+        adminFetch('/api/admin/scores/' + encodeURIComponent(game), { method: 'DELETE' })
           .then(result => {
             alert('Gewist: ' + result.deleted + ' scores. Statistieken zijn bijgewerkt.');
             loadAdminData();
