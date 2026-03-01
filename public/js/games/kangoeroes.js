@@ -7,6 +7,7 @@
   const PENALTY_PER_MISTAKE = 20; // strafpunten per fout
   let round = 0;
   let questionInRound = 0; // 0 t/m 4: welke van de 5 sommen
+  // eslint-disable-next-line no-unused-vars
   let correct = 0;
   let totalScore = 0;
   let startTime = 0;
@@ -24,21 +25,6 @@
   }
 
   // Zelfde geluiden als in andere spellen (uilen, dolfijnen)
-  function playSound(frequency, duration, type) {
-    try {
-      var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      var oscillator = audioContext.createOscillator();
-      var gainNode = audioContext.createGain();
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      oscillator.frequency.value = frequency;
-      oscillator.type = type || 'sine';
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {}
-  }
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
   }

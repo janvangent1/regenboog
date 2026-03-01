@@ -4,6 +4,13 @@ const vieropeenrijGame = require('./vieropeenrij-game');
 const zeeslagGame = require('./zeeslag-game');
 const rekenDuelGame = require('./reken-duel-game');
 
+const GRACE_PERIOD_MS = 10 * 1000;       // 10 seconds before opponent is kicked
+const INVITE_TIMEOUT_MS = 30 * 1000;      // invites expire after 30 seconds
+const INVITE_CLEANUP_INTERVAL_MS = 60 * 1000; // clean stale invites every 60 seconds
+
+// Per-socket move rate limiting: minimum ms between accepted moves
+const MIN_MOVE_INTERVAL_MS = 50;          // max 20 moves/sec
+
 function attachGameNamespace(ioOrNamespace, game) {
   const io = ioOrNamespace;
   const {
@@ -20,14 +27,15 @@ function attachGameNamespace(ioOrNamespace, game) {
   const pendingInvites = new Map();
   const rooms = new Map();
   const socketToRoom = new Map();
+  const disconnectTimers = new Map();   // socketId -> setTimeout handle
+  const lastMoveTime = new Map();       // socketId -> timestamp (rate limiting)
 
   function getLobbyList() {
     return Array.from(users.entries()).map(([id, u]) => ({ id, name: u.name }));
   }
 
   function broadcastLobby() {
-    const list = getLobbyList();
-    io.emit('lobby', list);
+    io.emit('lobby', getLobbyList());
   }
 
   function leaveRoom(socketId) {
@@ -43,7 +51,24 @@ function attachGameNamespace(ioOrNamespace, game) {
     io.to(socketId).emit('youLeftRoom');
   }
 
+  // Stale invite cleanup
+  setInterval(() => {
+    const now = Date.now();
+    for (const [targetId, invite] of pendingInvites.entries()) {
+      if (now - invite.timestamp > INVITE_TIMEOUT_MS) {
+        pendingInvites.delete(targetId);
+      }
+    }
+  }, INVITE_CLEANUP_INTERVAL_MS);
+
   io.on('connection', (socket) => {
+    // If this socket had a pending disconnect timer (reconnect scenario), cancel it
+    const existingTimer = disconnectTimers.get(socket.id);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      disconnectTimers.delete(socket.id);
+    }
+
     socket.on('setName', (name) => {
       const safeName = String(name || '').trim().slice(0, 30) || 'Speler';
       users.set(socket.id, { name: safeName });
@@ -60,7 +85,11 @@ function attachGameNamespace(ioOrNamespace, game) {
       if (!me || !targetId || targetId === socket.id) return;
       const target = users.get(targetId);
       if (!target) return;
-      pendingInvites.set(targetId, { inviterId: socket.id, inviterName: me.name });
+      pendingInvites.set(targetId, {
+        inviterId: socket.id,
+        inviterName: me.name,
+        timestamp: Date.now(),
+      });
       io.to(targetId).emit('invite', { fromId: socket.id, fromName: me.name });
     });
 
@@ -88,7 +117,6 @@ function attachGameNamespace(ioOrNamespace, game) {
       socketToRoom.set(fromId, roomId);
       socketToRoom.set(socket.id, roomId);
       socket.join(roomId);
-      // Default namespace (dammen): io.sockets.sockets; custom namespace (schaken, vieropeenrij): io.sockets
       const inviterSocket = io.sockets?.sockets?.get(fromId) ?? io.sockets?.get(fromId);
       if (inviterSocket) inviterSocket.join(roomId);
 
@@ -114,6 +142,11 @@ function attachGameNamespace(ioOrNamespace, game) {
     });
 
     socket.on('move', (move) => {
+      // Per-socket rate limiting
+      const now = Date.now();
+      if (now - (lastMoveTime.get(socket.id) || 0) < MIN_MOVE_INTERVAL_MS) return;
+      lastMoveTime.set(socket.id, now);
+
       const roomId = socketToRoom.get(socket.id);
       if (!roomId) return;
       const room = rooms.get(roomId);
@@ -150,14 +183,32 @@ function attachGameNamespace(ioOrNamespace, game) {
     });
 
     socket.on('leaveRoom', () => {
+      // Cancel any pending grace period
+      const timer = disconnectTimers.get(socket.id);
+      if (timer) { clearTimeout(timer); disconnectTimers.delete(socket.id); }
       leaveRoom(socket.id);
     });
 
     socket.on('disconnect', () => {
       pendingInvites.delete(socket.id);
-      leaveRoom(socket.id);
-      users.delete(socket.id);
-      broadcastLobby();
+      lastMoveTime.delete(socket.id);
+
+      if (socketToRoom.has(socket.id)) {
+        // Start grace period before kicking the opponent
+        const timer = setTimeout(() => {
+          disconnectTimers.delete(socket.id);
+          leaveRoom(socket.id);
+          users.delete(socket.id);
+          broadcastLobby();
+        }, GRACE_PERIOD_MS);
+        disconnectTimers.set(socket.id, timer);
+        // Remove from lobby immediately but keep in room
+        users.delete(socket.id);
+        broadcastLobby();
+      } else {
+        users.delete(socket.id);
+        broadcastLobby();
+      }
     });
   });
 }
@@ -168,13 +219,12 @@ function attachZeeslagNamespace(ioOrNamespace) {
     initBoard,
     getLegalMoves,
     applyMove,
-    checkWinner,
     moveMatches,
+    getRequiredShips,
     P1,
     P2,
   } = zeeslagGame;
 
-  // Helper om bord te serialiseren (Sets -> arrays)
   function serializeBoard(board) {
     return {
       ships: board.ships,
@@ -187,14 +237,15 @@ function attachZeeslagNamespace(ioOrNamespace) {
   const pendingInvites = new Map();
   const rooms = new Map();
   const socketToRoom = new Map();
+  const disconnectTimers = new Map();
+  const lastMoveTime = new Map();
 
   function getLobbyList() {
     return Array.from(users.entries()).map(([id, u]) => ({ id, name: u.name }));
   }
 
   function broadcastLobby() {
-    const list = getLobbyList();
-    io.emit('lobby', list);
+    io.emit('lobby', getLobbyList());
   }
 
   function leaveRoom(socketId) {
@@ -210,7 +261,22 @@ function attachZeeslagNamespace(ioOrNamespace) {
     io.to(socketId).emit('youLeftRoom');
   }
 
+  setInterval(() => {
+    const now = Date.now();
+    for (const [targetId, invite] of pendingInvites.entries()) {
+      if (now - invite.timestamp > INVITE_TIMEOUT_MS) {
+        pendingInvites.delete(targetId);
+      }
+    }
+  }, INVITE_CLEANUP_INTERVAL_MS);
+
   io.on('connection', (socket) => {
+    const existingTimer = disconnectTimers.get(socket.id);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      disconnectTimers.delete(socket.id);
+    }
+
     socket.on('setName', (name) => {
       const safeName = String(name || '').trim().slice(0, 30) || 'Speler';
       users.set(socket.id, { name: safeName });
@@ -227,7 +293,11 @@ function attachZeeslagNamespace(ioOrNamespace) {
       if (!me || !targetId || targetId === socket.id) return;
       const target = users.get(targetId);
       if (!target) return;
-      pendingInvites.set(targetId, { inviterId: socket.id, inviterName: me.name });
+      pendingInvites.set(targetId, {
+        inviterId: socket.id,
+        inviterName: me.name,
+        timestamp: Date.now(),
+      });
       io.to(targetId).emit('invite', { fromId: socket.id, fromName: me.name });
     });
 
@@ -284,6 +354,11 @@ function attachZeeslagNamespace(ioOrNamespace) {
     });
 
     socket.on('move', (move) => {
+      // Per-socket rate limiting
+      const now = Date.now();
+      if (now - (lastMoveTime.get(socket.id) || 0) < MIN_MOVE_INTERVAL_MS) return;
+      lastMoveTime.set(socket.id, now);
+
       const roomId = socketToRoom.get(socket.id);
       if (!roomId) return;
       const room = rooms.get(roomId);
@@ -295,20 +370,23 @@ function attachZeeslagNamespace(ioOrNamespace) {
       // Placement fase
       if (!room.player1Ready || !room.player2Ready) {
         if (move.type === 'placeDone') {
+          // Validate ship count and sizes match expected configuration
+          const required = getRequiredShips(); // [5, 4, 3, 3, 2]
+          if (!Array.isArray(move.ships) || move.ships.length !== required.length) return;
+          const sortedLengths = move.ships.map(s => (Array.isArray(s) ? s.length : 0)).sort((a, b) => b - a);
+          for (let i = 0; i < required.length; i++) {
+            if (sortedLengths[i] !== required[i]) return;
+          }
+
           if (youAre === P1) {
             room.player1Ready = true;
-            if (move.ships && Array.isArray(move.ships)) {
-              room.player1Board = initBoard();
-              room.player1Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
-            }
+            room.player1Board = initBoard();
+            room.player1Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
           } else {
             room.player2Ready = true;
-            if (move.ships && Array.isArray(move.ships)) {
-              room.player2Board = initBoard();
-              room.player2Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
-            }
+            room.player2Board = initBoard();
+            room.player2Board.ships = move.ships.map((s) => s.map((c) => [c[0], c[1]]));
           }
-          // Stuur update naar beide spelers
           io.to(room.player1.id).emit('gameState', {
             myBoard: serializeBoard(room.player1Board),
             opponentBoard: serializeBoard(room.player2Board),
@@ -369,11 +447,9 @@ function attachZeeslagNamespace(ioOrNamespace) {
         room.player1Board = updatedOpponentBoard;
       }
 
-      // Check hit
       const key = move.r + ',' + move.c;
       const isHit = updatedOpponentBoard.hits.has(key);
 
-      // Check win
       const totalShipCells = updatedOpponentBoard.ships.reduce((sum, ship) => sum + ship.length, 0);
       if (updatedOpponentBoard.hits.size >= totalShipCells) {
         room.winner = youAre;
@@ -382,7 +458,6 @@ function attachZeeslagNamespace(ioOrNamespace) {
         room.currentPlayer = room.currentPlayer === P1 ? P2 : P1;
       }
 
-      // Stuur update naar beide spelers met lastShot info
       io.to(room.player1.id).emit('gameState', {
         myBoard: serializeBoard(room.player1Board),
         opponentBoard: serializeBoard(room.player2Board),
@@ -416,14 +491,29 @@ function attachZeeslagNamespace(ioOrNamespace) {
     });
 
     socket.on('leaveRoom', () => {
+      const timer = disconnectTimers.get(socket.id);
+      if (timer) { clearTimeout(timer); disconnectTimers.delete(socket.id); }
       leaveRoom(socket.id);
     });
 
     socket.on('disconnect', () => {
       pendingInvites.delete(socket.id);
-      leaveRoom(socket.id);
-      users.delete(socket.id);
-      broadcastLobby();
+      lastMoveTime.delete(socket.id);
+
+      if (socketToRoom.has(socket.id)) {
+        const timer = setTimeout(() => {
+          disconnectTimers.delete(socket.id);
+          leaveRoom(socket.id);
+          users.delete(socket.id);
+          broadcastLobby();
+        }, GRACE_PERIOD_MS);
+        disconnectTimers.set(socket.id, timer);
+        users.delete(socket.id);
+        broadcastLobby();
+      } else {
+        users.delete(socket.id);
+        broadcastLobby();
+      }
     });
   });
 }
@@ -441,14 +531,14 @@ function attachRekenDuelNamespace(ioOrNamespace) {
   const pendingInvites = new Map();
   const rooms = new Map();
   const socketToRoom = new Map();
+  const disconnectTimers = new Map();
 
   function getLobbyList() {
     return Array.from(users.entries()).map(([id, u]) => ({ id, name: u.name }));
   }
 
   function broadcastLobby() {
-    const list = getLobbyList();
-    io.emit('lobby', list);
+    io.emit('lobby', getLobbyList());
   }
 
   function leaveRoom(socketId) {
@@ -464,7 +554,22 @@ function attachRekenDuelNamespace(ioOrNamespace) {
     io.to(socketId).emit('youLeftRoom');
   }
 
+  setInterval(() => {
+    const now = Date.now();
+    for (const [targetId, invite] of pendingInvites.entries()) {
+      if (now - invite.timestamp > INVITE_TIMEOUT_MS) {
+        pendingInvites.delete(targetId);
+      }
+    }
+  }, INVITE_CLEANUP_INTERVAL_MS);
+
   io.on('connection', (socket) => {
+    const existingTimer = disconnectTimers.get(socket.id);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      disconnectTimers.delete(socket.id);
+    }
+
     socket.on('setName', (name) => {
       const safeName = String(name || '').trim().slice(0, 30) || 'Speler';
       users.set(socket.id, { name: safeName });
@@ -483,14 +588,17 @@ function attachRekenDuelNamespace(ioOrNamespace) {
       if (!me || !targetId || targetId === socket.id) return;
       const target = users.get(targetId);
       if (!target) return;
-      // Opslaan met targetId als key (voor de ontvanger)
-      pendingInvites.set(targetId, { inviterId: socket.id, inviterName: me.name, difficulty: difficulty });
+      pendingInvites.set(targetId, {
+        inviterId: socket.id,
+        inviterName: me.name,
+        difficulty: difficulty,
+        timestamp: Date.now(),
+      });
       io.to(targetId).emit('invite', { fromId: socket.id, fromName: me.name, difficulty: difficulty });
     });
 
     socket.on('acceptInvite', (data) => {
       const fromId = typeof data === 'object' && data.fromId ? data.fromId : data;
-      // Zoek de invite voor deze socket (de ontvanger), socket.id is de targetId waar de invite voor was
       const pending = pendingInvites.get(socket.id);
       if (!pending || pending.inviterId !== fromId) return;
       const difficulty = typeof data === 'object' && data.difficulty ? data.difficulty : (pending.difficulty || 'normal');
@@ -536,7 +644,6 @@ function attachRekenDuelNamespace(ioOrNamespace) {
         difficulty: room.difficulty,
         chat: [],
       });
-      // Start eerste vraag
       const question = generateQuestion(room.difficulty);
       room.currentQuestion = question.question;
       room.currentAnswer = question.answer;
@@ -554,13 +661,12 @@ function attachRekenDuelNamespace(ioOrNamespace) {
       io.to(fromId).emit('inviteDeclined', { byId: socket.id });
     });
 
-    socket.on('newQuestion', (data) => {
+    socket.on('newQuestion', () => {
       const roomId = socketToRoom.get(socket.id);
       if (!roomId) return;
       const room = rooms.get(roomId);
       if (!room || room.winner != null) return;
       const youAre = room.player1.id === socket.id ? P1 : P2;
-      // Alleen speler 1 kan nieuwe vraag starten (of beide kunnen, maar we gebruiken player1)
       if (youAre !== P1) return;
       const question = generateQuestion(room.difficulty);
       room.currentQuestion = question.question;
@@ -592,7 +698,7 @@ function attachRekenDuelNamespace(ioOrNamespace) {
       if (!roomId) return;
       const room = rooms.get(roomId);
       if (!room || room.winner != null) return;
-      if (!room.waitingForAnswers.has(socket.id)) return; // Al geantwoord
+      if (!room.waitingForAnswers.has(socket.id)) return;
       const youAre = room.player1.id === socket.id ? P1 : P2;
       const answer = parseInt(data.answer, 10);
       const correct = answer === room.currentAnswer;
@@ -603,13 +709,11 @@ function attachRekenDuelNamespace(ioOrNamespace) {
         } else {
           room.player2Score++;
         }
-        // Check win
         if (room.player1Score >= POINTS_TO_WIN) {
           room.winner = P1;
         } else if (room.player2Score >= POINTS_TO_WIN) {
           room.winner = P2;
         }
-        // Stuur resultaat naar beide spelers
         io.to(roomId).emit('gameState', {
           player1Score: room.player1Score,
           player2Score: room.player2Score,
@@ -621,7 +725,6 @@ function attachRekenDuelNamespace(ioOrNamespace) {
           answerResult: { correct: false, scored: false },
         });
       }
-      // Als beide hebben geantwoord of iemand heeft gescoord, wacht even en start nieuwe vraag
       if (room.waitingForAnswers.size === 0 || correct) {
         if (!room.winner) {
           setTimeout(() => {
@@ -656,14 +759,28 @@ function attachRekenDuelNamespace(ioOrNamespace) {
     });
 
     socket.on('leaveRoom', () => {
+      const timer = disconnectTimers.get(socket.id);
+      if (timer) { clearTimeout(timer); disconnectTimers.delete(socket.id); }
       leaveRoom(socket.id);
     });
 
     socket.on('disconnect', () => {
       pendingInvites.delete(socket.id);
-      leaveRoom(socket.id);
-      users.delete(socket.id);
-      broadcastLobby();
+
+      if (socketToRoom.has(socket.id)) {
+        const timer = setTimeout(() => {
+          disconnectTimers.delete(socket.id);
+          leaveRoom(socket.id);
+          users.delete(socket.id);
+          broadcastLobby();
+        }, GRACE_PERIOD_MS);
+        disconnectTimers.set(socket.id, timer);
+        users.delete(socket.id);
+        broadcastLobby();
+      } else {
+        users.delete(socket.id);
+        broadcastLobby();
+      }
     });
   });
 }

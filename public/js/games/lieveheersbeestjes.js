@@ -26,8 +26,11 @@
   // Game constants - VERTICAAL SPEL (Space Invaders stijl)
   const LADYBUG_WIDTH = 60;
   const LADYBUG_HEIGHT = 50;
+  // eslint-disable-next-line no-unused-vars
   const LADYBUG_Y = 0; // Vaste Y positie onderaan (wordt berekend)
+  // eslint-disable-next-line no-unused-vars
   const OBSTACLE_WIDTH_BASE = 50;
+  // eslint-disable-next-line no-unused-vars
   const OBSTACLE_HEIGHT_BASE = 50;
   const FLOWER_WIDTH = 40;
   const FLOWER_HEIGHT = 40;
@@ -40,30 +43,10 @@
   const SPAWN_INTERVALS = [1800, 1200, 800]; // Sneller spawnen per ronde (zoals dolfijnen)
   const OBSTACLE_CHANCES = [0.25, 0.45, 0.55]; // Meer obstakels per ronde (zoals dolfijnen)
   
+  // eslint-disable-next-line no-unused-vars
   let flowerImage = null;
   
   // Sound functions using Web Audio API
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
   
   function playFlowerSound() {
     playSound(600, 0.15, 'sine'); // Zelfde als vis geluid bij dolfijnen
@@ -156,6 +139,7 @@
     // Initialize ladybug position (middle horizontally, bottom vertically)
     ladybugX = canvas.width / 2;
     mouseX = ladybugX;
+    // eslint-disable-next-line no-unused-vars
     const LADYBUG_Y_POS = canvas.height - LADYBUG_HEIGHT - 20; // 20px van onderen
     
     // Mouse/touch tracking (passive: false zodat preventDefault scroll blokkeert op tablet/gsm)
@@ -199,6 +183,7 @@
         flowerChance = 1 - obstacleChance;
       } else {
         obstacleChance = OBSTACLE_CHANCES[2];
+        // eslint-disable-next-line no-unused-vars
         flowerChance = 1 - obstacleChance;
       }
       

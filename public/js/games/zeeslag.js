@@ -16,12 +16,6 @@
     [2, 1], // 1 schip van 2
   ];
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
 
   let myBoard = null; // Mijn bord met schepen
   let opponentBoard = null; // Tegenstander bord (alleen shots/hits zichtbaar)
@@ -35,6 +29,7 @@
   let selectedShipIndex = null; // Voor rotate/move
   let gameOver = false;
   let winner = null;
+  // eslint-disable-next-line no-unused-vars
   let aiThinkingTimeout = null; // Voor AI delay
   let aiBoard = null; // AI's eigen bord (voor 1vAI)
   let aiDifficulty = 'normal'; // AI moeilijkheidsgraad
@@ -43,6 +38,7 @@
   let aiHuntDirection = null; // Richting waarin AI aan het zoeken is
   let aiHuntStartPos = null; // Start positie van de hunt
   let lastSunkShipMessage = null; // Voor schip gezonken meldingen
+  // eslint-disable-next-line no-unused-vars
   let previousOpponentHits = new Set(); // Track hits voor schip gezonken detectie
   let socket = null;
   let myName = '';
@@ -54,27 +50,6 @@
   let pendingInviteFrom = null;
 
   // Sound functions
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.type = type;
-      oscillator.frequency.value = frequency;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
 
   function playMissSound() {
     // Plons geluid - lage frequentie, water-achtig
@@ -240,6 +215,7 @@
     });
     socket.on('gameState', function (data) {
       var wasPlacementPhase = placementPhase;
+      // eslint-disable-next-line no-unused-vars
       var wasMyTurn = currentPlayer === mySide;
       var previousOpponentShots = new Set(opponentBoard.shots);
       var previousOpponentHits = new Set(opponentBoard.hits);

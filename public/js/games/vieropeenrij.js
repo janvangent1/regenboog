@@ -12,12 +12,6 @@
   const P2 = 2;
   const AI_DEPTHS = { easy: 1, normal: 4, hard: 6 };
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
 
   let board = [];
   let currentPlayer = P1;
@@ -33,6 +27,7 @@
   let myName = '';
   let mySide = null;
   let opponentName = '';
+  // eslint-disable-next-line no-unused-vars
   let roomId = null;
   let chatMessages = [];
   let lobbyList = [];
@@ -212,6 +207,7 @@
   function computeVieropeenrijScore() {
     var base = 10;
     var diffBonus = (aiDifficulty === 'easy' ? 5 : aiDifficulty === 'hard' ? 25 : 15);
+    // eslint-disable-next-line no-unused-vars
     var minMoves = 7;
     var speedBonus = Math.max(0, (42 - moveCount) * 1.2);
     return Math.round(base + diffBonus + speedBonus);

@@ -10,6 +10,7 @@
   let wordsInRound = []; // Array van 3 woorden voor deze ronde
   let totalScore = 0;
   let roundScore = 0; // Score voor deze ronde (som van 3 woorden)
+  // eslint-disable-next-line no-unused-vars
   let score = 0; // Score voor huidige woord
   let currentWord = '';
   let wordLetters = [];
@@ -25,28 +26,8 @@
   let hintButton = null;
 
   // Sound functions using Web Audio API
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
 
+  // eslint-disable-next-line no-unused-vars
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
   }
@@ -365,6 +346,7 @@
 
   function completeWord() {
     stopTimer();
+    // eslint-disable-next-line no-unused-vars
     const elapsed = (Date.now() - startTime) / 1000;
     const wordScore = calculateLiveScore();
     roundScore += wordScore;

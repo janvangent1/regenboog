@@ -8,12 +8,7 @@
   if (area) area.classList.add('dammen-game');
   const leaderboardEl = document.getElementById('leaderboard');
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
+
 
   const SIZE = 10;
   const P1 = 1;
@@ -35,6 +30,7 @@
   let myName = '';
   let mySide = null;         // P1 of P2 in multiplayer
   let opponentName = '';
+  // eslint-disable-next-line no-unused-vars
   let roomId = null;
   let chatMessages = [];
   let lobbyList = [];

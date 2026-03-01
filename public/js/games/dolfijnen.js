@@ -25,12 +25,15 @@
   const DOLPHIN_WIDTH = 80;
   const DOLPHIN_HEIGHT = 60;
   const DOLPHIN_X = 50;
+  // eslint-disable-next-line no-unused-vars
   const OBSTACLE_WIDTH_BASE = 40;
+  // eslint-disable-next-line no-unused-vars
   const OBSTACLE_HEIGHT_BASE = 40;
   const HOOP_WIDTH = 60;
   const HOOP_HEIGHT = 80;
   const FISH_WIDTH = 30;
   const FISH_HEIGHT = 30;
+  // eslint-disable-next-line no-unused-vars
   const SPEED_BASE = 3;
   const SPEEDS = [3, 5, 7]; // Sneller per ronde - meer verschil tussen rondes
   const OBSTACLE_SIZES = [
@@ -49,27 +52,6 @@
   }
   
   // Sound functions using Web Audio API
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
   
   function playHoopSound() {
     playSound(800, 0.2, 'sine');
@@ -181,6 +163,7 @@
   
   function spawnObjects() {
     const now = Date.now();
+    // eslint-disable-next-line no-unused-vars
     const speed = SPEEDS[currentRound - 1] || SPEEDS[0];
     // Moeilijker per ronde: sneller spawnen (minder tijd tussen spawns)
     const spawnIntervals = [1800, 1200, 800]; // Sneller spawnen per ronde
@@ -204,6 +187,7 @@
       } else {
         hoopChance = 0.25;
         fishChance = 0.2;
+        // eslint-disable-next-line no-unused-vars
         obstacleChance = 0.55; // Nog meer obstakels
       }
       

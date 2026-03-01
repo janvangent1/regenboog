@@ -16,27 +16,6 @@
   let currentRound = 1;
   let totalMoves = 0;
 
-  function playSound(frequency, duration, type, volume) {
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      const ctx = new Ctx();
-      function run() {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = type || 'sine';
-        osc.frequency.value = frequency;
-        gain.gain.setValueAtTime(volume || 0.045, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
-      else run();
-    } catch (e) {}
-  }
 
   function playFlipSound() { playSound(420, 0.05, 'triangle', 0.035); }
   function playMatchSound() { playSound(680, 0.12, 'sine', 0.055); }

@@ -11,12 +11,6 @@
   const P2 = 2;
   const AI_DEPTHS = { easy: 1, normal: 2, hard: 3 };
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
 
   let board = [];
   let currentPlayer = P1;
@@ -33,6 +27,7 @@
   let myName = '';
   let mySide = null;
   let opponentName = '';
+  // eslint-disable-next-line no-unused-vars
   let roomId = null;
   let chatMessages = [];
   let lobbyList = [];
@@ -275,6 +270,7 @@
     return null;
   }
 
+  // eslint-disable-next-line no-unused-vars
   function moveMatches(a, b) {
     return a.fromR === b.fromR && a.fromC === b.fromC && a.toR === b.toR && a.toC === b.toC;
   }

@@ -22,25 +22,6 @@
   let answered = false;
   let lastPatternLabel = null; // voorkomt hetzelfde patroon twee keer na elkaar
 
-  function playSound(frequency, duration, type) {
-    try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      function play() {
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = frequency;
-        osc.type = type || 'sine';
-        gain.gain.setValueAtTime(0.25, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(play).catch(function () {});
-      else play();
-    } catch (e) {}
-  }
 
   function playCorrectSound() { playSound(620, 0.2, 'sine'); }
   function playWrongSound() { playSound(220, 0.25, 'sawtooth'); }

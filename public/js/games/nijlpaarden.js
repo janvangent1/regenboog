@@ -10,27 +10,6 @@
   let mistakes = 0;
   let timerInterval = null;
 
-  function playSound(frequency, duration, type, volume) {
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      const ctx = new Ctx();
-      function run() {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = type || 'sine';
-        osc.frequency.value = frequency;
-        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
-      else run();
-    } catch (e) {}
-  }
 
   function playCorrectSound() { playSound(660, 0.12, 'sine', 0.055); }
   function playWrongSound() { playSound(210, 0.16, 'sawtooth', 0.065); }
@@ -52,6 +31,7 @@
     return Math.max(10, Math.floor(baseScore - elapsed * 5 - mistakes * 20));
   }
 
+  // eslint-disable-next-line no-unused-vars
   function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);

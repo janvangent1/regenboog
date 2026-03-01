@@ -62,21 +62,7 @@
     }
   }
 
-  function playSound(freq, duration, type) {
-    try {
-      const audio = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audio.createOscillator();
-      const gain = audio.createGain();
-      osc.connect(gain);
-      gain.connect(audio.destination);
-      osc.frequency.value = freq;
-      osc.type = type || 'sine';
-      gain.gain.setValueAtTime(0.22, audio.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + duration);
-      osc.start(audio.currentTime);
-      osc.stop(audio.currentTime + duration);
-    } catch (e) {}
-  }
+
 
   function playShootSound() { playSound(470, 0.08, 'square'); }
   function playHitSound() { playSound(210, 0.2, 'sawtooth'); }

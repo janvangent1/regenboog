@@ -114,31 +114,7 @@
     }
   }
 
-  function playSound(freq, duration, type) {
-    try {
-      const ctxAudio = getAudioContext();
-      if (!ctxAudio) return;
-      const startTone = function () {
-        const osc = ctxAudio.createOscillator();
-        const gain = ctxAudio.createGain();
-        osc.connect(gain);
-        gain.connect(ctxAudio.destination);
-        osc.frequency.value = freq;
-        osc.type = type || 'sine';
-        gain.gain.setValueAtTime(0.2, ctxAudio.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctxAudio.currentTime + duration);
-        osc.start(ctxAudio.currentTime);
-        osc.stop(ctxAudio.currentTime + duration);
-      };
-      if (ctxAudio.state === 'suspended') {
-        ctxAudio.resume().then(startTone).catch(function () {});
-      } else {
-        startTone();
-      }
-    } catch (e) {
-      // Geluid mag het spel nooit breken.
-    }
-  }
+
 
   function getAudioContext() {
     if (!audioCtx) {
@@ -206,6 +182,7 @@
   function playRoundWinSound() { playSound(720, 0.12, 'sine'); setTimeout(function () { playSound(890, 0.15, 'sine'); }, 120); }
   function playLoseSound() { playSound(140, 0.4, 'triangle'); }
 
+  // eslint-disable-next-line no-unused-vars
   function dirEquals(a, b) {
     return DIRS[a].r === DIRS[b].r && DIRS[a].c === DIRS[b].c;
   }

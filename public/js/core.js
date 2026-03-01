@@ -658,3 +658,50 @@ window.RegenboogCore.initAutoNextObserver();
 
 // Uniformeer intro-schermen met startknop.
 window.RegenboogCore.initIntroNormalizer();
+
+// ---------------------------------------------------------------------------
+// Globale hulpfuncties — beschikbaar in alle spellen
+// ---------------------------------------------------------------------------
+
+/**
+ * Bescherm tegen XSS door speciale HTML-tekens te escapen.
+ * @param {*} s
+ * @returns {string}
+ */
+// eslint-disable-next-line no-unused-vars
+function escapeHtml(s) {
+  if (s == null) return '';
+  var div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+/**
+ * Speel een toon via de Web Audio API.
+ * @param {number} frequency - Frequentie in Hz
+ * @param {number} duration  - Duur in seconden
+ * @param {string} [type]    - Oscillatortype ('sine', 'square', 'sawtooth', 'triangle')
+ * @param {number} [volume]  - Volume 0–1 (standaard 0.3)
+ */
+// eslint-disable-next-line no-unused-vars
+function playSound(frequency, duration, type, volume) {
+  try {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    var ctx = new Ctx();
+    function run() {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = type || 'sine';
+      osc.frequency.value = frequency;
+      gain.gain.setValueAtTime(volume || 0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + duration);
+    }
+    if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
+    else run();
+  } catch (e) {}
+}

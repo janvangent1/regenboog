@@ -39,6 +39,9 @@ desktop.ini
 deploy/deploy_config.json
 deploy/setup_config.json
 
+# Environment variables (contains secrets)
+.env
+
 # Logs
 *.log
 regenboog.log

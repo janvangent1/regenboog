@@ -11,27 +11,7 @@
   let timerId;
   let running = false;
 
-  function playSound(frequency, duration, type, volume) {
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!Ctx) return;
-      const ctx = new Ctx();
-      function run() {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = type || 'sine';
-        osc.frequency.value = frequency;
-        gain.gain.setValueAtTime(volume || 0.05, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(run).catch(function () {});
-      else run();
-    } catch (e) {}
-  }
+
 
   function playCollectSound() { playSound(740, 0.08, 'triangle', 0.06); }
   function playRoundDoneSound() { playSound(560, 0.14, 'sine', 0.06); }

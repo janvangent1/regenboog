@@ -7,6 +7,7 @@
   let gridCols = 5;
   let currentRound = 1;
   let totalScore = 0;
+  // eslint-disable-next-line no-unused-vars
   let targetPath = [];
   let playerPath = [];
   let prey = { r: 0, c: 0 };
@@ -46,25 +47,6 @@
     return path.map(function (d) { return dirToArrow[d] || d; }).join(' ');
   }
 
-  function playSound(frequency, duration, type) {
-    try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      function play() {
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = frequency;
-        osc.type = type || 'sine';
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(play).catch(function () {});
-      else play();
-    } catch (e) {}
-  }
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
   }
@@ -405,6 +387,7 @@
       lionEl.style.transform = 'translate(-50%, -50%)';
     }
 
+    // eslint-disable-next-line no-unused-vars
     var seqEl = document.getElementById('leeuwen-sequence');
     var btnWrap = document.getElementById('leeuwen-buttons');
 

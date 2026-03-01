@@ -14,25 +14,7 @@
 
   var dragonImg = '<img src="/assets/images/classes/draken.png" alt="Draak" class="draken-dragon-sprite">';
 
-  function playSound(frequency, duration, type) {
-    try {
-      var ctx = new (window.AudioContext || window.webkitAudioContext)();
-      function play() {
-        var osc = ctx.createOscillator();
-        var gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.frequency.value = frequency;
-        osc.type = type || 'sine';
-        gain.gain.setValueAtTime(0.3, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-        osc.start(ctx.currentTime);
-        osc.stop(ctx.currentTime + duration);
-      }
-      if (ctx.state === 'suspended') ctx.resume().then(play).catch(function () {});
-      else play();
-    } catch (e) {}
-  }
+
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
   }

@@ -5,6 +5,7 @@
 const SIZE = 8;
 const P1 = 1;
 const P2 = 2;
+// eslint-disable-next-line no-unused-vars
 const PIECES = { K: 'K', Q: 'Q', R: 'R', B: 'B', N: 'N', P: 'P' };
 
 function initBoard() {
@@ -38,6 +39,7 @@ function getKingPos(board, color) {
 
 function attacked(board, r, c, byColor) {
   const pieceAt = (rr, cc) => (rr >= 0 && rr < SIZE && cc >= 0 && cc < SIZE ? board[rr][cc] : null);
+  // eslint-disable-next-line no-unused-vars
   const isEnemy = (p) => p && p.color === byColor;
   const dirs = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
   for (const [dr, dc] of dirs) {

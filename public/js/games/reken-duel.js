@@ -4,9 +4,11 @@
  * Multiplayer: eerste met juiste antwoord krijgt punt, eerste tot 5 punten wint.
  */
 (function () {
+  // eslint-disable-next-line no-unused-vars
   const CLASS_ID = 'reken-duel';
   const area = document.getElementById('game-area');
   if (area) area.classList.add('reken-duel-game');
+  // eslint-disable-next-line no-unused-vars
   const leaderboardEl = document.getElementById('leaderboard');
   const P1 = 1;
   const P2 = 2;
@@ -18,12 +20,6 @@
     hard: { operations: ['+', '-', '*', '/'], minNum: 10, maxNum: 100, multMin: 2, multMax: 12, maxResult: 100, description: 'Alle bewerkingen (resultaat < 100)' },
   };
 
-  function escapeHtml(s) {
-    if (s == null) return '';
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
 
   function generateQuestion(difficulty) {
     const config = DIFFICULTY_CONFIG[difficulty] || DIFFICULTY_CONFIG.normal;
@@ -210,31 +206,6 @@
     }
   }
 
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = getAudioContext();
-      if (!audioContext) return;
-      
-      // Zorg dat context running is
-      if (audioContext.state === 'suspended') {
-        audioContext.resume();
-      }
-      
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      oscillator.type = type;
-      oscillator.frequency.value = frequency;
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-      console.log('Audio error:', e);
-    }
-  }
 
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
@@ -282,11 +253,13 @@
   let myName = '';
   let mySide = null;
   let opponentName = '';
+  // eslint-disable-next-line no-unused-vars
   let roomId = null;
   let chatMessages = [];
   let lobbyList = [];
   let pendingInviteFrom = null;
 
+  // eslint-disable-next-line no-unused-vars
   function initBoard() {
     return {
       player1Score: 0,

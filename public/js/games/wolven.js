@@ -10,6 +10,7 @@
   let direction = { x: 1, y: 0 }; // Start richting: rechts
   let nextDirection = { x: 1, y: 0 };
   let prey = null;
+  // eslint-disable-next-line no-unused-vars
   let score = 0;
   let currentRound = 0;
   let totalScore = 0;
@@ -19,10 +20,12 @@
   let timerInterval = null;
   let gameSpeed = 150; // Milliseconden tussen bewegingen
   let lastMoveTime = 0;
+  // eslint-disable-next-line no-unused-vars
   let roundEndTime = 0;
   
   // Game constants
   const GRID_SIZE = 20; // Aantal cellen per rij/kolom
+  // eslint-disable-next-line no-unused-vars
   const CELL_SIZE = 30; // Pixels per cel
   const PREY_TYPES = [
     { name: 'hog', emoji: '🐗', points: 10, color: '#8B4513' },
@@ -37,27 +40,7 @@
   // Wolf head icon wordt nu gebruikt (emoji 🐺)
   
   // Sound functions using Web Audio API
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
+
   
   function playEatSound() {
     playSound(600, 0.2, 'sine');
@@ -67,6 +50,7 @@
     playSound(200, 0.3, 'sawtooth');
   }
   
+  // eslint-disable-next-line no-unused-vars
   function playMoveSound() {
     playSound(400, 0.05, 'sine');
   }
@@ -198,6 +182,7 @@
     }
     
     // Recalculate cell size based on actual canvas size
+    // eslint-disable-next-line no-unused-vars
     const actualCellSize = Math.floor(canvasSize / GRID_SIZE);
     
     // Spawn eerste prooi

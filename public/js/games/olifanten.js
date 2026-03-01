@@ -30,21 +30,7 @@
   let startCell = null;
   let endCell = null;
 
-  function playSound(freq, duration, type) {
-    try {
-      const a = new (window.AudioContext || window.webkitAudioContext)();
-      const o = a.createOscillator();
-      const g = a.createGain();
-      o.connect(g);
-      g.connect(a.destination);
-      o.frequency.value = freq;
-      o.type = type || 'sine';
-      g.gain.setValueAtTime(0.28, a.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, a.currentTime + duration);
-      o.start(a.currentTime);
-      o.stop(a.currentTime + duration);
-    } catch (e) {}
-  }
+
 
   function playCorrectSound() {
     playSound(650, 0.09, 'sine');

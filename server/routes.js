@@ -57,11 +57,10 @@ function registerRoutes(app) {
     if (!visitor_id || !page) {
       return res.status(400).json({ error: 'visitor_id en page zijn verplicht' });
     }
-    const ipAddress = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for']?.split(',')[0];
     if (process.env.LOG_ANALYTICS) {
-      console.log('[track-visit]', page, ipAddress || '(no ip)');
+      console.log('[track-visit]', page);
     }
-    trackVisit(visitor_id, page, user_agent, referrer, ipAddress)
+    trackVisit(visitor_id, page, user_agent, referrer)
       .then((result) => res.json(result))
       .catch((err) => {
         console.error('Error tracking visit:', err);
@@ -127,7 +126,7 @@ function registerRoutes(app) {
   });
 
   // Admin routes - password protected
-  const ADMIN_PASSWORD = 'jeroom';
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'changeme';
   
   function checkAdminPassword(req, res, next) {
     const provided = req.headers['x-admin-password'] || req.body.password || req.query.password;

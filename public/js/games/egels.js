@@ -7,6 +7,7 @@
   let canvas, ctx;
   let hedgehogX = 0;
   let hedgehogY = 0;
+  // eslint-disable-next-line no-unused-vars
   let score = 0;
   let currentRound = 0;
   let totalScore = 0;
@@ -15,6 +16,7 @@
   let vehicles = [];
   let lastSpawnTime = 0;
   let startTime = 0;
+  // eslint-disable-next-line no-unused-vars
   let roundDuration = 0; // Geen timer, spel eindigt wanneer egel oversteekt
   let hedgehogImage = null;
   let lanes = [];
@@ -54,27 +56,7 @@
   }
   
   // Sound functions using Web Audio API
-  function playSound(frequency, duration, type = 'sine') {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    } catch (e) {
-      // Silently fail if audio not supported
-    }
-  }
+
   
   function playCorrectSound() {
     playSound(600, 0.2, 'sine');
