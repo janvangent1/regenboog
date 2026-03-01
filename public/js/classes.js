@@ -21,7 +21,7 @@ window.REGENBOOG_CLASSES = [
   { id: 'wolven', name: 'Wolven', grade: '3e-leerjaar', game: 'Roedel jacht' },
   { id: 'koalas', name: "Koala's", grade: '4e-leerjaar', game: 'Koala pong duel' },
   { id: 'olifanten', name: 'Olifanten', grade: '4e-leerjaar', game: 'Waterpoel route geheugen' },
-  { id: 'giraffen', name: 'Giraffen', grade: '5e-leerjaar', game: 'Giraffe naar het blad' },
+  { id: 'giraffen', name: 'Giraffen', grade: '5e-leerjaar', game: 'Vallende dieren' },
   { id: 'zebras', name: "Zebra's", grade: '5e-leerjaar', game: 'Getallenpatronen' },
   { id: 'pandas', name: "Panda's", grade: '6e-leerjaar', game: 'Panda space verdediging' },
   { id: 'zwaluwen', name: 'Zwaluwen', grade: '6e-leerjaar', game: 'Luchtdoolhof' },

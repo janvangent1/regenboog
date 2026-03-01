@@ -194,6 +194,13 @@ function attachGameNamespace(ioOrNamespace, game) {
       lastMoveTime.delete(socket.id);
 
       if (socketToRoom.has(socket.id)) {
+        // Notify opponent immediately so they know something happened
+        const roomId = socketToRoom.get(socket.id);
+        const room = rooms.get(roomId);
+        if (room) {
+          const other = room.player1.id === socket.id ? room.player2 : room.player1;
+          io.to(other.id).emit('opponentDisconnected');
+        }
         // Start grace period before kicking the opponent
         const timer = setTimeout(() => {
           disconnectTimers.delete(socket.id);
@@ -501,6 +508,12 @@ function attachZeeslagNamespace(ioOrNamespace) {
       lastMoveTime.delete(socket.id);
 
       if (socketToRoom.has(socket.id)) {
+        const roomId = socketToRoom.get(socket.id);
+        const room = rooms.get(roomId);
+        if (room) {
+          const other = room.player1.id === socket.id ? room.player2 : room.player1;
+          io.to(other.id).emit('opponentDisconnected');
+        }
         const timer = setTimeout(() => {
           disconnectTimers.delete(socket.id);
           leaveRoom(socket.id);
@@ -768,6 +781,12 @@ function attachRekenDuelNamespace(ioOrNamespace) {
       pendingInvites.delete(socket.id);
 
       if (socketToRoom.has(socket.id)) {
+        const roomId = socketToRoom.get(socket.id);
+        const room = rooms.get(roomId);
+        if (room) {
+          const other = room.player1.id === socket.id ? room.player2 : room.player1;
+          io.to(other.id).emit('opponentDisconnected');
+        }
         const timer = setTimeout(() => {
           disconnectTimers.delete(socket.id);
           leaveRoom(socket.id);

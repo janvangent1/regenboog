@@ -43,6 +43,7 @@
     socket.off('gameState');
     socket.off('chat');
     socket.off('opponentLeft');
+    socket.off('opponentDisconnected');
     socket.off('youLeftRoom');
     socket.off('inviteFailed');
     socket.off('inviteDeclined');
@@ -72,7 +73,16 @@
       render();
     });
     socket.on('chat', function (msg) { chatMessages.push(msg); render(); });
+    socket.on('opponentDisconnected', function () {
+      var b = document.createElement('div');
+      b.id = 'disconnect-banner';
+      b.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#f59e0b;color:#fff;text-align:center;padding:0.6rem 1rem;font-weight:600;z-index:9999;';
+      b.textContent = 'Verbinding tegenstander verbroken — moment geduld...';
+      if (!document.getElementById('disconnect-banner')) document.body.appendChild(b);
+    });
     socket.on('opponentLeft', function () {
+      var b = document.getElementById('disconnect-banner');
+      if (b) b.remove();
       roomId = null; step = 'mp-lobby'; opponentName = ''; mySide = null; chatMessages = [];
       render();
     });
