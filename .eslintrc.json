@@ -1,0 +1,40 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "globals": {
+    "io": "readonly",
+    "escapeHtml": "readonly",
+    "playSound": "readonly",
+    "RegenboogCore": "readonly",
+    "LeaderboardUI": "readonly",
+    "RegenboogAnalytics": "readonly",
+    "AnimalIcons": "readonly"
+  },
+  "rules": {
+    "no-undef": "error",
+    "no-unused-vars": ["warn", { "args": "none", "varsIgnorePattern": "^_" }],
+    "eqeqeq": ["warn", "smart"],
+    "no-console": "off",
+    "no-var": "off",
+    "prefer-const": "off",
+    "semi": ["warn", "always"],
+    "no-extra-semi": "warn",
+    "no-unreachable": "error",
+    "no-duplicate-case": "error",
+    "no-empty": ["warn", { "allowEmptyCatch": true }],
+    "use-isnan": "error",
+    "valid-typeof": "error"
+  },
+  "ignorePatterns": [
+    "node_modules/",
+    "venv/",
+    "deploy/",
+    "scripts/"
+  ]
+}

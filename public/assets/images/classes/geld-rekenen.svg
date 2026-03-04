@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true">
+  <rect width="64" height="64" rx="10" fill="#e65100"/>
+  <!-- Back coin (offset) -->
+  <circle cx="37" cy="37" r="17" fill="#ffa000" stroke="#e65100" stroke-width="1.5"/>
+  <circle cx="37" cy="37" r="13" fill="none" stroke="#ff6f00" stroke-width="1"/>
+  <!-- Front coin -->
+  <circle cx="27" cy="27" r="17" fill="#ffe082" stroke="#f9a825" stroke-width="1.5"/>
+  <circle cx="27" cy="27" r="13" fill="none" stroke="#f57f17" stroke-width="1"/>
+  <!-- Euro symbol on front coin -->
+  <!-- Horizontal bars of € -->
+  <line x1="22" y1="26" x2="30" y2="26" stroke="#e65100" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="22" y1="29" x2="30" y2="29" stroke="#e65100" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Arc of € -->
+  <path d="M 30 21 A 6 6 0 1 0 30 34" fill="none" stroke="#e65100" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

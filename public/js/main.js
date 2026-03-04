@@ -24,7 +24,8 @@
     if (!el) return;
     el.innerHTML = list
       .map(function (c) {
-        var imgSrc = (c.id === 'dammen' || c.id === 'schaken' || c.id === 'vieropeenrij' || c.id === 'zeeslag' || c.id === 'reken-duel')
+        var svgIds = ['dammen', 'schaken', 'vieropeenrij', 'zeeslag', 'reken-duel', 'klokkijken', 'geld-rekenen'];
+        var imgSrc = svgIds.indexOf(c.id) !== -1
           ? '/assets/images/classes/' + c.id + '.svg'
           : '/assets/images/classes/' + c.id + '.png';
         var iconHtml = '<span class="class-card-icon" aria-hidden="true">' +

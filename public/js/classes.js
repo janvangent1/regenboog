@@ -29,5 +29,7 @@ window.REGENBOOG_CLASSES = [
   { id: 'schaken', name: 'Schaken', grade: 'extra-spellen', game: 'Schaken' },
   { id: 'vieropeenrij', name: '4 op een rij', grade: 'extra-spellen', game: '4 op een rij' },
   { id: 'zeeslag', name: 'Zeeslag', grade: 'extra-spellen', game: 'Zeeslag' },
-  { id: 'reken-duel', name: 'Reken-duel', grade: 'extra-spellen', game: 'Reken-duel' },
+  { id: 'reken-duel',   name: 'Reken-duel',   grade: 'extra-spellen', game: 'Reken-duel' },
+  { id: 'klokkijken',   name: 'Klokkijken',   grade: 'extra-spellen', game: 'Klokkijken' },
+  { id: 'geld-rekenen', name: 'Geld rekenen', grade: 'extra-spellen', game: 'Geld rekenen' },
 ];
