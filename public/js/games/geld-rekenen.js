@@ -163,21 +163,43 @@
       '</button>';
   }
 
+  /* ── Small coin image for the basket (non-interactive) ─────── */
+  function basketCoinHtml(coin) {
+    var cfg = COIN_IMG[coin.cents];
+    if (!cfg) return '';
+    if (cfg.note) {
+      return '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px;">' +
+        '<img src="' + cfg.img + '" alt="' + escapeHtml(cfg.label) + '" width="90" ' +
+        'style="display:block;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.35);">' +
+        '</span>';
+    }
+    var sz = Math.round(cfg.size * 0.72);
+    return '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px;">' +
+      '<img src="' + cfg.img + '" alt="' + escapeHtml(coin.label) + '" ' +
+      'width="' + sz + '" height="' + sz + '" ' +
+      'style="border-radius:50%;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.35));">' +
+      '</span>';
+  }
+
   /* ── Question type A: betaal exact ───────────────────────── */
   function showBetaalQuestion(priceCents, item) {
     selectedCents = 0;
+    var selectedCoins = [];
     var coins = coinsForRound(currentRound).filter(function (c) { return c.cents <= priceCents; });
 
     area.innerHTML = renderHUD() +
       '<div style="text-align:center;padding:8px 12px">' +
       '<p style="font-size:1.1em;margin:6px 0">Vraag ' + (questionIndex + 1) + ' van ' + QUESTIONS_PER_ROUND + '</p>' +
       '<p style="font-size:1.3em;margin:8px 0">Een <strong>' + escapeHtml(item) + '</strong> kost <strong>' + formatCents(priceCents) + '</strong>.</p>' +
-      '<p style="margin:4px 0 10px">Geef het juiste bedrag!</p>' +
-      '<div id="gr-total" style="font-size:1.4em;font-weight:bold;margin:10px 0;color:#1565c0">Jouw bedrag: 0 cent</div>' +
-      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:10px 0">' +
+      '<p style="margin:4px 0 6px">Geef het juiste bedrag!</p>' +
+      '<div style="border:2px solid #ddd;border-radius:10px;min-height:56px;padding:6px 8px;margin:8px 0;background:#fafafa;">' +
+        '<div style="font-size:0.8em;color:#888;margin-bottom:4px;">Jouw keuze:</div>' +
+        '<div id="gr-basket" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;min-height:36px;"></div>' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:8px 0">' +
         coins.map(coinHtml).join('') +
       '</div>' +
-      '<div style="margin-top:10px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
+      '<div style="margin-top:8px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">' +
         '<button class="game-btn" id="gr-reset">Wis alles</button>' +
         '<button class="game-btn" id="gr-pay" style="font-size:1.1em;padding:10px 24px">Betalen!</button>' +
       '</div>' +
@@ -186,25 +208,25 @@
     refreshHUD();
     startTimer();
 
-    function updateTotal() {
-      var el = document.getElementById('gr-total');
-      if (!el) return;
-      var exact = selectedCents === priceCents;
-      var over = selectedCents > priceCents;
-      el.textContent = 'Jouw bedrag: ' + formatCents(selectedCents);
-      el.style.color = exact ? '#2e7d32' : (over ? '#c62828' : '#1565c0');
+    function updateBasket() {
+      selectedCents = selectedCoins.reduce(function (s, c) { return s + c.cents; }, 0);
+      var basket = document.getElementById('gr-basket');
+      if (!basket) return;
+      basket.innerHTML = selectedCoins.length ? selectedCoins.map(basketCoinHtml).join('') : '';
     }
 
     area.querySelectorAll('.gr-coin').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        selectedCents += parseInt(btn.getAttribute('data-cents'), 10);
-        updateTotal();
+        var cents = parseInt(btn.getAttribute('data-cents'), 10);
+        var coin = ALL_COINS.filter(function (c) { return c.cents === cents; })[0];
+        if (coin) selectedCoins.push(coin);
+        updateBasket();
       });
     });
 
     document.getElementById('gr-reset').addEventListener('click', function () {
-      selectedCents = 0;
-      updateTotal();
+      selectedCoins = [];
+      updateBasket();
     });
 
     document.getElementById('gr-pay').addEventListener('click', function () {
@@ -214,15 +236,15 @@
         totalScore += calcPts();
         window.RegenboogCore.updateHUDScore(CLASS_ID, totalScore);
         area.querySelectorAll('.gr-coin, #gr-reset, #gr-pay').forEach(function (b) { b.disabled = true; });
-        var totalEl = document.getElementById('gr-total');
-        if (totalEl) { totalEl.textContent = 'Juist!'; totalEl.style.color = '#2e7d32'; }
+        var basket = document.getElementById('gr-basket');
+        if (basket) { basket.style.outline = '3px solid #4caf50'; basket.style.borderRadius = '6px'; }
         setTimeout(nextQuestion, 1000);
       } else {
         totalScore = Math.max(0, totalScore - PTS_WRONG);
         window.RegenboogCore.updateHUDScore(CLASS_ID, totalScore);
         playSound(200, 0.2, 'sawtooth');
-        selectedCents = 0;
-        updateTotal();
+        selectedCoins = [];
+        updateBasket();
         var payBtn = document.getElementById('gr-pay');
         if (payBtn) {
           payBtn.textContent = 'Probeer opnieuw';
@@ -230,6 +252,40 @@
         }
       }
     });
+  }
+
+  /* ── Greedy coin breakdown ────────────────────────────────── */
+  function makeChange(cents) {
+    var result = [];
+    var sorted = ALL_COINS.slice().sort(function (a, b) { return b.cents - a.cents; });
+    var remaining = cents;
+    for (var i = 0; i < sorted.length; i++) {
+      while (remaining >= sorted[i].cents) {
+        result.push(sorted[i]);
+        remaining -= sorted[i].cents;
+      }
+    }
+    return result;
+  }
+
+  /* ── Coin image + label for wisselgeld options ────────────── */
+  function optionCoinImg(coin) {
+    var cfg = COIN_IMG[coin.cents];
+    if (!cfg) return '';
+    if (cfg.note) {
+      return '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px;gap:1px;">' +
+        '<img src="' + cfg.img + '" alt="' + escapeHtml(cfg.label) + '" width="80" ' +
+        'style="display:block;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.3);">' +
+        '<span style="font-size:0.65em;font-weight:bold;color:#555;">' + escapeHtml(cfg.label) + '</span>' +
+        '</span>';
+    }
+    var sz = Math.round(cfg.size * 0.68);
+    return '<span style="display:inline-flex;flex-direction:column;align-items:center;margin:2px;gap:1px;">' +
+      '<img src="' + cfg.img + '" alt="' + escapeHtml(coin.label) + '" ' +
+      'width="' + sz + '" height="' + sz + '" ' +
+      'style="border-radius:50%;display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));">' +
+      '<span style="font-size:0.65em;font-weight:bold;color:#555;">' + escapeHtml(coin.label) + '</span>' +
+      '</span>';
   }
 
   /* ── Question type B: wisselgeld ─────────────────────────── */
@@ -256,9 +312,22 @@
 
     var options = shuffle([correctChange].concat(wrongs));
 
-    var buttonsHtml = options.map(function (opt) {
-      return '<button class="gr-option game-btn" data-cents="' + opt + '">' + formatCents(opt) + '</button>';
-    }).join('');
+    function wisselOptHtml(opt) {
+      var coins = makeChange(opt);
+      var coinsHtml = coins.map(optionCoinImg).join('');
+      if (!coinsHtml) coinsHtml = '<span style="font-size:0.9em;">' + formatCents(opt) + '</span>';
+      return '<button class="gr-option" data-cents="' + opt + '" style="' +
+        'background:#fff;border:2px solid #ccc;border-radius:10px;' +
+        'padding:8px 10px;cursor:pointer;' +
+        'display:inline-flex;flex-direction:column;align-items:center;gap:4px;' +
+        'box-shadow:0 2px 5px rgba(0,0,0,0.1);">' +
+        '<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:2px;">' +
+        coinsHtml +
+        '</div>' +
+        '</button>';
+    }
+
+    var buttonsHtml = options.map(wisselOptHtml).join('');
 
     area.innerHTML = renderHUD() +
       '<div style="text-align:center;padding:8px 12px">' +
@@ -266,7 +335,7 @@
       '<p style="font-size:1.15em;margin:8px 0">Je koopt een <strong>' + escapeHtml(item) + '</strong> voor <strong>' + formatCents(priceCents) + '</strong>.</p>' +
       '<p style="font-size:1.15em;margin:6px 0">Je betaalt met <strong>' + formatCents(betaald) + '</strong>.</p>' +
       '<p style="font-size:1.2em;margin:12px 0 16px"><strong>Hoeveel wisselgeld krijg je?</strong></p>' +
-      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px">' + buttonsHtml + '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:12px">' + buttonsHtml + '</div>' +
       '</div>';
 
     refreshHUD();
@@ -277,16 +346,16 @@
         var val = parseInt(btn.getAttribute('data-cents'), 10);
         if (val === correctChange) {
           stopTimer();
-          btn.style.background = '#4caf50';
-          btn.style.color = '#fff';
+          btn.style.background = '#e8f5e9';
+          btn.style.borderColor = '#4caf50';
           playSound(660, 0.15, 'sine');
           totalScore += calcPts();
           window.RegenboogCore.updateHUDScore(CLASS_ID, totalScore);
           area.querySelectorAll('.gr-option').forEach(function (b) { b.disabled = true; });
           setTimeout(nextQuestion, 900);
         } else {
-          btn.style.background = '#e53935';
-          btn.style.color = '#fff';
+          btn.style.background = '#ffebee';
+          btn.style.borderColor = '#e53935';
           btn.disabled = true;
           totalScore = Math.max(0, totalScore - PTS_WRONG);
           window.RegenboogCore.updateHUDScore(CLASS_ID, totalScore);
