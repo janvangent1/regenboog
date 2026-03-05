@@ -71,7 +71,7 @@ window.Leaderboard = {
       // Gebruik dierennamen uit classes.js
       const uniqueClasses = new Map();
       window.REGENBOOG_CLASSES.forEach(cls => {
-        if (cls.name && !uniqueClasses.has(cls.name)) {
+        if (cls.name && cls.grade !== 'extra-spellen' && !uniqueClasses.has(cls.name)) {
           uniqueClasses.set(cls.name, cls.name);
         }
       });
